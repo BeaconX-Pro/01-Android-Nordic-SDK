@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WheelView">
+        <attr name="unitHeight" format="dimension" />
+        <attr name="itemNumber" format="integer" />
+
+        <attr name="normalTextColor" format="color" />
+        <attr name="normalTextSize" format="dimension" />
+        <attr name="selectedTextColor" format="color" />
+        <attr name="selectedTextSize" format="dimension" />
+        <attr name="selectedBgColor" format="color" />
+
+        <attr name="lineColor" format="color" />
+        <attr name="lineHeight" format="dimension" />
+
+        <attr name="maskHeight" format="dimension" />
+        <attr name="noEmpty" format="boolean" />
+        <attr name="isEnable" format="boolean" />
+    </declare-styleable>
+    <!-- xy坐标轴颜色 -->
+    <attr name="xylinecolor" format="color" />
+    <!-- xy坐标轴宽度 -->
+    <attr name="xylinewidth" format="dimension" />
+    <!-- xy坐标轴文字颜色 -->
+    <attr name="xytextcolor" format="color" />
+    <!-- xy坐标轴文字大小 -->
+    <attr name="xytextsize" format="dimension" />
+    <!-- 折线图中折线的颜色 -->
+    <attr name="linecolor" format="color" />
+    <!-- y轴坐标文字描述 -->
+    <attr name="ylineDesc" format="string" />
+    <!-- x轴各个坐标点水平间距 -->
+    <!--<attr name="interval" format="dimension" />-->
+    <!-- 背景颜色 -->
+    <!--<attr name="bgcolor" format="color" />-->
+    <!--是否在ACTION_UP时，根据速度进行自滑动，建议关闭，过于占用GPU-->
+    <!--<attr name="isScroll" format="boolean" />-->
+    <declare-styleable name="chartView">
+        <attr name="xylinecolor" />
+        <attr name="xylinewidth" />
+        <attr name="xytextcolor" />
+        <attr name="xytextsize" />
+        <attr name="linecolor" />
+        <attr name="ylineDesc" />
+        <!--<attr name="interval" />
+        <attr name="bgcolor" />
+        <attr name="isScroll" />-->
+    </declare-styleable>
+</resources>
