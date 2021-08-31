@@ -35,75 +35,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="RSSI@1m"
-            android:textColor="@color/grey_999999"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/tv_rssi_1m"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="170dp"
-            android:text="0dBm"
-            android:textColor="@color/grey_666666"
-            android:textSize="12sp" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:text="Tx Power"
-            android:textColor="@color/grey_999999"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/tv_tx_power"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="170dp"
-            android:text=""
-            android:textColor="@color/grey_666666"
-            android:textSize="12sp" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:text="Proximity State"
-            android:textColor="@color/grey_999999"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/tv_proximity_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="170dp"
-            android:text=""
-            android:textColor="@color/grey_666666"
-            android:textSize="12sp" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
             android:text="UUID"
             android:textColor="@color/grey_999999"
             android:textSize="12sp" />
@@ -156,6 +87,75 @@
 
         <TextView
             android:id="@+id/tv_minor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="170dp"
+            android:text=""
+            android:textColor="@color/grey_666666"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="RSSI@1m"
+            android:textColor="@color/grey_999999"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_rssi_1m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="170dp"
+            android:text="0dBm"
+            android:textColor="@color/grey_666666"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="Proximity state"
+            android:textColor="@color/grey_999999"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_proximity_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="170dp"
+            android:text=""
+            android:textColor="@color/grey_666666"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="Tx power"
+            android:textColor="@color/grey_999999"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_tx_power"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="170dp"

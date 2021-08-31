@@ -7,9 +7,9 @@ public enum SlotFrameTypeEnum implements Serializable {
     UID("UID", "00"),
     URL("URL", "10"),
     IBEACON("iBeacon", "50"),
-    DEVICE("Device Info", "40"),
-    NO_DATA("NO DATA", "FF"),
-    AXIS("Accel", "60"),
+    DEVICE("Device info", "40"),
+    NO_DATA("No data", "FF"),
+    AXIS("3-axis Acc", "60"),
     TH("T&H", "70"),
     ;
     private String frameType;
@@ -38,9 +38,9 @@ public enum SlotFrameTypeEnum implements Serializable {
         return null;
     }
 
-    public static SlotFrameTypeEnum fromEnumOrdinal(int ordinal) {
+    public static SlotFrameTypeEnum fromShowName(String showName) {
         for (SlotFrameTypeEnum frameTypeEnum : SlotFrameTypeEnum.values()) {
-            if (frameTypeEnum.ordinal() == ordinal) {
+            if (showName.equals(frameTypeEnum.showName)) {
                 return frameTypeEnum;
             }
         }

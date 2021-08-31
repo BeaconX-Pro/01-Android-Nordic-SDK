@@ -12,6 +12,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.activity.SlotDataActivity;
 
 import butterknife.BindView;
@@ -21,17 +22,17 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
 
     private static final String TAG = "HumidityFragment";
 
-    @BindView(R.id.sb_trigger_humidity)
+    @BindView(R2.id.sb_trigger_humidity)
     SeekBar sbTriggerHumidity;
-    @BindView(R.id.tv_trigger_humidiy)
+    @BindView(R2.id.tv_trigger_humidiy)
     TextView tvTriggerHumidiy;
-    @BindView(R.id.rb_start)
+    @BindView(R2.id.rb_start)
     RadioButton rbStart;
-    @BindView(R.id.rb_stop)
+    @BindView(R2.id.rb_stop)
     RadioButton rbStop;
-    @BindView(R.id.rg_advertising)
+    @BindView(R2.id.rg_advertising)
     RadioGroup rgAdvertising;
-    @BindView(R.id.tv_trigger_tips)
+    @BindView(R2.id.tv_trigger_tips)
     TextView tvTriggerTips;
 //    @BindView(R.id.trigger_humidiy)
 //    TextView triggerHumidiy;
@@ -71,7 +72,7 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
         sbTriggerHumidity.setProgress(mProgress);
         String humidityStr = String.format("%d%%", mProgress);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "start to broadcast" : "stop broadcasting", "humidity", mIsAbove ? "above" : "below", humidityStr));
+                mIsStart ? "stop advertising for" : "stop advertising for", "humidity", mIsAbove ? "above" : "below", humidityStr));
 //        triggerHumidiy.setText(mIsAbove ? "Humidity Above" : "Humidity Below");
         return view;
     }
@@ -101,7 +102,7 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
         String humidityStr = String.format("%d%%", progress);
         tvTriggerHumidiy.setText(humidityStr);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "start to broadcast" : "stop broadcasting", "humidity", mIsAbove ? "above" : "below", humidityStr));
+                mIsStart ? "stop advertising for" : "stop advertising for", "humidity", mIsAbove ? "above" : "below", humidityStr));
     }
 
     @Override
@@ -120,17 +121,14 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        switch (checkedId) {
-            case R.id.rb_start:
-                mIsStart = true;
-                break;
-            case R.id.rb_stop:
-                mIsStart = false;
-                break;
+        if (checkedId == R.id.rb_start) {
+            mIsStart = true;
+        } else if (checkedId == R.id.rb_stop) {
+            mIsStart = false;
         }
         String humidityStr = String.format("%d%%", mProgress);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "start to broadcast" : "stop broadcasting", "humidity", mIsAbove ? "above" : "below", humidityStr));
+                mIsStart ? "stop advertising for" : "stop advertising for", "humidity", mIsAbove ? "above" : "below", humidityStr));
     }
 
     public void setStart(boolean isStart) {
@@ -157,7 +155,7 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
         mIsAbove = isAbove;
         String humidityStr = String.format("%d%%", mProgress);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "start to broadcast" : "stop broadcasting", "humidity", mIsAbove ? "above" : "below", humidityStr));
+                mIsStart ? "stop advertising for" : "stop advertising for", "humidity", mIsAbove ? "above" : "below", humidityStr));
     }
 
     public boolean getHumidityType() {

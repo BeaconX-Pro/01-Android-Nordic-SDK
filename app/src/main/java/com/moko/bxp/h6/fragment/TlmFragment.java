@@ -12,6 +12,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.able.ISlotDataAction;
 import com.moko.bxp.h6.activity.SlotDataActivity;
 import com.moko.bxp.h6.utils.ToastUtils;
@@ -32,11 +33,11 @@ public class TlmFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     private static final String TAG = "TlmFragment";
 
 
-    @BindView(R.id.sb_tx_power)
+    @BindView(R2.id.sb_tx_power)
     SeekBar sbTxPower;
-    @BindView(R.id.tv_tx_power)
+    @BindView(R2.id.tv_tx_power)
     TextView tvTxPower;
-    @BindView(R.id.et_adv_interval)
+    @BindView(R2.id.et_adv_interval)
     EditText etAdvInterval;
 
     private SlotDataActivity activity;
@@ -112,13 +113,11 @@ public class TlmFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     }
 
     private void upgdateData(int viewId, int progress) {
-        switch (viewId) {
-            case R.id.sb_tx_power:
-                TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
-                int txPower = txPowerEnum.getTxPower();
-                tvTxPower.setText(String.format("%ddBm", txPower));
-                txPowerBytes = MokoUtils.toByteArray(txPower, 1);
-                break;
+        if (viewId == R.id.sb_tx_power) {
+            TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
+            int txPower = txPowerEnum.getTxPower();
+            tvTxPower.setText(String.format("%ddBm", txPower));
+            txPowerBytes = MokoUtils.toByteArray(txPower, 1);
         }
     }
 
@@ -136,12 +135,12 @@ public class TlmFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     public boolean isValid() {
         String advInterval = etAdvInterval.getText().toString();
         if (TextUtils.isEmpty(advInterval)) {
-            ToastUtils.showToast(activity, "The Adv Interval can not be empty.");
+            ToastUtils.showToast(activity, "The Adv interval can not be empty.");
             return false;
         }
         int advIntervalInt = Integer.parseInt(advInterval);
         if (advIntervalInt < 1 || advIntervalInt > 100) {
-            ToastUtils.showToast(activity, "The Adv Interval range is 1~100");
+            ToastUtils.showToast(activity, "The Adv interval range is 1~100");
             return false;
         }
         advIntervalBytes = MokoUtils.toByteArray(advIntervalInt * 100, 2);

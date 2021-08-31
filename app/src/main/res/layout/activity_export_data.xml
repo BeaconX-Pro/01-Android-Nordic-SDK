@@ -15,9 +15,11 @@
             android:id="@+id/tv_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:clickable="true"
             android:drawableLeft="@drawable/back"
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
+            android:onClick="onBack"
             android:paddingLeft="16dp"
             android:text=""
             android:textColor="@color/white_ffffff"
@@ -46,7 +48,9 @@
             android:id="@+id/ll_sync"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="true"
             android:gravity="center_horizontal"
+            android:onClick="onSync"
             android:orientation="vertical">
 
             <ImageView
@@ -85,7 +89,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:clickable="true"
             android:drawableTop="@drawable/ic_download"
+            android:onClick="onExport"
             android:text="Export"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
@@ -96,8 +102,10 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
             android:layout_toLeftOf="@id/tv_export"
+            android:clickable="true"
             android:drawableTop="@drawable/ic_empty"
-            android:text="Empty"
+            android:onClick="onEmpty"
+            android:text="Erase all"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 

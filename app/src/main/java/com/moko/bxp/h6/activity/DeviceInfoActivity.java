@@ -24,8 +24,10 @@ import android.widget.Toast;
 import com.elvishew.xlog.XLog;
 import com.moko.bxp.h6.AppConstants;
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.dialog.AlertMessageDialog;
 import com.moko.bxp.h6.dialog.LoadingMessageDialog;
+import com.moko.bxp.h6.dialog.ModifyPasswordDialog;
 import com.moko.bxp.h6.entity.ValidParams;
 import com.moko.bxp.h6.fragment.DeviceFragment;
 import com.moko.bxp.h6.fragment.SettingFragment;
@@ -43,6 +45,8 @@ import com.moko.support.h6.MokoSupport;
 import com.moko.support.h6.OrderTaskAssembler;
 import com.moko.support.h6.entity.OrderCHAR;
 import com.moko.support.h6.entity.ParamsKeyEnum;
+import com.moko.support.h6.entity.SlotEnum;
+import com.moko.support.h6.entity.SlotFrameTypeEnum;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -50,6 +54,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import androidx.annotation.IdRes;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -64,17 +69,17 @@ import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
 public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener {
     public static final int REQUEST_CODE_SELECT_FIRMWARE = 0x10;
 
-    @BindView(R.id.frame_container)
+    @BindView(R2.id.frame_container)
     FrameLayout frameContainer;
-    @BindView(R.id.radioBtn_slot)
+    @BindView(R2.id.radioBtn_slot)
     RadioButton radioBtnSlot;
-    @BindView(R.id.radioBtn_setting)
+    @BindView(R2.id.radioBtn_setting)
     RadioButton radioBtnSetting;
-    @BindView(R.id.radioBtn_device)
+    @BindView(R2.id.radioBtn_device)
     RadioButton radioBtnDevice;
-    @BindView(R.id.rg_options)
+    @BindView(R2.id.rg_options)
     RadioGroup rgOptions;
-    @BindView(R.id.tv_title)
+    @BindView(R2.id.tv_title)
     TextView tvTitle;
     private FragmentManager fragmentManager;
     private SlotFragment slotFragment;
@@ -198,7 +203,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                 dialog.show(getSupportFragmentManager());
                             } else if (mDisconnectType == 2) {
                                 AlertMessageDialog dialog = new AlertMessageDialog();
-                                dialog.setMessage("Reset success!\nPlease reconnect the Device.");
+                                dialog.setMessage("Reset success!\nBeacon is disconnected.");
                                 dialog.setCancelGone();
                                 dialog.setConfirm(R.string.ok);
                                 dialog.setOnAlertConfirmListener(() -> {
@@ -240,17 +245,6 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                             slotFragment.updateSlotType(value);
                         }
                         break;
-                    case CHAR_CONNECTABLE:
-                        if (responseType == OrderTask.RESPONSE_TYPE_READ) {
-                            if (value.length >= 1) {
-                                settingFragment.setConnectable(value);
-                                validParams.connectable = MokoUtils.byte2HexString(value[0]);
-                            }
-                        }
-                        if (responseType == OrderTask.RESPONSE_TYPE_WRITE) {
-                            ToastUtils.showToast(DeviceInfoActivity.this, "Success!");
-                        }
-                        break;
                     case CHAR_PARAMS:
                         if (value.length >= 2) {
                             int key = value[1] & 0xff;
@@ -258,6 +252,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                             if (configKeyEnum == null) {
                                 return;
                             }
+                            int length = value[3] & 0xFF;
                             switch (configKeyEnum) {
                                 case GET_DEVICE_MAC:
                                     if (value.length >= 10) {
@@ -269,44 +264,15 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                         validParams.mac = macShow;
                                     }
                                     break;
-                                case GET_CONNECTABLE:
-                                    if (value.length >= 5) {
-                                        settingFragment.setConnectable(value);
-                                        validParams.connectable = MokoUtils.byte2HexString(value[4]);
-                                    }
-                                    break;
-                                case GET_BUTTON_POWER:
-                                    if (value.length >= 5) {
-                                        boolean enable = value[4] == 1;
-                                        settingFragment.setButtonPower(enable);
-                                    }
-                                    break;
-//                                    case GET_IBEACON_UUID:
-//                                        if (value.length >= 20) {
-//                                            slotFragment.setiBeaconUUID(value);
-//                                        }
-//                                        break;
-//                                    case GET_IBEACON_INFO:
-//                                        if (value.length >= 9) {
-//                                            slotFragment.setiBeaconInfo(value);
-//                                        }
-//                                        break;
                                 case SET_CLOSE:
                                     if ("eb260000".equals(MokoUtils.bytesToHexString(value).toLowerCase())) {
                                         ToastUtils.showToast(DeviceInfoActivity.this, "Success!");
-                                        settingFragment.setClose();
                                         back();
                                     }
                                     break;
                                 case GET_TRIGGER_DATA:
                                     if (value.length >= 4) {
                                         slotFragment.setTriggerData(value);
-                                    }
-                                    break;
-                                case GET_HW_RESET_ENABLE:
-                                    if (value.length >= 4) {
-                                        int enable = value[4] & 0xFF;
-                                        settingFragment.setHWResetEnable(enable);
                                     }
                                     break;
 
@@ -366,36 +332,10 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                         }
                         break;
                     case CHAR_LOCK_STATE:
-                        String valueHexStr = MokoUtils.bytesToHexString(value);
-                        if (responseType == OrderTask.RESPONSE_TYPE_WRITE) {
-//                            if ("eb63000100".equals(valueHexStr.toLowerCase())) {
-//                                // 设备上锁
-//                                if (isModifyPassword) {
-//                                    isModifyPassword = false;
-//                                    dismissSyncProgressDialog();
-//                                    AlertMessageDialog dialog = new AlertMessageDialog();
-//                                    dialog.setMessage("Modify password success!\nPlease reconnect the Device.");
-//                                    dialog.setCancelGone();
-//                                    dialog.setOnAlertConfirmListener(new AlertMessageDialog.OnAlertConfirmListener() {
-//                                        @Override
-//                                        public void onClick() {
-//                                            setResult(RESULT_OK);
-//                                            back();
-//                                        }
-//                                    });
-//                                    dialog.show(getSupportFragmentManager());
-//                                }
-//                            }
-                        }
                         if (responseType == OrderTask.RESPONSE_TYPE_READ) {
-                            if ("01".equals(valueHexStr.toLowerCase())) {
-                                lockState = 1;
-                                settingFragment.setPasswordVerify(true);
-                            } else if ("02".equals(valueHexStr.toLowerCase())) {
-                                lockState = 2;
-                                settingFragment.setPasswordVerify(false);
-                            }
-                            settingFragment.setModifyPasswordVisiable(!TextUtils.isEmpty(mPassword));
+                            int enable = MokoUtils.toInt(value);
+                            settingFragment.setModifyPasswordShown(!TextUtils.isEmpty(mPassword));
+                            settingFragment.setResetShown(enable);
                         }
                         break;
                     case CHAR_UNLOCK:
@@ -409,13 +349,6 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                             MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getLockState());
                         }
                         break;
-//                    case CHAR_RESET_DEVICE:
-//                        if (lockState == 2) {
-//                            ToastUtils.showToast(DeviceInfoActivity.this, "Communication Timeout!");
-//                        } else {
-//                            ToastUtils.showToast(DeviceInfoActivity.this, "Reset successfully!\nPlease reconnect the Device.");
-//                        }
-//                        break;
                 }
             }
         });
@@ -431,17 +364,12 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         validParams.reset();
         ArrayList<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.getDeviceMac());
-        orderTasks.add(OrderTaskAssembler.getConnectable());
-        if (MokoSupport.isNewVersion) {
-            orderTasks.add(OrderTaskAssembler.getButtonPower());
-        }
         orderTasks.add(OrderTaskAssembler.getManufacturer());
         orderTasks.add(OrderTaskAssembler.getDeviceModel());
         orderTasks.add(OrderTaskAssembler.getProductDate());
         orderTasks.add(OrderTaskAssembler.getHardwareVersion());
         orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
         orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
-        orderTasks.add(OrderTaskAssembler.getHWResetEnable());
         orderTasks.add(OrderTaskAssembler.getBattery());
         orderTasks.add(OrderTaskAssembler.getLockState());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
@@ -470,11 +398,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                             break;
                         case BluetoothAdapter.STATE_TURNING_ON:
                             showSyncingProgressDialog();
-                            showSyncingProgressDialog();
                             ArrayList<OrderTask> orderTasks = new ArrayList<>();
                             orderTasks.add(OrderTaskAssembler.getSlotType());
                             orderTasks.add(OrderTaskAssembler.getDeviceMac());
-                            orderTasks.add(OrderTaskAssembler.getConnectable());
                             orderTasks.add(OrderTaskAssembler.getManufacturer());
                             orderTasks.add(OrderTaskAssembler.getDeviceModel());
                             orderTasks.add(OrderTaskAssembler.getProductDate());
@@ -516,6 +442,13 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 }
             }
         }
+        if (requestCode == AppConstants.REQUEST_CODE_QUICK_SWITCH) {
+            if (resultCode == RESULT_OK) {
+                boolean enablePasswordVerify = data.getBooleanExtra(AppConstants.EXTRA_KEY_PASSWORD_VERIFICATION, false);
+                settingFragment.setModifyPasswordShown(enablePasswordVerify ? !TextUtils.isEmpty(mPassword) : false);
+                settingFragment.setResetShown(enablePasswordVerify ? 1 : 0);
+            }
+        }
     }
 
     @Override
@@ -541,15 +474,6 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     public void dismissSyncProgressDialog() {
         if (mLoadingMessageDialog != null)
             mLoadingMessageDialog.dismissAllowingStateLoss();
-    }
-
-    @OnClick({R.id.tv_back})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.tv_back:
-                back();
-                break;
-        }
     }
 
     private void back() {
@@ -616,19 +540,15 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     @Override
     public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-        switch (checkedId) {
-            case R.id.radioBtn_slot:
-                showSlotFragment();
-                getSlotType();
-                break;
-            case R.id.radioBtn_setting:
-                showSettingFragment();
-                getDeviceInfo();
-                break;
-            case R.id.radioBtn_device:
-                showDeviceFragment();
-                getDeviceInfo();
-                break;
+        if (checkedId == R.id.radioBtn_slot) {
+            showSlotFragment();
+            getSlotType();
+        } else if (checkedId == R.id.radioBtn_setting) {
+            showSettingFragment();
+            getDeviceInfo();
+        } else if (checkedId == R.id.radioBtn_device) {
+            showDeviceFragment();
+            getDeviceInfo();
         }
     }
 
@@ -643,39 +563,6 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     public void resetDevice() {
         showSyncingProgressDialog();
         MokoSupport.getInstance().sendOrder(OrderTaskAssembler.resetDevice());
-    }
-
-
-    public void setConnectable(boolean isConneacted) {
-        showSyncingProgressDialog();
-        ArrayList<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setConnectable(isConneacted));
-        orderTasks.add(OrderTaskAssembler.getConnectable());
-        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-    }
-
-    public void setButtonPower(boolean enable) {
-        showSyncingProgressDialog();
-        ArrayList<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setButtonPower(enable));
-        orderTasks.add(OrderTaskAssembler.getButtonPower());
-        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-    }
-
-    public void setDirectedConnectable(boolean noPassword) {
-        showSyncingProgressDialog();
-        ArrayList<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setLockStateDirected(noPassword));
-        orderTasks.add(OrderTaskAssembler.getLockState());
-        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-    }
-
-    public void setHWResetEnable(boolean enable) {
-        showSyncingProgressDialog();
-        ArrayList<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setHWResetEnable(enable ? 1 : 0));
-        orderTasks.add(OrderTaskAssembler.getHWResetEnable());
-        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     public void setClose() {
@@ -807,4 +694,116 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             XLog.i("DFU Error:" + message);
         }
     };
+
+    public void onSensorConfig(View view) {
+        if (isWindowLocked())
+            return;
+        startActivity(new Intent(this, AxisDataActivity.class));
+    }
+
+    public void onQuickSwitch(View view) {
+        if (isWindowLocked())
+            return;
+        startActivityForResult(new Intent(this, QuickSwitchActivity.class), AppConstants.REQUEST_CODE_QUICK_SWITCH);
+    }
+
+    public void onTurnOffBeacon(View view) {
+        if (isWindowLocked())
+            return;
+        AlertMessageDialog powerAlertDialog = new AlertMessageDialog();
+        powerAlertDialog.setTitle("Warning！");
+        powerAlertDialog.setMessage("Are you sure to turn off the Beacon?Please make sure the Beacon has a button to turn on!");
+        powerAlertDialog.setConfirm(R.string.ok);
+        powerAlertDialog.setOnAlertConfirmListener(() -> {
+            setClose();
+        });
+        powerAlertDialog.show(getSupportFragmentManager());
+    }
+
+    public void onResetBeacon(View view) {
+        if (isWindowLocked())
+            return;
+        AlertMessageDialog resetDeviceDialog = new AlertMessageDialog();
+        resetDeviceDialog.setTitle("Warning！");
+        resetDeviceDialog.setMessage("Are you sure to reset the Beacon？");
+        resetDeviceDialog.setConfirm(R.string.ok);
+        resetDeviceDialog.setOnAlertConfirmListener(() -> {
+            resetDevice();
+        });
+        resetDeviceDialog.show(getSupportFragmentManager());
+    }
+
+    public void onDFU(View view) {
+        if (isWindowLocked())
+            return;
+        chooseFirmwareFile();
+    }
+
+    public void onModifyPassword(View view) {
+        if (isWindowLocked())
+            return;
+        final ModifyPasswordDialog modifyPasswordDialog = new ModifyPasswordDialog();
+        modifyPasswordDialog.setOnModifyPasswordClicked(new ModifyPasswordDialog.ModifyPasswordClickListener() {
+            @Override
+            public void onEnsureClicked(String password) {
+                modifyPassword(password);
+            }
+
+            @Override
+            public void onPasswordNotMatch() {
+                AlertMessageDialog dialog = new AlertMessageDialog();
+                dialog.setMessage("Password not match!\nPlease try again.");
+                dialog.setConfirm(R.string.ok);
+                dialog.setCancelGone();
+                dialog.show(getSupportFragmentManager());
+            }
+        });
+        modifyPasswordDialog.show(getSupportFragmentManager());
+    }
+
+    public void onBack(View view) {
+        back();
+    }
+
+    public void onSlot1(View view) {
+        if (slotFragment != null) {
+            SlotFrameTypeEnum frameType = (SlotFrameTypeEnum) view.getTag();
+            slotFragment.createData(frameType, SlotEnum.SLOT_1);
+        }
+    }
+
+    public void onSlot2(View view) {
+        if (slotFragment != null) {
+            SlotFrameTypeEnum frameType = (SlotFrameTypeEnum) view.getTag();
+            slotFragment.createData(frameType, SlotEnum.SLOT_2);
+        }
+    }
+
+    public void onSlot3(View view) {
+        if (slotFragment != null) {
+            SlotFrameTypeEnum frameType = (SlotFrameTypeEnum) view.getTag();
+            slotFragment.createData(frameType, SlotEnum.SLOT_3);
+        }
+    }
+
+    public void onSlot4(View view) {
+        if (slotFragment != null) {
+            SlotFrameTypeEnum frameType = (SlotFrameTypeEnum) view.getTag();
+            slotFragment.createData(frameType, SlotEnum.SLOT_4);
+        }
+    }
+
+    public void onSlot5(View view) {
+        if (slotFragment != null) {
+            SlotFrameTypeEnum frameType = (SlotFrameTypeEnum) view.getTag();
+            slotFragment.createData(frameType, SlotEnum.SLOT_5);
+        }
+    }
+
+    public void onSlot6(View view) {
+        if (slotFragment != null) {
+            SlotFrameTypeEnum frameType = (SlotFrameTypeEnum) view.getTag();
+            slotFragment.createData(frameType, SlotEnum.SLOT_6);
+        }
+    }
 }

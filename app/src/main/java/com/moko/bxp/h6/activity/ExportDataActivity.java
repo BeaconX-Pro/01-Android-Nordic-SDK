@@ -23,7 +23,9 @@ import android.widget.TextView;
 
 import com.elvishew.xlog.XLog;
 import com.moko.bxp.h6.AppConstants;
+import com.moko.bxp.h6.BuildConfig;
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.dialog.AlertMessageDialog;
 import com.moko.bxp.h6.dialog.LoadingMessageDialog;
 import com.moko.bxp.h6.utils.ToastUtils;
@@ -61,27 +63,27 @@ public class ExportDataActivity extends BaseActivity {
     private static final String TRACKED_FILE = "th.txt";
 
     private static String PATH_LOGCAT;
-    @BindView(R.id.iv_sync)
+    @BindView(R2.id.iv_sync)
     ImageView ivSync;
-    @BindView(R.id.tv_export)
+    @BindView(R2.id.tv_export)
     TextView tvExport;
-    @BindView(R.id.ll_data)
+    @BindView(R2.id.ll_data)
     LinearLayout llData;
-    @BindView(R.id.tv_sync)
+    @BindView(R2.id.tv_sync)
     TextView tvSync;
-    @BindView(R.id.cb_data_show)
+    @BindView(R2.id.cb_data_show)
     CheckBox cbDataShow;
-    @BindView(R.id.ll_th_chart_view)
+    @BindView(R2.id.ll_th_chart_view)
     LinearLayout llTHChartView;
-    @BindView(R.id.temp_chart_view)
+    @BindView(R2.id.temp_chart_view)
     THChartView tempChartView;
-    @BindView(R.id.humi_chart_view)
+    @BindView(R2.id.humi_chart_view)
     THChartView humiChartView;
-    @BindView(R.id.sv_th_data)
+    @BindView(R2.id.sv_th_data)
     ScrollView svTHData;
-    @BindView(R.id.th_chart_total)
+    @BindView(R2.id.th_chart_total)
     TextView thChartTotal;
-    @BindView(R.id.th_chart_display)
+    @BindView(R2.id.th_chart_display)
     TextView thChartDisplay;
 
     private boolean mReceiverTag = false;
@@ -100,10 +102,10 @@ public class ExportDataActivity extends BaseActivity {
 
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             // 优先保存到SD卡中
-            PATH_LOGCAT = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "mokoBeaconXPro" + File.separator + TRACKED_FILE;
+            PATH_LOGCAT = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "mokoBeaconXPro" : "BXP-H6") + File.separator + TRACKED_FILE;
         } else {
             // 如果SD卡不存在，就保存到本应用的目录下
-            PATH_LOGCAT = getFilesDir().getAbsolutePath() + File.separator + File.separator + "mokoBeaconXPro" + File.separator + TRACKED_FILE;
+            PATH_LOGCAT = getFilesDir().getAbsolutePath() + File.separator + File.separator + (BuildConfig.IS_LIBRARY ? "mokoBeaconXPro" : "BXP-H6") + File.separator + TRACKED_FILE;
         }
         mHumiList = new ArrayList<>();
         mTempList = new ArrayList<>();
@@ -193,7 +195,7 @@ public class ExportDataActivity extends BaseActivity {
                                         llData.setVisibility(View.GONE);
                                         Drawable top = getResources().getDrawable(R.drawable.ic_download);
                                         tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
-                                        ToastUtils.showToast(ExportDataActivity.this, "Empty success!");
+                                        ToastUtils.showToast(ExportDataActivity.this, "Erase success!");
                                     } else {
                                         ToastUtils.showToast(ExportDataActivity.this, "Failed");
                                     }
@@ -392,71 +394,6 @@ public class ExportDataActivity extends BaseActivity {
             mLoadingMessageDialog.dismissAllowingStateLoss();
     }
 
-    @OnClick({R.id.tv_back, R.id.tv_empty, R.id.ll_sync, R.id.tv_export})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.tv_back:
-                back();
-                break;
-            case R.id.tv_empty:
-                AlertMessageDialog dialog = new AlertMessageDialog();
-                dialog.setTitle("Warning!");
-                dialog.setMessage("Are you sure to empty the saved T&H data?");
-                dialog.setConfirm(R.string.ok);
-                dialog.setOnAlertConfirmListener(new AlertMessageDialog.OnAlertConfirmListener() {
-                    @Override
-                    public void onClick() {
-                        showSyncingProgressDialog();
-                        ArrayList<OrderTask> orderTasks = new ArrayList<>();
-                        orderTasks.add(OrderTaskAssembler.setTHEmpty());
-                        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                    }
-                });
-                dialog.show(getSupportFragmentManager());
-                break;
-            case R.id.ll_sync:
-                if (!isSync) {
-                    isSync = true;
-
-                    MokoSupport.getInstance().enableStoreNotify();
-                    Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
-                    ivSync.startAnimation(animation);
-                    tvSync.setText("Stop");
-                    cbDataShow.setChecked(false);
-                    cbDataShow.setEnabled(false);
-                } else {
-                    MokoSupport.getInstance().disableStoreNotify();
-                    isSync = false;
-                    ivSync.clearAnimation();
-                    tvSync.setText("Sync");
-                    cbDataShow.setEnabled(true);
-                }
-                break;
-            case R.id.tv_export:
-                if (mIsShown) {
-                    showSyncingProgressDialog();
-                    writeTHFile("");
-                    tvExport.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            dismissSyncProgressDialog();
-                            String log = storeString.toString();
-                            if (!TextUtils.isEmpty(log)) {
-                                writeTHFile(log);
-                                File file = getTHFile();
-                                // 发送邮件
-                                String address = "Development@mokotechnology.com";
-                                String title = "T&H Log";
-                                String content = title;
-                                Utils.sendEmail(ExportDataActivity.this, address, content, title, "Choose Email Client", file);
-                            }
-                        }
-                    }, 500);
-                }
-                break;
-        }
-    }
-
     private void back() {
         // 关闭通知
         MokoSupport.getInstance().disableStoreNotify();
@@ -497,5 +434,73 @@ public class ExportDataActivity extends BaseActivity {
             e.printStackTrace();
         }
         return file;
+    }
+
+    public void onBack(View view) {
+        back();
+    }
+
+    public void onSync(View view) {
+        if (isWindowLocked())
+            return;
+        if (!isSync) {
+            isSync = true;
+            MokoSupport.getInstance().enableStoreNotify();
+            Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
+            ivSync.startAnimation(animation);
+            tvSync.setText("Stop");
+            cbDataShow.setChecked(false);
+            cbDataShow.setEnabled(false);
+        } else {
+            MokoSupport.getInstance().disableStoreNotify();
+            isSync = false;
+            ivSync.clearAnimation();
+            tvSync.setText("Sync");
+            cbDataShow.setEnabled(true);
+        }
+    }
+
+    public void onExport(View view) {
+        if (isWindowLocked())
+            return;
+        if (mIsShown) {
+            showSyncingProgressDialog();
+            writeTHFile("");
+            tvExport.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    dismissSyncProgressDialog();
+                    String log = storeString.toString();
+                    if (!TextUtils.isEmpty(log)) {
+                        writeTHFile(log);
+                        File file = getTHFile();
+                        // 发送邮件
+                        String address = "Development@mokotechnology.com";
+                        String title = "T&H Log";
+                        String content = title;
+                        Utils.sendEmail(ExportDataActivity.this, address, content, title, "Choose Email Client", file);
+                    }
+                }
+            }, 500);
+        }
+    }
+
+    public void onEmpty(View view) {
+        if (isWindowLocked())
+            return;
+        AlertMessageDialog dialog = new AlertMessageDialog();
+        dialog.setTitle("Warning!");
+        dialog.setMessage("Are you sure to erase the saved T&H data?");
+        dialog.setConfirm(R.string.ok);
+        dialog.setOnAlertConfirmListener(new AlertMessageDialog.OnAlertConfirmListener() {
+            @Override
+            public void onClick() {
+                showSyncingProgressDialog();
+                ArrayList<OrderTask> orderTasks = new ArrayList<>();
+                orderTasks.add(OrderTaskAssembler.setTHEmpty());
+                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            }
+        });
+        dialog.show(getSupportFragmentManager());
     }
 }

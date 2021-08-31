@@ -1,21 +1,21 @@
 <resources>
-    <string name="app_name">BeaconX Pro</string>
+    <string name="app_name">BXP-NORDIC</string>
 
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
     <string name="ok">OK</string>
 
     <string name="permission_storage_close_title">Storage permission is not available</string>
-    <string name="permission_storage_close_content">Please find it in cellphone setting- permission, and allow BeaconXPro use the Storage permission</string>
+    <string name="permission_storage_close_content">Please find it in cellphone setting- permission, and allow BXP-NORDIC use the Storage permission</string>
     <string name="permission_open">OK</string>
     <string name="permission_storage_need_title">Please turn on Storage permissions</string>
-    <string name="permission_storage_need_content">BeaconXPro requires access to Location and Storage permission. If the permissions are not on, BeaconXPro cannot be used normally.</string>
+    <string name="permission_storage_need_content">BXP-NORDIC requires access to Location and Storage permission. If the permissions are not on, BXP-NORDIC cannot be used normally.</string>
     <string name="location_need_title">Turn on Location permission</string>
-    <string name="location_need_content">After that, BeaconXPro could search and connect with the BeaconXPro</string>
+    <string name="location_need_content">After that, BXP-NORDIC could search and connect with the BXP-NORDIC</string>
     <string name="permission_location_close_title">Location persission is not available</string>
-    <string name="permission_location_close_content">Please find it in cellphone setting- permission, and allow BeaconXPro use the Location and Storage permission</string>
+    <string name="permission_location_close_content">Please find it in cellphone setting- permission, and allow BXP-NORDIC use the Location and Storage permission</string>
     <string name="permission_location_need_title">Turn on Location permission</string>
-    <string name="permission_location_need_content">After that, BeaconXPro could search and connect with the BeaconXPro</string>
+    <string name="permission_location_need_content">After that, BXP-NORDIC could search and connect with the BXP-NORDIC</string>
 
     <string name="main_exit_tips">Are you sure you want to quit?</string>
     <string name="setting_syncing">syncing</string>
@@ -41,53 +41,54 @@
     <string name="humidity_only_tips_0"><![CDATA[*The device stores all sampled T&H data.]]></string>
     <string name="time_only_tips"><![CDATA[*The device stores T&H data every %d minutes.]]></string>
     <string name="t_h_tips_0"><![CDATA[*The device stores T&H data when the temperature changed ≥ %s ℃ or humidity changed ≥ %s%%RH.]]></string>
-<!--    <string name="t_h_tips_1"><![CDATA[*The device stores T&H data when the temperature changes arbitrarily or humidity changed ≥ %s%%.]]></string>-->
-<!--    <string name="t_h_tips_2"><![CDATA[*The device stores T&H data when the temperature changed ≥ %s ℃ or humidity changes arbitrarily.]]></string>-->
-<!--    <string name="t_h_tips_3"><![CDATA[*The device stores T&H data when the temperature or humidity changes arbitrarily.]]></string>-->
+    <!--    <string name="t_h_tips_1"><![CDATA[*The device stores T&H data when the temperature changes arbitrarily or humidity changed ≥ %s%%.]]></string>-->
+    <!--    <string name="t_h_tips_2"><![CDATA[*The device stores T&H data when the temperature changed ≥ %s ℃ or humidity changes arbitrarily.]]></string>-->
+    <!--    <string name="t_h_tips_3"><![CDATA[*The device stores T&H data when the temperature or humidity changes arbitrarily.]]></string>-->
     <string name="trigger_t_h_tips">*The Beacon will %1$s when the %2$s is %3$s %4$s.</string>
-    <string name="trigger_tapped_tips_1">*The Beacon will always broadcast after press the button %s.</string>
+    <string name="trigger_tapped_tips_1">*The Beacon will start and keep advertising after press the button %s.</string>
     <string name="trigger_tapped_tips_2">*The Beacon will %1$s for %2$s after press the button %3$s.</string>
-<!--    <string name="trigger_tapped_tips_3">*The Beacon will always stop advertising after press button %s times.</string>-->
-    <string name="trigger_moved_tips_1">*The Beacon will always %s once a movement occurred.</string>
-    <string name="trigger_moved_tips_2">*The Beacon will %1$s after a static period of %2$s and it %3$s again once a movement occurred.</string>
+    <!--    <string name="trigger_tapped_tips_3">*The Beacon will always stop advertising after press button %s times.</string>-->
+    <string name="trigger_moved_tips_1">*The Beacon will start and keep advertising once a movement occurred.</string>
+    <string name="trigger_moved_tips_2">*The Beacon will %1$s after device keep static for %2$s and it %3$s again once a movement occurred.</string>
     <string name="rssi_filter_tips">* RSSI filtering is the highest priority filtering condition. BLE Name and MAC Address filtering must first meet the RSSI filtering condition.\n* There is an "OR" relationship between the BLE Name filtering and the MAC Address filtering.</string>
     <string name="th_chart_total">Total Data Points:%d</string>
     <string name="th_chart_display">Window Display Points:%d</string>
+    <string name="temperature_humidity"><![CDATA[Temperature&Humidity]]></string>
     <string-array name="slot_type_no_sensor">
         <item>TLM</item>
         <item>UID</item>
         <item>URL</item>
         <item>iBeacon</item>
-        <item>Device Info</item>
-        <item>NO DATA</item>
+        <item>Device info</item>
+        <item>No data</item>
     </string-array>
     <string-array name="slot_type_axis">
         <item>TLM</item>
         <item>UID</item>
         <item>URL</item>
         <item>iBeacon</item>
-        <item>Device Info</item>
-        <item>NO DATA</item>
-        <item>Accel</item>
+        <item>Device info</item>
+        <item>3-axis Acc</item>
+        <item>No data</item>
     </string-array>
     <string-array name="slot_type_th">
         <item>TLM</item>
         <item>UID</item>
         <item>URL</item>
         <item>iBeacon</item>
-        <item>Device Info</item>
-        <item>NO DATA</item>
+        <item>Device info</item>
         <item><![CDATA[T&H]]></item>
+        <item>No data</item>
     </string-array>
     <string-array name="slot_type_all">
         <item>TLM</item>
         <item>UID</item>
         <item>URL</item>
         <item>iBeacon</item>
-        <item>Device Info</item>
-        <item>NO DATA</item>
-        <item>Accel</item>
+        <item>Device info</item>
+        <item>3-axis Acc</item>
         <item><![CDATA[T&H]]></item>
+        <item>No data</item>
     </string-array>
     <string-array name="storage_condition">
         <item>Temperature</item>

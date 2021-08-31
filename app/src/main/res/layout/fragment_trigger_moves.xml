@@ -23,22 +23,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Always advertise"
-                android:textSize="10sp" />
-
-            <RadioButton
-                android:id="@+id/rb_stop_advertising"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Stop advertising after a static period of time"
+                android:text="Start and keep advertising"
                 android:textSize="10sp" />
 
             <RadioButton
                 android:id="@+id/rb_start_advertising"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Start advertising after a static period of time"
+                android:text="Start advertising after device keep static for"
                 android:textSize="10sp" />
+
+            <RadioButton
+                android:id="@+id/rb_stop_advertising"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stop advertising after device keep static for"
+                android:textSize="10sp" />
+
 
         </RadioGroup>
 

@@ -15,6 +15,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.activity.SlotDataActivity;
 import com.moko.bxp.h6.utils.ToastUtils;
 
@@ -26,19 +27,19 @@ public class TriggerMovesFragment extends Fragment implements RadioGroup.OnCheck
     private static final String TAG = "MovesFragment";
 
 
-    @BindView(R.id.tv_trigger_tips)
+    @BindView(R2.id.tv_trigger_tips)
     TextView tvTriggerTips;
-    @BindView(R.id.rb_always_start)
+    @BindView(R2.id.rb_always_start)
     RadioButton rbAlwaysStart;
-    @BindView(R.id.rb_start_advertising)
+    @BindView(R2.id.rb_start_advertising)
     RadioButton rbStartAdvertising;
-    @BindView(R.id.rb_stop_advertising)
+    @BindView(R2.id.rb_stop_advertising)
     RadioButton rbStopAdvertising;
-    @BindView(R.id.rg_moves)
+    @BindView(R2.id.rg_moves)
     RadioGroup rgMoves;
-    @BindView(R.id.et_start)
+    @BindView(R2.id.et_start)
     EditText etStart;
-    @BindView(R.id.et_stop)
+    @BindView(R2.id.et_stop)
     EditText etStop;
 
 
@@ -66,7 +67,7 @@ public class TriggerMovesFragment extends Fragment implements RadioGroup.OnCheck
         View view = inflater.inflate(R.layout.fragment_trigger_moves, container, false);
         ButterKnife.bind(this, view);
         activity = (SlotDataActivity) getActivity();
-        tvTriggerTips.setText(getString(R.string.trigger_moved_tips_1, "broadcast"));
+        tvTriggerTips.setText(getString(R.string.trigger_moved_tips_1));
         if (mDuration == 0) {
             if (!mIsStart) {
                 rbAlwaysStart.setChecked(true);
@@ -76,12 +77,12 @@ public class TriggerMovesFragment extends Fragment implements RadioGroup.OnCheck
                 rbStartAdvertising.setChecked(true);
                 etStop.setText(mDuration + "");
                 etStop.setSelection((mDuration + "").length());
-                tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "start to broadcast", String.format("%ds", mDuration), "stops broadcasting"));
+                tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "start advertising", String.format("%ds", mDuration), "stops broadcasting"));
             } else {
                 rbStopAdvertising.setChecked(true);
                 etStart.setText(mDuration + "");
                 etStart.setSelection((mDuration + "").length());
-                tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "stop broadcasting", String.format("%ds", mDuration), "starts to broadcast"));
+                tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "stop advertising", String.format("%ds", mDuration), "starts to broadcast"));
             }
         }
         rgMoves.setOnCheckedChangeListener(this);
@@ -101,7 +102,7 @@ public class TriggerMovesFragment extends Fragment implements RadioGroup.OnCheck
                 String duration = s.toString();
                 if (rbStopAdvertising.isChecked() && !TextUtils.isEmpty(duration)) {
                     mDuration = Integer.parseInt(duration);
-                    tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "stop broadcasting", String.format("%ds", mDuration), "starts to broadcast"));
+                    tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "stop advertising", String.format("%ds", mDuration), "starts to broadcast"));
                 }
             }
         });
@@ -121,7 +122,7 @@ public class TriggerMovesFragment extends Fragment implements RadioGroup.OnCheck
                 String duration = s.toString();
                 if (rbStartAdvertising.isChecked() && !TextUtils.isEmpty(duration)) {
                     mDuration = Integer.parseInt(duration);
-                    tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "start to broadcast", String.format("%ds", mDuration), "stops broadcasting"));
+                    tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "start advertising", String.format("%ds", mDuration), "stops broadcasting"));
                 }
             }
         });
@@ -151,32 +152,28 @@ public class TriggerMovesFragment extends Fragment implements RadioGroup.OnCheck
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        switch (checkedId) {
-            case R.id.rb_always_start:
-                mIsStart = false;
+        if (checkedId == R.id.rb_always_start) {
+            mIsStart = false;
+            mDuration = 0;
+            tvTriggerTips.setText(getString(R.string.trigger_moved_tips_1));
+        } else if (checkedId == R.id.rb_start_advertising) {
+            mIsStart = true;
+            String startDuration = etStop.getText().toString();
+            if (TextUtils.isEmpty(startDuration)) {
                 mDuration = 0;
-                tvTriggerTips.setText(getString(R.string.trigger_moved_tips_1, "broadcast"));
-                break;
-            case R.id.rb_start_advertising:
-                mIsStart = true;
-                String startDuration = etStop.getText().toString();
-                if (TextUtils.isEmpty(startDuration)) {
-                    mDuration = 0;
-                } else {
-                    mDuration = Integer.parseInt(startDuration);
-                }
-                tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "start to broadcast", String.format("%ds", mDuration), "stops broadcasting"));
-                break;
-            case R.id.rb_stop_advertising:
-                mIsStart = false;
-                String stopDuration = etStart.getText().toString();
-                if (TextUtils.isEmpty(stopDuration)) {
-                    mDuration = 0;
-                } else {
-                    mDuration = Integer.parseInt(stopDuration);
-                }
-                tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "stop broadcasting", String.format("%ds", mDuration), "starts to broadcast"));
-                break;
+            } else {
+                mDuration = Integer.parseInt(startDuration);
+            }
+            tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "start advertising", String.format("%ds", mDuration), "stops broadcasting"));
+        } else if (checkedId == R.id.rb_stop_advertising) {
+            mIsStart = false;
+            String stopDuration = etStart.getText().toString();
+            if (TextUtils.isEmpty(stopDuration)) {
+                mDuration = 0;
+            } else {
+                mDuration = Integer.parseInt(stopDuration);
+            }
+            tvTriggerTips.setText(getString(R.string.trigger_moved_tips_2, "stop advertising", String.format("%ds", mDuration), "starts to broadcast"));
         }
     }
 

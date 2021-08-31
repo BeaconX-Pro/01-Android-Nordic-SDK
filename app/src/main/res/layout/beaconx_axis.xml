@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="3-axis Acceleration"
+            android:text="3-axis accelerometer"
             android:textColor="@color/black_333333"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -35,16 +35,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="Measured RSSI"
+            android:text="Tx power"
             android:textColor="@color/grey_999999"
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/tv_rssi_0m"
+            android:id="@+id/tv_tx_power"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="170dp"
-            android:text="0dBm"
+            android:text=""
             android:textColor="@color/grey_666666"
             android:textSize="12sp" />
     </RelativeLayout>
@@ -58,16 +58,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="Tx Power"
+            android:text="Ranging data"
             android:textColor="@color/grey_999999"
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/tv_tx_power"
+            android:id="@+id/tv_rssi_0m"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="170dp"
-            android:text=""
+            android:text="0dBm"
             android:textColor="@color/grey_666666"
             android:textSize="12sp" />
     </RelativeLayout>
@@ -104,7 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="Scale"
+            android:text="Full-scale"
             android:textColor="@color/grey_999999"
             android:textSize="12sp" />
 
@@ -117,6 +117,7 @@
             android:textColor="@color/grey_666666"
             android:textSize="12sp" />
     </RelativeLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -126,7 +127,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="Sensitivity"
+            android:text="Motion threshold "
             android:textColor="@color/grey_999999"
             android:textSize="12sp" />
 

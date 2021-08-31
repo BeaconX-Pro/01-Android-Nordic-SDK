@@ -19,6 +19,8 @@
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
             android:paddingLeft="16dp"
+            android:clickable="true"
+            android:onClick="onBack"
             android:text=""
             android:textColor="@color/white_ffffff"
             android:textSize="15sp" />
@@ -37,6 +39,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
+            android:clickable="true"
+            android:onClick="onSave"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:src="@drawable/save" />
@@ -69,7 +73,7 @@
                     android:drawableLeft="@drawable/frame_type"
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
-                    android:text="Frame Type"
+                    android:text="Frame type"
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -124,8 +128,10 @@
                     android:id="@+id/iv_trigger"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:onClick="onTrigger"
                     android:layout_alignParentRight="true"
-                    android:src="@drawable/connectable_unchecked" />
+                    android:src="@drawable/ic_unchecked" />
 
                 <RelativeLayout
                     android:id="@+id/rl_trigger"
@@ -157,6 +163,8 @@
                             android:paddingLeft="20dp"
                             android:paddingTop="5dp"
                             android:paddingRight="20dp"
+                            android:clickable="true"
+                            android:onClick="onTriggerType"
                             android:paddingBottom="5dp"
                             android:text="Press button twice"
                             android:textColor="@color/black_333333"

@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.utils.ToastUtils;
 
 import butterknife.BindView;
@@ -19,9 +20,9 @@ import butterknife.OnClick;
 public class PasswordDialog extends MokoBaseDialog {
     public static final String TAG = PasswordDialog.class.getSimpleName();
 
-    @BindView(R.id.et_password)
+    @BindView(R2.id.et_password)
     EditText etPassword;
-    private final String FILTER_ASCII = "\\A\\p{ASCII}*\\z";
+    private final String FILTER_ASCII = "[ -~]*";
 
     private String password;
 
@@ -61,28 +62,26 @@ public class PasswordDialog extends MokoBaseDialog {
                         .getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputManager.showSoftInput(etPassword, 0);
             }
-        },200);
+        }, 200);
     }
 
-    @OnClick({R.id.tv_password_cancel, R.id.tv_password_ensure})
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.tv_password_cancel:
-                dismiss();
-                if (passwordClickListener != null) {
-                    passwordClickListener.onDismiss();
-                }
-                break;
-            case R.id.tv_password_ensure:
-                dismiss();
-                if (TextUtils.isEmpty(etPassword.getText().toString())) {
-                    ToastUtils.showToast(getContext(), getContext().getString(R.string.password_null));
-                    return;
-                }
-                if (passwordClickListener != null)
-                    passwordClickListener.onEnsureClicked(etPassword.getText().toString());
-                break;
+    @OnClick(R2.id.tv_password_cancel)
+    public void onCancel(View view) {
+        dismiss();
+        if (passwordClickListener != null) {
+            passwordClickListener.onDismiss();
         }
+    }
+
+    @OnClick(R2.id.tv_password_ensure)
+    public void onEnsure(View view) {
+        dismiss();
+        if (TextUtils.isEmpty(etPassword.getText().toString())) {
+            ToastUtils.showToast(getContext(), getContext().getString(R.string.password_null));
+            return;
+        }
+        if (passwordClickListener != null)
+            passwordClickListener.onEnsureClicked(etPassword.getText().toString());
     }
 
     @Override

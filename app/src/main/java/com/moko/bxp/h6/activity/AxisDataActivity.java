@@ -16,6 +16,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.dialog.BottomDialog;
 import com.moko.bxp.h6.dialog.LoadingMessageDialog;
 import com.moko.bxp.h6.utils.ToastUtils;
@@ -42,23 +43,23 @@ import butterknife.OnClick;
 
 public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarChangeListener {
 
-    @BindView(R.id.iv_sync)
+    @BindView(R2.id.iv_sync)
     ImageView ivSync;
-    @BindView(R.id.tv_sync)
+    @BindView(R2.id.tv_sync)
     TextView tvSync;
-    @BindView(R.id.tv_x_data)
+    @BindView(R2.id.tv_x_data)
     TextView tvXData;
-    @BindView(R.id.tv_y_data)
+    @BindView(R2.id.tv_y_data)
     TextView tvYData;
-    @BindView(R.id.tv_z_data)
+    @BindView(R2.id.tv_z_data)
     TextView tvZData;
-    @BindView(R.id.tv_axis_scale)
+    @BindView(R2.id.tv_axis_scale)
     TextView tvAxisScale;
-    @BindView(R.id.tv_axis_data_rate)
+    @BindView(R2.id.tv_axis_data_rate)
     TextView tvAxisDataRate;
-    @BindView(R.id.sb_trigger_sensitivity)
+    @BindView(R2.id.sb_trigger_sensitivity)
     SeekBar sbTriggerSensitivity;
-    @BindView(R.id.tv_trigger_sensitivity)
+    @BindView(R2.id.tv_trigger_sensitivity)
     TextView tvTriggerSensitivity;
     private boolean mReceiverTag = false;
     private ArrayList<String> axisDataRates;
@@ -66,7 +67,8 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
     private boolean isSync;
     private int mSelectedRate;
     private int mSelectedScale;
-    private int mSelectedSensivity;
+    private int mSelectedSensitivity;
+    private double mScale;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,25 +153,25 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
                                         tvAxisDataRate.setText(axisDataRates.get(mSelectedRate));
                                         mSelectedScale = value[5] & 0xff;
                                         tvAxisScale.setText(axisScales.get(mSelectedScale));
-                                        mSelectedSensivity = value[6] & 0xff;
+                                        mSelectedSensitivity = value[6] & 0xff;
                                         if (MokoSupport.isNewVersion) {
-                                            sbTriggerSensitivity.setProgress(mSelectedSensivity - 1);
+                                            sbTriggerSensitivity.setProgress(mSelectedSensitivity - 1);
                                             if (mSelectedScale == 0) {
-                                                sbTriggerSensitivity.setMax(18);
+                                                sbTriggerSensitivity.setMax(19);
                                             }
                                             if (mSelectedScale == 1) {
-                                                sbTriggerSensitivity.setMax(38);
+                                                sbTriggerSensitivity.setMax(39);
                                             }
                                             if (mSelectedScale == 2) {
-                                                sbTriggerSensitivity.setMax(78);
+                                                sbTriggerSensitivity.setMax(79);
                                             }
                                             if (mSelectedScale == 3) {
-                                                sbTriggerSensitivity.setMax(158);
+                                                sbTriggerSensitivity.setMax(159);
                                             }
-                                            tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("#.#g").format(mSelectedSensivity * 0.1));
+                                            tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("#.#g").format(mSelectedSensitivity * 0.1));
                                         } else {
-                                            sbTriggerSensitivity.setProgress(mSelectedSensivity - 7);
-                                            tvTriggerSensitivity.setText(String.valueOf(mSelectedSensivity));
+                                            sbTriggerSensitivity.setProgress(mSelectedSensitivity - 7);
+                                            tvTriggerSensitivity.setText(String.valueOf(mSelectedSensitivity));
                                         }
                                     }
                                     break;
@@ -186,7 +188,6 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
                 }
             }
             if (MokoConstants.ACTION_CURRENT_DATA.equals(action)) {
-
                 OrderTaskResponse response = event.getResponse();
                 OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
                 int responseType = response.responseType;
@@ -257,69 +258,6 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
             mLoadingMessageDialog.dismissAllowingStateLoss();
     }
 
-    @OnClick({R.id.tv_back, R.id.ll_sync, R.id.iv_save, R.id.tv_axis_scale, R.id.tv_axis_data_rate})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.tv_back:
-                back();
-                break;
-            case R.id.ll_sync:
-                if (!isSync) {
-                    isSync = true;
-                    MokoSupport.getInstance().enableThreeAxisNotify();
-                    Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
-                    ivSync.startAnimation(animation);
-                    tvSync.setText("Stop");
-                } else {
-                    MokoSupport.getInstance().disableThreeAxisNotify();
-                    isSync = false;
-                    ivSync.clearAnimation();
-                    tvSync.setText("Sync");
-                }
-                break;
-            case R.id.tv_axis_data_rate:
-                BottomDialog dataRateDialog = new BottomDialog();
-                dataRateDialog.setDatas(axisDataRates, mSelectedRate);
-                dataRateDialog.setListener(value -> {
-                    mSelectedRate = value;
-                    tvAxisDataRate.setText(axisDataRates.get(value));
-                });
-                dataRateDialog.show(getSupportFragmentManager());
-                break;
-            case R.id.tv_axis_scale:
-                BottomDialog scaleDialog = new BottomDialog();
-                scaleDialog.setDatas(axisScales, mSelectedScale);
-                scaleDialog.setListener(value -> {
-                    mSelectedScale = value;
-                    tvAxisScale.setText(axisScales.get(value));
-                    if (MokoSupport.isNewVersion) {
-                        sbTriggerSensitivity.setProgress(0);
-                        if (mSelectedScale == 0) {
-                            sbTriggerSensitivity.setMax(18);
-                        }
-                        if (mSelectedScale == 1) {
-                            sbTriggerSensitivity.setMax(38);
-                        }
-                        if (mSelectedScale == 2) {
-                            sbTriggerSensitivity.setMax(78);
-                        }
-                        if (mSelectedScale == 3) {
-                            sbTriggerSensitivity.setMax(158);
-                        }
-                    }
-                });
-                scaleDialog.show(getSupportFragmentManager());
-                break;
-            case R.id.iv_save:
-                // 保存
-                showSyncingProgressDialog();
-                ArrayList<OrderTask> orderTasks = new ArrayList<>();
-                orderTasks.add(OrderTaskAssembler.setAxisParams(mSelectedRate, mSelectedScale, mSelectedSensivity));
-                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                break;
-        }
-    }
-
     private void back() {
         // 关闭通知
         MokoSupport.getInstance().disableThreeAxisNotify();
@@ -337,13 +275,8 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (MokoSupport.isNewVersion) {
-            mSelectedSensivity = progress + 1;
-            tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("#.#g").format(mSelectedSensivity * 0.1));
-        } else {
-            mSelectedSensivity = progress + 7;
-            tvTriggerSensitivity.setText(mSelectedSensivity + "");
-        }
+        mSelectedSensitivity = progress + 1;
+        tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("#.#g").format(mSelectedSensitivity * 0.1));
     }
 
     @Override
@@ -354,5 +287,75 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    public void onBack(View view) {
+        back();
+    }
+
+    public void onSave(View view) {
+        if (isWindowLocked())
+            return;
+        // 保存
+        showSyncingProgressDialog();
+        ArrayList<OrderTask> orderTasks = new ArrayList<>();
+        orderTasks.add(OrderTaskAssembler.setAxisParams(mSelectedRate, mSelectedScale, mSelectedSensitivity));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+    }
+
+    public void onSync(View view) {
+        if (isWindowLocked())
+            return;
+        if (!isSync) {
+            isSync = true;
+            MokoSupport.getInstance().enableThreeAxisNotify();
+            Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
+            ivSync.startAnimation(animation);
+            tvSync.setText("Stop");
+        } else {
+            MokoSupport.getInstance().disableThreeAxisNotify();
+            isSync = false;
+            ivSync.clearAnimation();
+            tvSync.setText("Sync");
+        }
+    }
+
+    public void onAxisScale(View view) {
+        if (isWindowLocked())
+            return;
+        BottomDialog scaleDialog = new BottomDialog();
+        scaleDialog.setDatas(axisScales, mSelectedScale);
+        scaleDialog.setListener(value -> {
+            mSelectedScale = value;
+            tvAxisScale.setText(axisScales.get(value));
+            if (MokoSupport.isNewVersion) {
+                sbTriggerSensitivity.setProgress(0);
+                if (mSelectedScale == 0) {
+                    sbTriggerSensitivity.setMax(19);
+                }
+                if (mSelectedScale == 1) {
+                    sbTriggerSensitivity.setMax(39);
+                }
+                if (mSelectedScale == 2) {
+                    sbTriggerSensitivity.setMax(79);
+                }
+                if (mSelectedScale == 3) {
+                    sbTriggerSensitivity.setMax(159);
+                }
+            }
+        });
+        scaleDialog.show(getSupportFragmentManager());
+    }
+
+    public void onAxisDataRate(View view) {
+        if (isWindowLocked())
+            return;
+        BottomDialog dataRateDialog = new BottomDialog();
+        dataRateDialog.setDatas(axisDataRates, mSelectedRate);
+        dataRateDialog.setListener(value -> {
+            mSelectedRate = value;
+            tvAxisDataRate.setText(axisDataRates.get(value));
+        });
+        dataRateDialog.show(getSupportFragmentManager());
     }
 }

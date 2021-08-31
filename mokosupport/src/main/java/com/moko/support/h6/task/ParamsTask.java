@@ -35,6 +35,7 @@ public class ParamsTask extends OrderTask {
             case SET_TH_EMPTY:
             case GET_TRIGGER_DATA:
             case GET_HW_RESET_ENABLE:
+            case GET_TRIGGER_LED_NOTIFICATION:
                 createGetConfigData(key.getParamsKey());
                 break;
         }
@@ -152,6 +153,16 @@ public class ParamsTask extends OrderTask {
         data = new byte[]{
                 (byte) 0xEA,
                 (byte) ParamsKeyEnum.SET_HW_RESET_ENABLE.getParamsKey(),
+                (byte) 0x00,
+                (byte) 0x01,
+                (byte) enable
+        };
+    }
+
+    public void setTriggerLEDNotifyEnable(int enable) {
+        data = new byte[]{
+                (byte) 0xEA,
+                (byte) ParamsKeyEnum.SET_TRIGGER_LED_NOTIFICATION.getParamsKey(),
                 (byte) 0x00,
                 (byte) 0x01,
                 (byte) enable

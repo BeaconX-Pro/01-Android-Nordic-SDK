@@ -20,9 +20,17 @@ import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.elvishew.xlog.XLog;
+import com.moko.ble.lib.MokoConstants;
+import com.moko.ble.lib.event.ConnectStatusEvent;
+import com.moko.ble.lib.event.OrderTaskResponseEvent;
+import com.moko.ble.lib.task.OrderTask;
+import com.moko.ble.lib.task.OrderTaskResponse;
+import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.h6.AppConstants;
 import com.moko.bxp.h6.BeaconXListAdapter;
+import com.moko.bxp.h6.BuildConfig;
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.dialog.AlertMessageDialog;
 import com.moko.bxp.h6.dialog.LoadingDialog;
 import com.moko.bxp.h6.dialog.LoadingMessageDialog;
@@ -31,12 +39,6 @@ import com.moko.bxp.h6.dialog.ScanFilterDialog;
 import com.moko.bxp.h6.entity.BeaconXInfo;
 import com.moko.bxp.h6.utils.BeaconXInfoParseableImpl;
 import com.moko.bxp.h6.utils.ToastUtils;
-import com.moko.ble.lib.MokoConstants;
-import com.moko.ble.lib.event.ConnectStatusEvent;
-import com.moko.ble.lib.event.OrderTaskResponseEvent;
-import com.moko.ble.lib.task.OrderTask;
-import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.h6.MokoBleScanner;
 import com.moko.support.h6.MokoSupport;
 import com.moko.support.h6.OrderTaskAssembler;
@@ -60,22 +62,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 
 public class H6MainActivity extends BaseActivity implements MokoScanDeviceCallback, BaseQuickAdapter.OnItemChildClickListener {
 
-    @BindView(R.id.iv_refresh)
+    @BindView(R2.id.iv_refresh)
     ImageView ivRefresh;
-    @BindView(R.id.rv_devices)
+    @BindView(R2.id.rv_devices)
     RecyclerView rvDevices;
-    @BindView(R.id.tv_device_num)
+    @BindView(R2.id.tv_device_num)
     TextView tvDeviceNum;
-    @BindView(R.id.rl_edit_filter)
+    @BindView(R2.id.rl_edit_filter)
     RelativeLayout rl_edit_filter;
-    @BindView(R.id.rl_filter)
+    @BindView(R2.id.rl_filter)
     RelativeLayout rl_filter;
-    @BindView(R.id.tv_filter)
+    @BindView(R2.id.tv_filter)
     TextView tv_filter;
     private boolean mReceiverTag = false;
     private ConcurrentHashMap<String, BeaconXInfo> beaconXInfoHashMap;
@@ -173,7 +174,7 @@ public class H6MainActivity extends BaseActivity implements MokoScanDeviceCallba
             // 设备连接成功，通知页面更新
             dismissLoadingProgressDialog();
             BluetoothGattCharacteristic characteristic = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_DEVICE_TYPE);
-            if (characteristic != null) {
+            if (characteristic == null) {
                 showLoadingMessageDialog();
                 mHandler.postDelayed(new Runnable() {
                     @Override
@@ -194,8 +195,11 @@ public class H6MainActivity extends BaseActivity implements MokoScanDeviceCallba
             } else {
                 MokoSupport.getInstance().disConnectBle();
                 AlertMessageDialog dialog = new AlertMessageDialog();
-                dialog.setMessage("Oops!Something went wrong. Please check the device version.");
+                dialog.setMessage("The firmware version selected is incorrect. Please back to the firmware version options and select again.");
                 dialog.setConfirm(R.string.ok);
+                dialog.setOnAlertConfirmListener(() -> {
+                    back();
+                });
                 dialog.show(getSupportFragmentManager());
             }
         }
@@ -411,113 +415,6 @@ public class H6MainActivity extends BaseActivity implements MokoScanDeviceCallba
     public String filterMac;
     public int filterRssi = -100;
 
-    @OnClick({R.id.iv_refresh, R.id.iv_about, R.id.rl_edit_filter, R.id.rl_filter, R.id.iv_filter_delete})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.iv_refresh:
-                if (isWindowLocked())
-                    return;
-                if (!MokoSupport.getInstance().isBluetoothOpen()) {
-                    // 蓝牙未打开，开启蓝牙
-                    MokoSupport.getInstance().enableBluetooth();
-                    return;
-                }
-                if (animation == null) {
-                    startScan();
-                } else {
-                    mHandler.removeMessages(0);
-                    mokoBleScanner.stopScanDevice();
-                }
-                break;
-            case R.id.iv_about:
-                startActivity(new Intent(this, AboutActivity.class));
-                break;
-            case R.id.rl_edit_filter:
-            case R.id.rl_filter:
-                if (animation != null) {
-                    mHandler.removeMessages(0);
-                    mokoBleScanner.stopScanDevice();
-                }
-                ScanFilterDialog scanFilterDialog = new ScanFilterDialog(this);
-                scanFilterDialog.setFilterName(filterName);
-                scanFilterDialog.setFilterMac(filterMac);
-                scanFilterDialog.setFilterRssi(filterRssi);
-                scanFilterDialog.setOnScanFilterListener((filterName, filterMac, filterRssi) -> {
-                    H6MainActivity.this.filterName = filterName;
-                    H6MainActivity.this.filterMac = filterMac;
-                    String showFilterMac = "";
-                    if (filterMac.length() == 12) {
-                        StringBuffer stringBuffer = new StringBuffer(filterMac);
-                        stringBuffer.insert(2, ":");
-                        stringBuffer.insert(5, ":");
-                        stringBuffer.insert(8, ":");
-                        stringBuffer.insert(11, ":");
-                        stringBuffer.insert(14, ":");
-                        showFilterMac = stringBuffer.toString();
-                    } else {
-                        showFilterMac = filterMac;
-                    }
-                    H6MainActivity.this.filterRssi = filterRssi;
-                    if (!TextUtils.isEmpty(filterName)
-                            || !TextUtils.isEmpty(showFilterMac)
-                            || filterRssi != -100) {
-                        rl_filter.setVisibility(View.VISIBLE);
-                        rl_edit_filter.setVisibility(View.GONE);
-                        StringBuilder stringBuilder = new StringBuilder();
-                        if (!TextUtils.isEmpty(filterName)) {
-                            stringBuilder.append(filterName);
-                            stringBuilder.append(";");
-                        }
-                        if (!TextUtils.isEmpty(showFilterMac)) {
-                            stringBuilder.append(showFilterMac);
-                            stringBuilder.append(";");
-                        }
-                        if (filterRssi != -100) {
-                            stringBuilder.append(String.format("%sdBm", filterRssi + ""));
-                            stringBuilder.append(";");
-                        }
-                        tv_filter.setText(stringBuilder.toString());
-                    } else {
-                        rl_filter.setVisibility(View.GONE);
-                        rl_edit_filter.setVisibility(View.VISIBLE);
-                    }
-                    if (isWindowLocked())
-                        return;
-                    if (animation == null) {
-                        startScan();
-                    }
-                });
-                scanFilterDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        if (isWindowLocked())
-                            return;
-                        if (animation == null) {
-                            startScan();
-                        }
-                    }
-                });
-                scanFilterDialog.show();
-                break;
-            case R.id.iv_filter_delete:
-                if (animation != null) {
-                    mHandler.removeMessages(0);
-                    mokoBleScanner.stopScanDevice();
-                }
-                rl_filter.setVisibility(View.GONE);
-                rl_edit_filter.setVisibility(View.VISIBLE);
-                filterName = "";
-                filterMac = "";
-                filterRssi = -100;
-                if (isWindowLocked())
-                    return;
-                if (animation == null) {
-                    startScan();
-                }
-                break;
-        }
-    }
-
     private void startScan() {
         if (!MokoSupport.getInstance().isBluetoothOpen()) {
             // 蓝牙未打开，开启蓝牙
@@ -528,12 +425,6 @@ public class H6MainActivity extends BaseActivity implements MokoScanDeviceCallba
         findViewById(R.id.iv_refresh).startAnimation(animation);
         beaconXInfoParseable = new BeaconXInfoParseableImpl();
         mokoBleScanner.startScanDevice(this);
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mokoBleScanner.stopScanDevice();
-            }
-        }, 1000 * 60);
     }
 
 
@@ -566,15 +457,7 @@ public class H6MainActivity extends BaseActivity implements MokoScanDeviceCallba
 
     @Override
     public void onBackPressed() {
-        AlertMessageDialog dialog = new AlertMessageDialog();
-        dialog.setMessage(R.string.main_exit_tips);
-        dialog.setOnAlertConfirmListener(new AlertMessageDialog.OnAlertConfirmListener() {
-            @Override
-            public void onClick() {
-                H6MainActivity.this.finish();
-            }
-        });
-        dialog.show(getSupportFragmentManager());
+        back();
     }
 
     private String mPassword;
@@ -602,6 +485,135 @@ public class H6MainActivity extends BaseActivity implements MokoScanDeviceCallba
                     MokoSupport.getInstance().connDevice(beaconXInfo.mac);
                 }
             }, 500);
+        }
+    }
+
+    public void onBack(View view) {
+        if (isWindowLocked())
+            return;
+        back();
+    }
+
+    public void onAbout(View view) {
+        if (isWindowLocked())
+            return;
+        startActivity(new Intent(this, AboutActivity.class));
+    }
+
+    public void onFilter(View view) {
+        if (isWindowLocked())
+            return;
+        if (animation != null) {
+            mHandler.removeMessages(0);
+            mokoBleScanner.stopScanDevice();
+        }
+        ScanFilterDialog scanFilterDialog = new ScanFilterDialog(this);
+        scanFilterDialog.setFilterName(filterName);
+        scanFilterDialog.setFilterMac(filterMac);
+        scanFilterDialog.setFilterRssi(filterRssi);
+        scanFilterDialog.setOnScanFilterListener((filterName, filterMac, filterRssi) -> {
+            H6MainActivity.this.filterName = filterName;
+            H6MainActivity.this.filterMac = filterMac;
+            String showFilterMac = "";
+            if (filterMac.length() == 12) {
+                StringBuffer stringBuffer = new StringBuffer(filterMac);
+                stringBuffer.insert(2, ":");
+                stringBuffer.insert(5, ":");
+                stringBuffer.insert(8, ":");
+                stringBuffer.insert(11, ":");
+                stringBuffer.insert(14, ":");
+                showFilterMac = stringBuffer.toString();
+            } else {
+                showFilterMac = filterMac;
+            }
+            H6MainActivity.this.filterRssi = filterRssi;
+            if (!TextUtils.isEmpty(filterName)
+                    || !TextUtils.isEmpty(showFilterMac)
+                    || filterRssi != -100) {
+                rl_filter.setVisibility(View.VISIBLE);
+                rl_edit_filter.setVisibility(View.GONE);
+                StringBuilder stringBuilder = new StringBuilder();
+                if (!TextUtils.isEmpty(filterName)) {
+                    stringBuilder.append(filterName);
+                    stringBuilder.append(";");
+                }
+                if (!TextUtils.isEmpty(showFilterMac)) {
+                    stringBuilder.append(showFilterMac);
+                    stringBuilder.append(";");
+                }
+                if (filterRssi != -100) {
+                    stringBuilder.append(String.format("%sdBm", filterRssi + ""));
+                    stringBuilder.append(";");
+                }
+                tv_filter.setText(stringBuilder.toString());
+            } else {
+                rl_filter.setVisibility(View.GONE);
+                rl_edit_filter.setVisibility(View.VISIBLE);
+            }
+            if (isWindowLocked())
+                return;
+            if (animation == null) {
+                startScan();
+            }
+        });
+        scanFilterDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if (isWindowLocked())
+                    return;
+                if (animation == null) {
+                    startScan();
+                }
+            }
+        });
+        scanFilterDialog.show();
+    }
+
+    private void back() {
+        if (animation != null) {
+            mHandler.removeMessages(0);
+            mokoBleScanner.stopScanDevice();
+        }
+        if (BuildConfig.IS_LIBRARY) {
+            finish();
+        } else {
+            AlertMessageDialog dialog = new AlertMessageDialog();
+            dialog.setMessage(R.string.main_exit_tips);
+            dialog.setOnAlertConfirmListener(() -> H6MainActivity.this.finish());
+            dialog.show(getSupportFragmentManager());
+        }
+    }
+
+    public void onRefresh(View view) {
+        if (isWindowLocked())
+            return;
+        if (!MokoSupport.getInstance().isBluetoothOpen()) {
+            // 蓝牙未打开，开启蓝牙
+            MokoSupport.getInstance().enableBluetooth();
+            return;
+        }
+        if (animation == null) {
+            startScan();
+        } else {
+            mHandler.removeMessages(0);
+            mokoBleScanner.stopScanDevice();
+        }
+    }
+
+    public void onFilterDelete(View view) {
+        if (animation != null) {
+            mHandler.removeMessages(0);
+            mokoBleScanner.stopScanDevice();
+        }
+        rl_filter.setVisibility(View.GONE);
+        rl_edit_filter.setVisibility(View.VISIBLE);
+        filterName = "";
+        filterMac = "";
+        filterRssi = -100;
+        if (isWindowLocked())
+            return;
+        if (animation == null) {
+            startScan();
         }
     }
 }

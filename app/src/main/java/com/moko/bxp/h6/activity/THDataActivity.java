@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.elvishew.xlog.XLog;
 import com.moko.bxp.h6.AppConstants;
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.dialog.LoadingMessageDialog;
 import com.moko.bxp.h6.fragment.StorageHumidityFragment;
 import com.moko.bxp.h6.fragment.StorageTHFragment;
@@ -51,17 +52,17 @@ import cn.carbswang.android.numberpickerview.library.NumberPickerView;
 
 public class THDataActivity extends BaseActivity implements NumberPickerView.OnValueChangeListener {
 
-    @BindView(R.id.tv_temp)
+    @BindView(R2.id.tv_temp)
     TextView tvTemp;
-    @BindView(R.id.tv_humidity)
+    @BindView(R2.id.tv_humidity)
     TextView tvHumidity;
-    @BindView(R.id.npv_storage_condition)
+    @BindView(R2.id.npv_storage_condition)
     NumberPickerView npvStorageCondition;
-    //    @BindView(R.id.frame_storage_condition)
+    //    @BindView(R2.id.frame_storage_condition)
 //    FrameLayout frameStorageCondition;
-    @BindView(R.id.tv_update_date)
+    @BindView(R2.id.tv_update_date)
     TextView tvUpdateDate;
-    @BindView(R.id.et_period)
+    @BindView(R2.id.et_period)
     EditText etPeriod;
 
     private FragmentManager fragmentManager;
@@ -369,64 +370,6 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
             mLoadingMessageDialog.dismissAllowingStateLoss();
     }
 
-    @OnClick({R.id.tv_back, R.id.iv_save, R.id.tv_update, R.id.rl_export_data})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.tv_back:
-                back();
-                break;
-            case R.id.iv_save:
-                // 保存
-                String periodStr = etPeriod.getText().toString();
-                if (TextUtils.isEmpty(periodStr)) {
-                    ToastUtils.showToast(this, "The Sampling Period can not be empty");
-                    return;
-                }
-                int period = Integer.parseInt(periodStr);
-                if (period < 1 || period > 65535) {
-                    ToastUtils.showToast(this, "The Sampling Period range is 1~65535");
-                    return;
-                }
-                showSyncingProgressDialog();
-                String storageData = "";
-                switch (mStorageType) {
-                    case 0:
-                        storageData = String.format("%04X", mSelectedTemp * 5);
-                        break;
-                    case 1:
-                        storageData = String.format("%04X", mSelectedHumidity * 5);
-                        break;
-                    case 2:
-                        storageData = String.format("%04X", mSelectedTemp * 5) + String.format("%04X", mSelectedHumidity * 5);
-                        break;
-                    case 3:
-                        storageData = String.format("%02X", mSelectedTime);
-                        break;
-                }
-                ArrayList<OrderTask> orderTasks = new ArrayList<>();
-                orderTasks.add(OrderTaskAssembler.setTHPeriod(period));
-                orderTasks.add(OrderTaskAssembler.setStorageCondition(mStorageType, storageData));
-                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                break;
-            case R.id.tv_update:
-                showSyncingProgressDialog();
-                Calendar calendar = Calendar.getInstance();
-                ArrayList<OrderTask> tasks = new ArrayList<>();
-                tasks.add(OrderTaskAssembler.setDeviceTime(calendar.get(Calendar.YEAR) - 2000, calendar.get(Calendar.MONTH) + 1,
-                        calendar.get(Calendar.DAY_OF_MONTH),
-                        calendar.get(Calendar.HOUR_OF_DAY),
-                        calendar.get(Calendar.MINUTE),
-                        calendar.get(Calendar.SECOND)));
-                tasks.add(OrderTaskAssembler.getDeviceTime());
-                MokoSupport.getInstance().sendOrder(tasks.toArray(new OrderTask[]{}));
-                break;
-            case R.id.rl_export_data:
-                // 跳转导出数据页面
-                startActivity(new Intent(this, ExportDataActivity.class));
-                break;
-        }
-    }
-
     private void back() {
         // 关闭通知
         MokoSupport.getInstance().disableTHNotify();
@@ -452,5 +395,107 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
 
     public void setSelectedTime(int selectedTime) {
         this.mSelectedTime = selectedTime;
+    }
+
+    public void onExportData(View view) {
+        if (isWindowLocked())
+            return;
+        // 跳转导出数据页面
+        startActivity(new Intent(this, ExportDataActivity.class));
+    }
+
+    public void onUpdate(View view) {
+        if (isWindowLocked())
+            return;
+        showSyncingProgressDialog();
+        Calendar calendar = Calendar.getInstance();
+        ArrayList<OrderTask> tasks = new ArrayList<>();
+        tasks.add(OrderTaskAssembler.setDeviceTime(calendar.get(Calendar.YEAR) - 2000, calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                calendar.get(Calendar.SECOND)));
+        tasks.add(OrderTaskAssembler.getDeviceTime());
+        MokoSupport.getInstance().sendOrder(tasks.toArray(new OrderTask[]{}));
+    }
+
+    public void onBack(View view) {
+        back();
+    }
+
+    public void onSave(View view) {
+        if (isWindowLocked())
+            return;
+        // 保存
+        String periodStr = etPeriod.getText().toString();
+        if (TextUtils.isEmpty(periodStr)) {
+            ToastUtils.showToast(this, "The Sampling Period can not be empty");
+            return;
+        }
+        int period = Integer.parseInt(periodStr);
+        if (period < 1 || period > 65535) {
+            ToastUtils.showToast(this, "The Sampling Period range is 1~65535");
+            return;
+        }
+        showSyncingProgressDialog();
+        String storageData = "";
+        switch (mStorageType) {
+            case 0:
+                storageData = String.format("%04X", mSelectedTemp * 5);
+                break;
+            case 1:
+                storageData = String.format("%04X", mSelectedHumidity * 5);
+                break;
+            case 2:
+                storageData = String.format("%04X", mSelectedTemp * 5) + String.format("%04X", mSelectedHumidity * 5);
+                break;
+            case 3:
+                storageData = String.format("%02X", mSelectedTime);
+                break;
+        }
+        ArrayList<OrderTask> orderTasks = new ArrayList<>();
+        orderTasks.add(OrderTaskAssembler.setTHPeriod(period));
+        orderTasks.add(OrderTaskAssembler.setStorageCondition(mStorageType, storageData));
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+    }
+
+    public void onSelectStorageTemp(View view) {
+        if (isWindowLocked())
+            return;
+        if (tempFragment != null) {
+            tempFragment.selectStorageTemp();
+        }
+    }
+
+    public void onSelectStorageHumi(View view) {
+        if (isWindowLocked())
+            return;
+        if (humidityFragment != null) {
+            humidityFragment.selectStorageHumi();
+        }
+    }
+
+    public void onSelectTHStorageTemp(View view) {
+        if (isWindowLocked())
+            return;
+        if (thFragment != null) {
+            thFragment.selectStorageTemp();
+        }
+    }
+
+    public void onSelectTHStorageHumi(View view) {
+        if (isWindowLocked())
+            return;
+        if (thFragment != null) {
+            thFragment.selectStorageHumi();
+        }
+    }
+
+    public void onSelectStorageTime(View view) {
+        if (isWindowLocked())
+            return;
+        if (timeFragment != null) {
+            timeFragment.selectStorageTime();
+        }
     }
 }

@@ -13,12 +13,13 @@ import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.moko.ble.lib.task.OrderTask;
+import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.able.ISlotDataAction;
 import com.moko.bxp.h6.activity.SlotDataActivity;
 import com.moko.bxp.h6.utils.ToastUtils;
-import com.moko.ble.lib.task.OrderTask;
-import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.h6.MokoSupport;
 import com.moko.support.h6.OrderTaskAssembler;
 import com.moko.support.h6.entity.SlotFrameTypeEnum;
@@ -32,18 +33,18 @@ import butterknife.ButterKnife;
 public class DeviceInfoFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, ISlotDataAction {
 
     private static final String TAG = "DeviceInfoFragment";
-    private final String FILTER_ASCII = "\\A\\p{ASCII}*\\z";
-    @BindView(R.id.et_device_name)
+    private final String FILTER_ASCII = "[ -~]*";
+    @BindView(R2.id.et_device_name)
     EditText etDeviceName;
-    @BindView(R.id.sb_adv_tx_power)
-    SeekBar sbAdvTxPower;
-    @BindView(R.id.sb_tx_power)
+    @BindView(R2.id.sb_adv_tx_power)
+    SeekBar sbRssi;
+    @BindView(R2.id.sb_tx_power)
     SeekBar sbTxPower;
-    @BindView(R.id.tv_adv_tx_power)
-    TextView tvAdvTxPower;
-    @BindView(R.id.tv_tx_power)
+    @BindView(R2.id.tv_adv_tx_power)
+    TextView tvRssi;
+    @BindView(R2.id.tv_tx_power)
     TextView tvTxPower;
-    @BindView(R.id.et_adv_interval)
+    @BindView(R2.id.et_adv_interval)
     EditText etAdvInterval;
 
 
@@ -70,7 +71,7 @@ public class DeviceInfoFragment extends Fragment implements SeekBar.OnSeekBarCha
         View view = inflater.inflate(R.layout.fragment_device_info, container, false);
         ButterKnife.bind(this, view);
         activity = (SlotDataActivity) getActivity();
-        sbAdvTxPower.setOnSeekBarChangeListener(this);
+        sbRssi.setOnSeekBarChangeListener(this);
         sbTxPower.setOnSeekBarChangeListener(this);
         InputFilter filter = new InputFilter() {
             @Override
@@ -91,7 +92,7 @@ public class DeviceInfoFragment extends Fragment implements SeekBar.OnSeekBarCha
         if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.NO_DATA) {
             etAdvInterval.setText("10");
             etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
-            sbAdvTxPower.setProgress(100);
+            sbRssi.setProgress(100);
             sbTxPower.setProgress(6);
         } else {
             int advIntervalProgress = activity.slotData.advInterval / 100;
@@ -100,14 +101,14 @@ public class DeviceInfoFragment extends Fragment implements SeekBar.OnSeekBarCha
             advIntervalBytes = MokoUtils.toByteArray(activity.slotData.advInterval, 2);
 
             if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.TLM) {
-                sbAdvTxPower.setProgress(100);
-                advTxPowerBytes = MokoUtils.toByteArray(0, 1);
-                tvAdvTxPower.setText(String.format("%ddBm", 0));
+                sbRssi.setProgress(100);
+                rssiBytes = MokoUtils.toByteArray(0, 1);
+                tvRssi.setText(String.format("%ddBm", 0));
             } else {
                 int advTxPowerProgress = activity.slotData.rssi_0m + 100;
-                sbAdvTxPower.setProgress(advTxPowerProgress);
-                advTxPowerBytes = MokoUtils.toByteArray(activity.slotData.rssi_0m, 1);
-                tvAdvTxPower.setText(String.format("%ddBm", activity.slotData.rssi_0m));
+                sbRssi.setProgress(advTxPowerProgress);
+                rssiBytes = MokoUtils.toByteArray(activity.slotData.rssi_0m, 1);
+                tvRssi.setText(String.format("%ddBm", activity.slotData.rssi_0m));
             }
 
             int txPowerProgress = TxPowerEnum.fromTxPower(activity.slotData.txPower).ordinal();
@@ -142,7 +143,7 @@ public class DeviceInfoFragment extends Fragment implements SeekBar.OnSeekBarCha
     }
 
     private byte[] advIntervalBytes;
-    private byte[] advTxPowerBytes;
+    private byte[] rssiBytes;
     private byte[] txPowerBytes;
 
     @Override
@@ -151,18 +152,15 @@ public class DeviceInfoFragment extends Fragment implements SeekBar.OnSeekBarCha
     }
 
     public void upgdateData(int viewId, int progress) {
-        switch (viewId) {
-            case R.id.sb_adv_tx_power:
-                int advTxPower = progress - 100;
-                tvAdvTxPower.setText(String.format("%ddBm", advTxPower));
-                advTxPowerBytes = MokoUtils.toByteArray(advTxPower, 1);
-                break;
-            case R.id.sb_tx_power:
-                TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
-                int txPower = txPowerEnum.getTxPower();
-                tvTxPower.setText(String.format("%ddBm", txPower));
-                txPowerBytes = MokoUtils.toByteArray(txPower, 1);
-                break;
+        if (viewId == R.id.sb_adv_tx_power) {
+            int advTxPower = progress - 100;
+            tvRssi.setText(String.format("%ddBm", advTxPower));
+            rssiBytes = MokoUtils.toByteArray(advTxPower, 1);
+        } else if (viewId == R.id.sb_tx_power) {
+            TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
+            int txPower = txPowerEnum.getTxPower();
+            tvTxPower.setText(String.format("%ddBm", txPower));
+            txPowerBytes = MokoUtils.toByteArray(txPower, 1);
         }
     }
 
@@ -187,12 +185,12 @@ public class DeviceInfoFragment extends Fragment implements SeekBar.OnSeekBarCha
             return false;
         }
         if (TextUtils.isEmpty(advInterval)) {
-            ToastUtils.showToast(activity, "The Adv Interval can not be empty.");
+            ToastUtils.showToast(activity, "The Adv interval can not be empty.");
             return false;
         }
         int advIntervalInt = Integer.parseInt(advInterval);
         if (advIntervalInt < 1 || advIntervalInt > 100) {
-            ToastUtils.showToast(activity, "The Adv Interval range is 1~100");
+            ToastUtils.showToast(activity, "The Adv interval range is 1~100");
             return false;
         }
         String deviceNameHex = MokoUtils.string2Hex(deviceName);
@@ -209,7 +207,7 @@ public class DeviceInfoFragment extends Fragment implements SeekBar.OnSeekBarCha
         orderTasks.add(OrderTaskAssembler.setSlot(activity.slotData.slotEnum));
         orderTasks.add(OrderTaskAssembler.setSlotData(deviceInfoParamsBytes));
         orderTasks.add(OrderTaskAssembler.setRadioTxPower(txPowerBytes));
-        orderTasks.add(OrderTaskAssembler.setAdvTxPower(advTxPowerBytes));
+        orderTasks.add(OrderTaskAssembler.setRssi(rssiBytes));
         orderTasks.add(OrderTaskAssembler.setAdvInterval(advIntervalBytes));
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
@@ -222,8 +220,8 @@ public class DeviceInfoFragment extends Fragment implements SeekBar.OnSeekBarCha
             etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
             advIntervalBytes = MokoUtils.toByteArray(activity.slotData.advInterval, 2);
 
-            int advTxPowerProgress = activity.slotData.rssi_0m + 100;
-            sbAdvTxPower.setProgress(advTxPowerProgress);
+            int rssiProgress = activity.slotData.rssi_0m + 100;
+            sbRssi.setProgress(rssiProgress);
 
             int txPowerProgress = TxPowerEnum.fromTxPower(activity.slotData.txPower).ordinal();
             sbTxPower.setProgress(txPowerProgress);
@@ -233,7 +231,7 @@ public class DeviceInfoFragment extends Fragment implements SeekBar.OnSeekBarCha
         } else {
             etAdvInterval.setText("10");
             etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
-            sbAdvTxPower.setProgress(100);
+            sbRssi.setProgress(100);
             sbTxPower.setProgress(6);
             etDeviceName.setText("");
         }

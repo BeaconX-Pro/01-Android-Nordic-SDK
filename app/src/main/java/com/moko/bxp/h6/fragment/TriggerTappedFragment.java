@@ -15,6 +15,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.activity.SlotDataActivity;
 import com.moko.bxp.h6.utils.ToastUtils;
 
@@ -26,19 +27,19 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
     private static final String TAG = "TappedFragment";
 
 
-    @BindView(R.id.tv_trigger_tips)
+    @BindView(R2.id.tv_trigger_tips)
     TextView tvTriggerTips;
-    @BindView(R.id.rb_always_start)
+    @BindView(R2.id.rb_always_start)
     RadioButton rbAlwaysStart;
-    @BindView(R.id.rb_start_advertising)
+    @BindView(R2.id.rb_start_advertising)
     RadioButton rbStartAdvertising;
-    @BindView(R.id.rb_stop_advertising)
+    @BindView(R2.id.rb_stop_advertising)
     RadioButton rbStopAdvertising;
-    @BindView(R.id.rg_tapped)
+    @BindView(R2.id.rg_tapped)
     RadioGroup rgTapped;
-    @BindView(R.id.et_start)
+    @BindView(R2.id.et_start)
     EditText etStart;
-    @BindView(R.id.et_stop)
+    @BindView(R2.id.et_stop)
     EditText etStop;
 
 
@@ -99,7 +100,7 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                 String duration = s.toString();
                 if (rbStartAdvertising.isChecked() && !TextUtils.isEmpty(duration)) {
                     mDuration = Integer.parseInt(duration);
-                    tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "start to broadcast", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
+                    tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
                 }
             }
         });
@@ -119,7 +120,7 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                 String duration = s.toString();
                 if (rbStopAdvertising.isChecked() && !TextUtils.isEmpty(duration)) {
                     mDuration = Integer.parseInt(duration);
-                    tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "stop broadcasting", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
+                    tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
                 }
             }
         });
@@ -131,10 +132,10 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
             tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_1, mIsDouble ? "twice" : "three times"));
         } else if (rbStartAdvertising.isChecked()) {
             mDuration = Integer.parseInt(etStart.getText().toString());
-            tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "start to broadcast", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
+            tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
         } else {
             mDuration = Integer.parseInt(etStop.getText().toString());
-            tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "stop broadcasting", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
+            tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
         }
     }
 
@@ -162,31 +163,27 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        switch (checkedId) {
-            case R.id.rb_always_start:
-                mIsStart = true;
-                tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_1, mIsDouble ? "twice" : "three times"));
-                break;
-            case R.id.rb_start_advertising:
-                mIsStart = true;
-                String startDuration = etStart.getText().toString();
-                if (TextUtils.isEmpty(startDuration)) {
-                    mDuration = 0;
-                } else {
-                    mDuration = Integer.parseInt(startDuration);
-                }
-                tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "start to broadcast", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
-                break;
-            case R.id.rb_stop_advertising:
-                mIsStart = false;
-                String stopDuration = etStop.getText().toString();
-                if (TextUtils.isEmpty(stopDuration)) {
-                    mDuration = 0;
-                } else {
-                    mDuration = Integer.parseInt(stopDuration);
-                }
-                tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "stop broadcasting", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
-                break;
+        if (checkedId == R.id.rb_always_start) {
+            mIsStart = true;
+            tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_1, mIsDouble ? "twice" : "three times"));
+        } else if (checkedId == R.id.rb_start_advertising) {
+            mIsStart = true;
+            String startDuration = etStart.getText().toString();
+            if (TextUtils.isEmpty(startDuration)) {
+                mDuration = 0;
+            } else {
+                mDuration = Integer.parseInt(startDuration);
+            }
+            tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
+        } else if (checkedId == R.id.rb_stop_advertising) {
+            mIsStart = false;
+            String stopDuration = etStop.getText().toString();
+            if (TextUtils.isEmpty(stopDuration)) {
+                mDuration = 0;
+            } else {
+                mDuration = Integer.parseInt(stopDuration);
+            }
+            tvTriggerTips.setText(getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), mIsDouble ? "twice" : "three times"));
         }
     }
 

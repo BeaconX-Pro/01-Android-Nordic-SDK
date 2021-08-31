@@ -50,9 +50,9 @@ public class OrderTaskAssembler {
     /**
      * @Description 设置设备锁方式
      */
-    public static OrderTask setLockStateDirected(boolean isDirected) {
+    public static OrderTask setLockStateDirected(int enable) {
         SetLockStateTask task = new SetLockStateTask();
-        task.setData(isDirected ? new byte[]{0x02} : new byte[]{0x01});
+        task.setData(MokoUtils.toByteArray(enable, 1));
         return task;
     }
 
@@ -253,9 +253,9 @@ public class OrderTaskAssembler {
     /**
      * @Description 设置连接状态
      */
-    public static OrderTask setConnectable(boolean isConnectable) {
+    public static OrderTask setConnectable(int enable) {
         SetConnectableTask task = new SetConnectableTask();
-        task.setData(isConnectable ? MokoUtils.toByteArray(1, 1) : MokoUtils.toByteArray(0, 1));
+        task.setData(MokoUtils.toByteArray(enable, 1));
         return task;
     }
 
@@ -396,7 +396,7 @@ public class OrderTaskAssembler {
     /**
      * @Description 设置广播强度
      */
-    public static OrderTask setAdvTxPower(byte[] data) {
+    public static OrderTask setRssi(byte[] data) {
         SetAdvTxPowerTask advTxPowerTask = new SetAdvTxPowerTask();
         advTxPowerTask.setData(data);
         return advTxPowerTask;
@@ -405,7 +405,7 @@ public class OrderTaskAssembler {
     /**
      * @Description 设置广播强度
      */
-    public static OrderTask getAdvTxPower() {
+    public static OrderTask getRssi() {
         GetAdvTxPowerTask task = new GetAdvTxPowerTask();
         return task;
     }
@@ -487,6 +487,18 @@ public class OrderTaskAssembler {
     public static OrderTask setHWResetEnable(int enable) {
         ParamsTask task = new ParamsTask();
         task.setHWResetEnable(enable);
+        return task;
+    }
+
+    public static OrderTask getTriggerLEDNotifyEnable() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.GET_TRIGGER_LED_NOTIFICATION);
+        return task;
+    }
+
+    public static OrderTask setTriggerLEDNotifyEnable(int enable) {
+        ParamsTask task = new ParamsTask();
+        task.setTriggerLEDNotifyEnable(enable);
         return task;
     }
 }

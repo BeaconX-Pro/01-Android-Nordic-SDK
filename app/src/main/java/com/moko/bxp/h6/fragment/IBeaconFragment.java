@@ -2,9 +2,7 @@ package com.moko.bxp.h6.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.text.method.ReplacementTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,19 +12,19 @@ import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.moko.ble.lib.task.OrderTask;
+import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.able.ISlotDataAction;
 import com.moko.bxp.h6.activity.SlotDataActivity;
 import com.moko.bxp.h6.utils.ToastUtils;
-import com.moko.ble.lib.task.OrderTask;
-import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.h6.MokoSupport;
 import com.moko.support.h6.OrderTaskAssembler;
 import com.moko.support.h6.entity.SlotFrameTypeEnum;
 import com.moko.support.h6.entity.TxPowerEnum;
 
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,26 +32,23 @@ import butterknife.ButterKnife;
 public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, ISlotDataAction {
     private static final String TAG = "IBeaconFragment";
 
-    public static final String UUID_PATTERN = "[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}";
-
-    @BindView(R.id.sb_adv_tx_power)
-    SeekBar sbAdvTxPower;
-    @BindView(R.id.sb_tx_power)
+    @BindView(R2.id.sb_adv_tx_power)
+    SeekBar sbRssi;
+    @BindView(R2.id.sb_tx_power)
     SeekBar sbTxPower;
-    @BindView(R.id.et_major)
+    @BindView(R2.id.et_major)
     EditText etMajor;
-    @BindView(R.id.et_minor)
+    @BindView(R2.id.et_minor)
     EditText etMinor;
-    @BindView(R.id.et_uuid)
+    @BindView(R2.id.et_uuid)
     EditText etUuid;
-    @BindView(R.id.tv_adv_tx_power)
-    TextView tvAdvTxPower;
-    @BindView(R.id.tv_tx_power)
+    @BindView(R2.id.tv_adv_tx_power)
+    TextView tvRssi;
+    @BindView(R2.id.tv_tx_power)
     TextView tvTxPower;
-    @BindView(R.id.et_adv_interval)
+    @BindView(R2.id.et_adv_interval)
     EditText etAdvInterval;
 
-    private Pattern pattern;
 
     private SlotDataActivity activity;
 
@@ -78,49 +73,10 @@ public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChange
         View view = inflater.inflate(R.layout.fragment_ibeacon, container, false);
         ButterKnife.bind(this, view);
         activity = (SlotDataActivity) getActivity();
-        sbAdvTxPower.setOnSeekBarChangeListener(this);
+        sbRssi.setOnSeekBarChangeListener(this);
         sbTxPower.setOnSeekBarChangeListener(this);
-        pattern = Pattern.compile(UUID_PATTERN);
         //限制只输入大写，自动小写转大写
         etUuid.setTransformationMethod(new A2bigA());
-        etUuid.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String input = s.toString();
-                if (!pattern.matcher(input).matches()) {
-                    if (input.length() == 9 && !input.endsWith("-")) {
-                        String show = input.substring(0, 8) + "-" + input.substring(8, input.length());
-                        etUuid.setText(show);
-                        etUuid.setSelection(show.length());
-                    }
-                    if (input.length() == 14 && !input.endsWith("-")) {
-                        String show = input.substring(0, 13) + "-" + input.substring(13, input.length());
-                        etUuid.setText(show);
-                        etUuid.setSelection(show.length());
-                    }
-                    if (input.length() == 19 && !input.endsWith("-")) {
-                        String show = input.substring(0, 18) + "-" + input.substring(18, input.length());
-                        etUuid.setText(show);
-                        etUuid.setSelection(show.length());
-                    }
-                    if (input.length() == 24 && !input.endsWith("-")) {
-                        String show = input.substring(0, 23) + "-" + input.substring(23, input.length());
-                        etUuid.setText(show);
-                        etUuid.setSelection(show.length());
-                    }
-                }
-            }
-        });
         setDefault();
         return view;
     }
@@ -129,7 +85,7 @@ public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChange
         if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.NO_DATA) {
             etAdvInterval.setText("10");
             etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
-            sbAdvTxPower.setProgress(41);
+            sbRssi.setProgress(41);
             sbTxPower.setProgress(6);
         } else {
             int advIntervalProgress = activity.slotData.advInterval / 100;
@@ -139,18 +95,18 @@ public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChange
 
             if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.IBEACON) {
                 int advTxPowerProgress = activity.slotData.rssi_1m + 100;
-                sbAdvTxPower.setProgress(advTxPowerProgress);
-                advTxPowerBytes = MokoUtils.toByteArray(activity.slotData.rssi_1m, 1);
-                tvAdvTxPower.setText(String.format("%ddBm", activity.slotData.rssi_1m));
+                sbRssi.setProgress(advTxPowerProgress);
+                rssiBytes = MokoUtils.toByteArray(activity.slotData.rssi_1m, 1);
+                tvRssi.setText(String.format("%ddBm", activity.slotData.rssi_1m));
             } else if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.TLM) {
-                sbAdvTxPower.setProgress(41);
-                advTxPowerBytes = MokoUtils.toByteArray(-59, 1);
-                tvAdvTxPower.setText(String.format("%ddBm", -59));
+                sbRssi.setProgress(41);
+                rssiBytes = MokoUtils.toByteArray(-59, 1);
+                tvRssi.setText(String.format("%ddBm", -59));
             } else {
                 int advTxPowerProgress = activity.slotData.rssi_0m + 100;
-                sbAdvTxPower.setProgress(advTxPowerProgress);
-                advTxPowerBytes = MokoUtils.toByteArray(activity.slotData.rssi_0m, 1);
-                tvAdvTxPower.setText(String.format("%ddBm", activity.slotData.rssi_0m));
+                sbRssi.setProgress(advTxPowerProgress);
+                rssiBytes = MokoUtils.toByteArray(activity.slotData.rssi_0m, 1);
+                tvRssi.setText(String.format("%ddBm", activity.slotData.rssi_0m));
             }
 
             int txPowerProgress = TxPowerEnum.fromTxPower(activity.slotData.txPower).ordinal();
@@ -161,12 +117,7 @@ public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChange
         if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.IBEACON) {
             etMajor.setText(Integer.parseInt(activity.slotData.major, 16) + "");
             etMinor.setText(Integer.parseInt(activity.slotData.minor, 16) + "");
-            StringBuilder stringBuilder = new StringBuilder(activity.slotData.iBeaconUUID);
-            stringBuilder.insert(8, "-");
-            stringBuilder.insert(13, "-");
-            stringBuilder.insert(18, "-");
-            stringBuilder.insert(23, "-");
-            etUuid.setText(stringBuilder.toString().toUpperCase());
+            etUuid.setText(activity.slotData.iBeaconUUID.toUpperCase());
             etMajor.setSelection(etMajor.getText().toString().length());
             etMinor.setSelection(etMinor.getText().toString().length());
             etUuid.setSelection(etUuid.getText().toString().length());
@@ -192,7 +143,7 @@ public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChange
     }
 
     private byte[] advIntervalBytes;
-    private byte[] advTxPowerBytes;
+    private byte[] rssiBytes;
     private byte[] txPowerBytes;
 
     @Override
@@ -202,18 +153,15 @@ public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChange
 
 
     public void upgdateData(int viewId, int progress) {
-        switch (viewId) {
-            case R.id.sb_adv_tx_power:
-                int advTxPower = progress - 100;
-                tvAdvTxPower.setText(String.format("%ddBm", advTxPower));
-                advTxPowerBytes = MokoUtils.toByteArray(advTxPower, 1);
-                break;
-            case R.id.sb_tx_power:
-                TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
-                int txPower = txPowerEnum.getTxPower();
-                tvTxPower.setText(String.format("%ddBm", txPower));
-                txPowerBytes = MokoUtils.toByteArray(txPower, 1);
-                break;
+        if (viewId == R.id.sb_adv_tx_power) {
+            int advTxPower = progress - 100;
+            tvRssi.setText(String.format("%ddBm", advTxPower));
+            rssiBytes = MokoUtils.toByteArray(advTxPower, 1);
+        } else if (viewId == R.id.sb_tx_power) {
+            TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
+            int txPower = txPowerEnum.getTxPower();
+            tvTxPower.setText(String.format("%ddBm", txPower));
+            txPowerBytes = MokoUtils.toByteArray(txPower, 1);
         }
     }
 
@@ -236,7 +184,7 @@ public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChange
     public boolean isValid() {
         String majorStr = etMajor.getText().toString();
         String minorStr = etMinor.getText().toString();
-        String uuidStr = etUuid.getText().toString().replaceAll("-", "");
+        String uuidStr = etUuid.getText().toString();
         String advInterval = etAdvInterval.getText().toString();
         if (TextUtils.isEmpty(majorStr) || TextUtils.isEmpty(minorStr) || TextUtils.isEmpty(uuidStr)) {
             ToastUtils.showToast(activity, "Data format incorrect!");
@@ -247,12 +195,12 @@ public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChange
             return false;
         }
         if (TextUtils.isEmpty(advInterval)) {
-            ToastUtils.showToast(activity, "The Adv Interval can not be empty.");
+            ToastUtils.showToast(activity, "The Adv interval can not be empty.");
             return false;
         }
         int advIntervalInt = Integer.parseInt(advInterval);
         if (advIntervalInt < 1 || advIntervalInt > 100) {
-            ToastUtils.showToast(activity, "The Adv Interval range is 1~100");
+            ToastUtils.showToast(activity, "The Adv interval range is 1~100");
             return false;
         }
         major = String.format("%04X", Integer.valueOf(majorStr));
@@ -271,7 +219,7 @@ public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChange
         orderTasks.add(OrderTaskAssembler.setSlot(activity.slotData.slotEnum));
         orderTasks.add(OrderTaskAssembler.setSlotData(iBeaconParamsBytes));
         orderTasks.add(OrderTaskAssembler.setRadioTxPower(txPowerBytes));
-        orderTasks.add(OrderTaskAssembler.setAdvTxPower(advTxPowerBytes));
+        orderTasks.add(OrderTaskAssembler.setRssi(rssiBytes));
         orderTasks.add(OrderTaskAssembler.setAdvInterval(advIntervalBytes));
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
@@ -299,27 +247,22 @@ public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChange
             etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
             advIntervalBytes = MokoUtils.toByteArray(activity.slotData.advInterval, 2);
 
-            int advTxPowerProgress = activity.slotData.rssi_1m + 100;
-            sbAdvTxPower.setProgress(advTxPowerProgress);
+            int rssiProgress = activity.slotData.rssi_1m + 100;
+            sbRssi.setProgress(rssiProgress);
 
             int txPowerProgress = TxPowerEnum.fromTxPower(activity.slotData.txPower).ordinal();
             sbTxPower.setProgress(txPowerProgress);
 
             etMajor.setText(Integer.parseInt(activity.slotData.major, 16) + "");
             etMinor.setText(Integer.parseInt(activity.slotData.minor, 16) + "");
-            StringBuilder stringBuilder = new StringBuilder(activity.slotData.iBeaconUUID);
-            stringBuilder.insert(8, "-");
-            stringBuilder.insert(13, "-");
-            stringBuilder.insert(18, "-");
-            stringBuilder.insert(23, "-");
-            etUuid.setText(stringBuilder.toString().toUpperCase());
+            etUuid.setText(activity.slotData.iBeaconUUID.toUpperCase());
             etMajor.setSelection(etMajor.getText().toString().length());
             etMinor.setSelection(etMinor.getText().toString().length());
             etUuid.setSelection(etUuid.getText().toString().length());
         } else {
             etAdvInterval.setText("10");
             etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
-            sbAdvTxPower.setProgress(41);
+            sbRssi.setProgress(41);
             sbTxPower.setProgress(6);
 
             etMajor.setText("");

@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import com.moko.bxp.h6.R;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.bxp.h6.R2;
+
+import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -17,21 +20,21 @@ import butterknife.ButterKnife;
 public class DeviceFragment extends Fragment {
 
     private static final String TAG = "DeviceFragment";
-    @BindView(R.id.tv_soc)
+    @BindView(R2.id.tv_soc)
     TextView tvSoc;
-    @BindView(R.id.tv_mac_address)
+    @BindView(R2.id.tv_mac_address)
     TextView tvMacAddress;
-    @BindView(R.id.tv_product_date)
+    @BindView(R2.id.tv_product_date)
     TextView tvProductDate;
-    @BindView(R.id.tv_device_model)
+    @BindView(R2.id.tv_device_model)
     TextView tvDeviceModel;
-    @BindView(R.id.tv_software_version)
+    @BindView(R2.id.tv_software_version)
     TextView tvSoftwareVersion;
-    @BindView(R.id.tv_hardware_version)
+    @BindView(R2.id.tv_hardware_version)
     TextView tvHardwareVersion;
-    @BindView(R.id.tv_manufacturer)
+    @BindView(R2.id.tv_manufacturer)
     TextView tvManufacturer;
-    @BindView(R.id.tv_firmware_version)
+    @BindView(R2.id.tv_firmware_version)
     TextView tvFirmwareVersion;
 
 

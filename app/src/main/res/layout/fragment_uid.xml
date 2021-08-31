@@ -20,7 +20,7 @@
             android:drawableLeft="@drawable/adv_content"
             android:drawablePadding="10dp"
             android:gravity="center"
-            android:text="Adv Content"
+            android:text="Adv content"
             android:textColor="@color/black_333333"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -35,7 +35,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Namespace"
+                android:text="Namespace ID"
                 android:textColor="@color/grey_666666"
                 android:textSize="15sp" />
 
@@ -114,7 +114,7 @@
             android:drawableLeft="@drawable/base_params"
             android:drawablePadding="10dp"
             android:gravity="center"
-            android:text="Base Params"
+            android:text="Parameters"
             android:textColor="@color/black_333333"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -129,7 +129,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="Adv Interval"
+                android:text="Adv interval"
                 android:textColor="@color/grey_666666"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -163,10 +163,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
                 android:layout_toLeftOf="@id/adv_interval_unit"
-                android:ems="3"
                 android:gravity="center"
                 android:inputType="number"
-                android:lines="1"
+                android:maxLength="3"
+                android:singleLine="true"
                 android:text=""
                 android:textColor="@color/black_333333"
                 android:textSize="15sp"
@@ -230,7 +230,7 @@
                 android:id="@+id/tx_power"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tx Power"
+                android:text="Tx power"
                 android:textColor="@color/grey_666666"
                 android:textSize="15sp"
                 android:textStyle="bold" />

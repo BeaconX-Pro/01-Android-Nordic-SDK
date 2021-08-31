@@ -7,7 +7,7 @@ public class AppConstants {
     public static final String PATTERN_MM_DD = "MM/dd";
     public static final String PATTERN_MM_DD_2 = "MM-dd";
     public static final String PATTERN_YYYY_MM_DD_HH_MM = "yyyy-MM-dd HH:mm";
-    public static final String PATTERN_YYYY_MM_DD_HH_MM_SS = "yyyy/MM/dd HH:mm:ss";
+    public static final String PATTERN_YYYY_MM_DD_HH_MM_SS = "dd/MM/yyyy HH:mm:ss";
     // sp
     public static final String SP_NAME = "sp_name_beaconx_pro";
 
@@ -20,11 +20,13 @@ public class AppConstants {
     public static final String EXTRA_KEY_DEVICE_TYPE = "EXTRA_KEY_DEVICE_TYPE";
     public static final String EXTRA_KEY_TRIGGER_TYPE = "EXTRA_KEY_TRIGGER_TYPE";
     public static final String EXTRA_KEY_TRIGGER_DATA = "EXTRA_KEY_TRIGGER_DATA";
+    public static final String EXTRA_KEY_PASSWORD_VERIFICATION = "EXTRA_KEY_PASSWORD_VERIFICATION";
 
     // request_code
     public static final int REQUEST_CODE_DEVICE_INFO = 0x10;
     public static final int REQUEST_CODE_SLOT_DATA = 100;
     public static final int REQUEST_CODE_ENABLE_BT = 1001;
+    public static final int REQUEST_CODE_QUICK_SWITCH = 1002;
 
 
     public static final int REQUEST_CODE_PERMISSION = 120;

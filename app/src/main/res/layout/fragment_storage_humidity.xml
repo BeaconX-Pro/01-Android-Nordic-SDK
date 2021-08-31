@@ -10,6 +10,8 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:background="@drawable/shape_radius_blue_frame"
+        android:clickable="true"
+        android:onClick="onSelectStorageHumi"
         android:paddingLeft="20dp"
         android:paddingTop="5dp"
         android:paddingRight="20dp"

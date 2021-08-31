@@ -23,21 +23,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Always advertise"
+                android:text="Start and keep advertising"
                 android:textSize="10sp" />
 
             <RadioButton
                 android:id="@+id/rb_start_advertising"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Start advertising for a while"
+                android:text="Start advertising for "
                 android:textSize="10sp" />
 
             <RadioButton
                 android:id="@+id/rb_stop_advertising"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Stop advertising for a while"
+                android:text="Stop advertising for"
                 android:textSize="10sp" />
         </RadioGroup>
 

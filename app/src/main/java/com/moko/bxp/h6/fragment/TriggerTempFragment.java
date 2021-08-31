@@ -12,6 +12,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.activity.SlotDataActivity;
 
 import butterknife.BindView;
@@ -20,17 +21,17 @@ import butterknife.ButterKnife;
 public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, RadioGroup.OnCheckedChangeListener {
 
     private static final String TAG = "TempFragment";
-    @BindView(R.id.sb_trigger_temp)
+    @BindView(R2.id.sb_trigger_temp)
     SeekBar sbTriggerTemp;
-    @BindView(R.id.tv_trigger_temp)
+    @BindView(R2.id.tv_trigger_temp)
     TextView tvTriggerTemp;
-    @BindView(R.id.rb_start)
+    @BindView(R2.id.rb_start)
     RadioButton rbStart;
-    @BindView(R.id.rb_stop)
+    @BindView(R2.id.rb_stop)
     RadioButton rbStop;
-    @BindView(R.id.rg_advertising)
+    @BindView(R2.id.rg_advertising)
     RadioGroup rgAdvertising;
-    @BindView(R.id.tv_trigger_tips)
+    @BindView(R2.id.tv_trigger_tips)
     TextView tvTriggerTips;
 //    @BindView(R.id.trigger_temp)
 //    TextView triggerTemp;
@@ -70,7 +71,7 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
         sbTriggerTemp.setProgress(mProgress);
         String tempStr = String.format("%d℃", mProgress - 20);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "start to broadcast" : "stop broadcasting", "temperature", mIsAbove ? "above" : "below", tempStr));
+                mIsStart ? "stop advertising for" : "stop advertising for", "temperature", mIsAbove ? "above" : "below", tempStr));
 //        triggerTemp.setText(mIsAbove ? "Temperature Above" : "Temperature Below");
         return view;
     }
@@ -100,7 +101,7 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
         String tempStr = String.format("%d℃", progress - 20);
         tvTriggerTemp.setText(tempStr);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "start to broadcast" : "stop broadcasting", "temperature", mIsAbove ? "above" : "below", tempStr));
+                mIsStart ? "stop advertising for" : "stop advertising for", "temperature", mIsAbove ? "above" : "below", tempStr));
     }
 
     @Override
@@ -119,17 +120,14 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        switch (checkedId) {
-            case R.id.rb_start:
-                mIsStart = true;
-                break;
-            case R.id.rb_stop:
-                mIsStart = false;
-                break;
+        if (checkedId == R.id.rb_start) {
+            mIsStart = true;
+        } else if (checkedId == R.id.rb_stop) {
+            mIsStart = false;
         }
         String tempStr = String.format("%d℃", mProgress - 20);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "start to broadcast" : "stop broadcasting", "temperature", mIsAbove ? "above" : "below", tempStr));
+                mIsStart ? "stop advertising for" : "stop advertising for", "temperature", mIsAbove ? "above" : "below", tempStr));
     }
 
     public void setStart(boolean isStart) {
@@ -156,7 +154,7 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
         mIsAbove = isAbove;
         String tempStr = String.format("%d℃", mProgress - 20);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "start to broadcast" : "stop broadcasting", "temperature", mIsAbove ? "above" : "below", tempStr));
+                mIsStart ? "stop advertising for" : "stop advertising for", "temperature", mIsAbove ? "above" : "below", tempStr));
     }
 
     public boolean getTempType() {

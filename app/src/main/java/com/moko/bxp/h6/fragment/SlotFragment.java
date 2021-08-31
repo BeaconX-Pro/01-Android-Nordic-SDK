@@ -12,9 +12,9 @@ import android.widget.TextView;
 
 import com.moko.bxp.h6.AppConstants;
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.activity.DeviceInfoActivity;
 import com.moko.bxp.h6.activity.SlotDataActivity;
-import com.moko.bxp.h6.utils.BeaconXParser;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.h6.MokoSupport;
@@ -22,40 +22,40 @@ import com.moko.support.h6.OrderTaskAssembler;
 import com.moko.support.h6.entity.SlotData;
 import com.moko.support.h6.entity.SlotEnum;
 import com.moko.support.h6.entity.SlotFrameTypeEnum;
+import com.moko.support.h6.entity.UrlSchemeEnum;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class SlotFragment extends Fragment {
 
     private static final String TAG = "SlotFragment";
-    @BindView(R.id.tv_slot1)
+    @BindView(R2.id.tv_slot1)
     TextView tvSlot1;
-    @BindView(R.id.rl_slot1)
+    @BindView(R2.id.rl_slot1)
     RelativeLayout rlSlot1;
-    @BindView(R.id.tv_slot2)
+    @BindView(R2.id.tv_slot2)
     TextView tvSlot2;
-    @BindView(R.id.rl_slot2)
+    @BindView(R2.id.rl_slot2)
     RelativeLayout rlSlot2;
-    @BindView(R.id.tv_slot3)
+    @BindView(R2.id.tv_slot3)
     TextView tvSlot3;
-    @BindView(R.id.rl_slot3)
+    @BindView(R2.id.rl_slot3)
     RelativeLayout rlSlot3;
-    @BindView(R.id.tv_slot4)
+    @BindView(R2.id.tv_slot4)
     TextView tvSlot4;
-    @BindView(R.id.rl_slot4)
+    @BindView(R2.id.rl_slot4)
     RelativeLayout rlSlot4;
-    @BindView(R.id.tv_slot5)
+    @BindView(R2.id.tv_slot5)
     TextView tvSlot5;
-    @BindView(R.id.rl_slot5)
+    @BindView(R2.id.rl_slot5)
     RelativeLayout rlSlot5;
-    @BindView(R.id.tv_slot6)
+    @BindView(R2.id.tv_slot6)
     TextView tvSlot6;
-    @BindView(R.id.rl_slot6)
+    @BindView(R2.id.rl_slot6)
     RelativeLayout rlSlot6;
 
     private DeviceInfoActivity activity;
@@ -106,35 +106,9 @@ public class SlotFragment extends Fragment {
         super.onDestroy();
     }
 
-    @OnClick({R.id.rl_slot1, R.id.rl_slot2, R.id.rl_slot3, R.id.rl_slot4, R.id.rl_slot5, R.id.rl_slot6})
-    public void onViewClicked(View view) {
+    public void createData(SlotFrameTypeEnum frameType, SlotEnum slot) {
         slotData = new SlotData();
-        SlotFrameTypeEnum frameType = (SlotFrameTypeEnum) view.getTag();
         slotData.frameTypeEnum = frameType;
-        // NO DATA直接跳转
-        switch (view.getId()) {
-            case R.id.rl_slot1:
-                createData(frameType, SlotEnum.SLOT_1);
-                break;
-            case R.id.rl_slot2:
-                createData(frameType, SlotEnum.SLOT_2);
-                break;
-            case R.id.rl_slot3:
-                createData(frameType, SlotEnum.SLOT_3);
-                break;
-            case R.id.rl_slot4:
-                createData(frameType, SlotEnum.SLOT_4);
-                break;
-            case R.id.rl_slot5:
-                createData(frameType, SlotEnum.SLOT_5);
-                break;
-            case R.id.rl_slot6:
-                createData(frameType, SlotEnum.SLOT_6);
-                break;
-        }
-    }
-
-    private void createData(SlotFrameTypeEnum frameType, SlotEnum slot) {
         slotData.slotEnum = slot;
         switch (frameType) {
             case NO_DATA:
@@ -161,7 +135,7 @@ public class SlotFragment extends Fragment {
         orderTasks.add(OrderTaskAssembler.setSlot(slotEnum));
         orderTasks.add(OrderTaskAssembler.getSlotData());
         orderTasks.add(OrderTaskAssembler.getTrigger());
-        orderTasks.add(OrderTaskAssembler.getAdvTxPower());
+        orderTasks.add(OrderTaskAssembler.getRssi());
         orderTasks.add(OrderTaskAssembler.getRadioTxPower());
         orderTasks.add(OrderTaskAssembler.getAdvInterval());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
@@ -275,16 +249,17 @@ public class SlotFragment extends Fragment {
             switch (slotFrameTypeEnum) {
                 case URL:
                     // URL：10cf014c6f766500
-                    BeaconXParser.parseUrlData(slotData, value);
+                    if (value.length > 3) {
+                        int urlType = (int) value[2] & 0xff;
+                        slotData.urlSchemeEnum = UrlSchemeEnum.fromUrlType(urlType);
+                        slotData.urlContent = MokoUtils.bytesToHexString(value).substring(6);
+                    }
                     break;
-//                case TLM:
-//                    break;
-//                case TH:
-//                    break;
-//                case AXIS:
-//                    break;
                 case UID:
-                    BeaconXParser.parseUidData(slotData, value);
+                    if (value.length >= 18) {
+                        slotData.namespace = MokoUtils.bytesToHexString(value).substring(4, 24);
+                        slotData.instanceId = MokoUtils.bytesToHexString(value).substring(24);
+                    }
                     break;
                 case DEVICE:
                     byte[] deviceName = Arrays.copyOfRange(value, 1, value.length);

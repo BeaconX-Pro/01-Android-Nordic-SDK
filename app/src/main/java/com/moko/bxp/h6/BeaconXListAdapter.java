@@ -67,6 +67,10 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TLM) {
                 parent.addView(createTLMView(BeaconXParser.getTLM(validData.data)));
+                if (validData.data.length() > 7) {
+                    int battery = Integer.parseInt(validData.data.substring(4, 8), 16);
+                    helper.setText(R.id.tv_battery, String.format("%dmV", battery));
+                }
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_IBEACON) {
                 BeaconXiBeacon beaconXiBeacon = BeaconXParser.getiBeacon(item.rssi, validData.data);
@@ -75,16 +79,26 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TH) {
                 BeaconXTH beaconXTH = BeaconXParser.getTH(validData.data);
+                if (validData.data.length() > 17) {
+                    int battery = Integer.parseInt(validData.data.substring(14, 18), 16);
+                    helper.setText(R.id.tv_battery, String.format("%dmV", battery));
+                }
                 beaconXTH.txPower = validData.txPower + "";
                 parent.addView(createTHView(beaconXTH));
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_AXIS) {
                 BeaconXAxis beaconXAxis = BeaconXParser.getAxis(validData.data);
+                if (validData.data.length() > 27) {
+                    int battery = Integer.parseInt(validData.data.substring(24, 28), 16);
+                    helper.setText(R.id.tv_battery, String.format("%dmV", battery));
+                }
                 beaconXAxis.txPower = validData.txPower + "";
                 parent.addView(createAxisView(beaconXAxis));
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_INFO) {
-                helper.setText(R.id.tv_tx_power, String.format("Tx Power:%ddBm", validData.txPower));
+                helper.setText(R.id.tv_tx_power, String.format("Tx power:%ddBm", validData.txPower));
+                int rangingData = Integer.parseInt(validData.data.substring(2, 4), 16);
+                helper.setText(R.id.tv_ranging_data, String.format("Ranging data:%sdBm", String.valueOf((byte) rangingData)));
             }
         }
     }
@@ -141,7 +155,7 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
         tv_rssi_1m.setText(String.format("%sdBm", iBeacon.rangingData));
         tv_tx_power.setText(String.format("%sdBm", iBeacon.txPower));
         tv_proximity_state.setText(iBeacon.distanceDesc);
-        tv_uuid.setText(iBeacon.uuid.toUpperCase());
+        tv_uuid.setText(iBeacon.uuid);
         tv_major.setText(iBeacon.major);
         tv_minor.setText(iBeacon.minor);
         return view;
@@ -175,7 +189,7 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
         tv_data_rate.setText(beaconXAxis.dataRate);
         tv_scale.setText(beaconXAxis.scale);
         tv_sensitivity.setText(beaconXAxis.sensitivity);
-        tv_sampled_data.setText(String.format("X:0x%s Y:0x%s Z:0x%s", beaconXAxis.x_data.toUpperCase(), beaconXAxis.y_data.toUpperCase(), beaconXAxis.z_data.toUpperCase()));
+        tv_sampled_data.setText(String.format("X:%smg Y:%smg Z:%smg", beaconXAxis.x_data, beaconXAxis.y_data, beaconXAxis.z_data));
         return view;
     }
 }

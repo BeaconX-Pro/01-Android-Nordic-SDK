@@ -6,6 +6,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.support.h6.entity.UrlSchemeEnum;
 
 import butterknife.BindView;
@@ -13,15 +14,15 @@ import butterknife.OnClick;
 
 public class UrlSchemeDialog extends BaseDialog<String> {
 
-    @BindView(R.id.rg_url_scheme)
+    @BindView(R2.id.rg_url_scheme)
     RadioGroup rgUrlScheme;
-    @BindView(R.id.rb_http_www)
+    @BindView(R2.id.rb_http_www)
     RadioButton rbHttpWww;
-    @BindView(R.id.rb_https_www)
+    @BindView(R2.id.rb_https_www)
     RadioButton rbHttpsWww;
-    @BindView(R.id.rb_http)
+    @BindView(R2.id.rb_http)
     RadioButton rbHttp;
-    @BindView(R.id.rb_https)
+    @BindView(R2.id.rb_https)
     RadioButton rbHttps;
 
     public UrlSchemeDialog(Context context) {
@@ -52,17 +53,17 @@ public class UrlSchemeDialog extends BaseDialog<String> {
         }
     }
 
-    @OnClick({R.id.tv_cancel, R.id.tv_ensure})
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.tv_cancel:
-                dismiss();
-                break;
-            case R.id.tv_ensure:
-                dismiss();
-                urlSchemeClickListener.onEnsureClicked((String) findViewById(rgUrlScheme.getCheckedRadioButtonId()).getTag());
-                break;
-        }
+    @OnClick(R2.id.tv_cancel)
+    public void onCancel(View view) {
+        dismiss();
+
+    }
+
+    @OnClick(R2.id.tv_ensure)
+    public void onConfirm(View view) {
+        dismiss();
+        urlSchemeClickListener.onEnsureClicked((String) findViewById(rgUrlScheme.getCheckedRadioButtonId()).getTag());
+
     }
 
     private UrlSchemeClickListener urlSchemeClickListener;

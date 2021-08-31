@@ -13,6 +13,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.able.ISlotDataAction;
 import com.moko.bxp.h6.activity.SlotDataActivity;
 import com.moko.bxp.h6.utils.ToastUtils;
@@ -31,19 +32,19 @@ import butterknife.ButterKnife;
 public class UidFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, ISlotDataAction {
 
     private static final String TAG = "UidFragment";
-    @BindView(R.id.et_namespace)
+    @BindView(R2.id.et_namespace)
     EditText etNamespace;
-    @BindView(R.id.et_instance_id)
+    @BindView(R2.id.et_instance_id)
     EditText etInstanceId;
-    @BindView(R.id.sb_adv_tx_power)
-    SeekBar sbAdvTxPower;
-    @BindView(R.id.sb_tx_power)
+    @BindView(R2.id.sb_adv_tx_power)
+    SeekBar sbRssi;
+    @BindView(R2.id.sb_tx_power)
     SeekBar sbTxPower;
-    @BindView(R.id.tv_adv_tx_power)
-    TextView tvAdvTxPower;
-    @BindView(R.id.tv_tx_power)
+    @BindView(R2.id.tv_adv_tx_power)
+    TextView tvRssi;
+    @BindView(R2.id.tv_tx_power)
     TextView tvTxPower;
-    @BindView(R.id.et_adv_interval)
+    @BindView(R2.id.et_adv_interval)
     EditText etAdvInterval;
 
     private SlotDataActivity activity;
@@ -69,7 +70,7 @@ public class UidFragment extends Fragment implements SeekBar.OnSeekBarChangeList
         View view = inflater.inflate(R.layout.fragment_uid, container, false);
         ButterKnife.bind(this, view);
         activity = (SlotDataActivity) getActivity();
-        sbAdvTxPower.setOnSeekBarChangeListener(this);
+        sbRssi.setOnSeekBarChangeListener(this);
         sbTxPower.setOnSeekBarChangeListener(this);
         etNamespace.setTransformationMethod(new A2bigA());
         etInstanceId.setTransformationMethod(new A2bigA());
@@ -81,7 +82,7 @@ public class UidFragment extends Fragment implements SeekBar.OnSeekBarChangeList
         if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.NO_DATA) {
             etAdvInterval.setText("10");
             etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
-            sbAdvTxPower.setProgress(100);
+            sbRssi.setProgress(100);
             sbTxPower.setProgress(6);
         } else {
             int advIntervalProgress = activity.slotData.advInterval / 100;
@@ -90,14 +91,14 @@ public class UidFragment extends Fragment implements SeekBar.OnSeekBarChangeList
             advIntervalBytes = MokoUtils.toByteArray(activity.slotData.advInterval, 2);
 
             if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.TLM) {
-                sbAdvTxPower.setProgress(100);
+                sbRssi.setProgress(100);
                 advTxPowerBytes = MokoUtils.toByteArray(0, 1);
-                tvAdvTxPower.setText(String.format("%ddBm", 0));
+                tvRssi.setText(String.format("%ddBm", 0));
             } else {
                 int advTxPowerProgress = activity.slotData.rssi_0m + 100;
-                sbAdvTxPower.setProgress(advTxPowerProgress);
+                sbRssi.setProgress(advTxPowerProgress);
                 advTxPowerBytes = MokoUtils.toByteArray(activity.slotData.rssi_0m, 1);
-                tvAdvTxPower.setText(String.format("%ddBm", activity.slotData.rssi_0m));
+                tvRssi.setText(String.format("%ddBm", activity.slotData.rssi_0m));
             }
 
             int txPowerProgress = TxPowerEnum.fromTxPower(activity.slotData.txPower).ordinal();
@@ -147,18 +148,15 @@ public class UidFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     }
 
     public void upgdateData(int viewId, int progress) {
-        switch (viewId) {
-            case R.id.sb_adv_tx_power:
-                int advTxPower = progress - 100;
-                tvAdvTxPower.setText(String.format("%ddBm", advTxPower));
-                advTxPowerBytes = MokoUtils.toByteArray(advTxPower, 1);
-                break;
-            case R.id.sb_tx_power:
-                TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
-                int txPower = txPowerEnum.getTxPower();
-                tvTxPower.setText(String.format("%ddBm", txPower));
-                txPowerBytes = MokoUtils.toByteArray(txPower, 1);
-                break;
+        if (viewId == R.id.sb_adv_tx_power) {
+            int advTxPower = progress - 100;
+            tvRssi.setText(String.format("%ddBm", advTxPower));
+            advTxPowerBytes = MokoUtils.toByteArray(advTxPower, 1);
+        } else if (viewId == R.id.sb_tx_power) {
+            TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
+            int txPower = txPowerEnum.getTxPower();
+            tvTxPower.setText(String.format("%ddBm", txPower));
+            txPowerBytes = MokoUtils.toByteArray(txPower, 1);
         }
     }
 
@@ -188,12 +186,12 @@ public class UidFragment extends Fragment implements SeekBar.OnSeekBarChangeList
             return false;
         }
         if (TextUtils.isEmpty(advInterval)) {
-            ToastUtils.showToast(activity, "The Adv Interval can not be empty.");
+            ToastUtils.showToast(activity, "The Adv interval can not be empty.");
             return false;
         }
         int advIntervalInt = Integer.parseInt(advInterval);
         if (advIntervalInt < 1 || advIntervalInt > 100) {
-            ToastUtils.showToast(activity, "The Adv Interval range is 1~100");
+            ToastUtils.showToast(activity, "The Adv interval range is 1~100");
             return false;
         }
         String uidParamsStr = activity.slotData.frameTypeEnum.getFrameType() + namespace + instanceId;
@@ -209,7 +207,7 @@ public class UidFragment extends Fragment implements SeekBar.OnSeekBarChangeList
         orderTasks.add(OrderTaskAssembler.setSlot(activity.slotData.slotEnum));
         orderTasks.add(OrderTaskAssembler.setSlotData(uidParamsBytes));
         orderTasks.add(OrderTaskAssembler.setRadioTxPower(txPowerBytes));
-        orderTasks.add(OrderTaskAssembler.setAdvTxPower(advTxPowerBytes));
+        orderTasks.add(OrderTaskAssembler.setRssi(advTxPowerBytes));
         orderTasks.add(OrderTaskAssembler.setAdvInterval(advIntervalBytes));
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
@@ -237,8 +235,8 @@ public class UidFragment extends Fragment implements SeekBar.OnSeekBarChangeList
             etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
             advIntervalBytes = MokoUtils.toByteArray(activity.slotData.advInterval, 2);
 
-            int advTxPowerProgress = activity.slotData.rssi_0m + 100;
-            sbAdvTxPower.setProgress(advTxPowerProgress);
+            int rssiProgress = activity.slotData.rssi_0m + 100;
+            sbRssi.setProgress(rssiProgress);
 
             int txPowerProgress = TxPowerEnum.fromTxPower(activity.slotData.txPower).ordinal();
             sbTxPower.setProgress(txPowerProgress);
@@ -250,7 +248,7 @@ public class UidFragment extends Fragment implements SeekBar.OnSeekBarChangeList
         } else {
             etAdvInterval.setText("10");
             etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
-            sbAdvTxPower.setProgress(100);
+            sbRssi.setProgress(100);
             sbTxPower.setProgress(6);
 
             etNamespace.setText("");

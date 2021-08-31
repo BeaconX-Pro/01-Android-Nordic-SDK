@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.elvishew.xlog.XLog;
 import com.moko.bxp.h6.AppConstants;
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.able.ISlotDataAction;
 import com.moko.bxp.h6.dialog.BottomDialog;
 import com.moko.bxp.h6.dialog.LoadingMessageDialog;
@@ -58,24 +59,24 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.carbswang.android.numberpickerview.library.NumberPickerView;
 
-public class SlotDataActivity extends FragmentActivity implements NumberPickerView.OnValueChangeListener {
-    @BindView(R.id.tv_slot_title)
+public class SlotDataActivity extends BaseActivity implements NumberPickerView.OnValueChangeListener {
+    @BindView(R2.id.tv_slot_title)
     TextView tvSlotTitle;
-    @BindView(R.id.iv_save)
+    @BindView(R2.id.iv_save)
     ImageView ivSave;
-    @BindView(R.id.frame_slot_container)
+    @BindView(R2.id.frame_slot_container)
     FrameLayout frameSlotContainer;
-    @BindView(R.id.npv_slot_type)
+    @BindView(R2.id.npv_slot_type)
     NumberPickerView npvSlotType;
-    @BindView(R.id.iv_trigger)
+    @BindView(R2.id.iv_trigger)
     ImageView ivTrigger;
-    @BindView(R.id.tv_trigger_type)
+    @BindView(R2.id.tv_trigger_type)
     TextView tvTriggerType;
-    @BindView(R.id.frame_trigger_container)
+    @BindView(R2.id.frame_trigger_container)
     FrameLayout frameTriggerContainer;
-    @BindView(R.id.rl_trigger)
+    @BindView(R2.id.rl_trigger)
     RelativeLayout rlTrigger;
-    @BindView(R.id.rl_trigger_switch)
+    @BindView(R2.id.rl_trigger_switch)
     RelativeLayout rlTriggerSwitch;
     private FragmentManager fragmentManager;
     private UidFragment uidFragment;
@@ -95,9 +96,11 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
     private boolean mReceiverTag = false;
     private int triggerType;
     private byte[] triggerData;
+    private String[] slotTypeArray;
     private ArrayList<String> triggerTypes;
     private int triggerTypeSelected;
     public SlotFrameTypeEnum currentFrameTypeEnum;
+    public boolean isConfigError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,20 +122,23 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
         createFragments();
         triggerTypes = new ArrayList<>();
         if (deviceType == 0) {
-            npvSlotType.setDisplayedValues(getResources().getStringArray(R.array.slot_type_no_sensor));
+            slotTypeArray = getResources().getStringArray(R.array.slot_type_no_sensor);
+            npvSlotType.setDisplayedValues(slotTypeArray);
             npvSlotType.setMinValue(0);
             npvSlotType.setMaxValue(5);
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
         } else if (deviceType == 1) {
-            npvSlotType.setDisplayedValues(getResources().getStringArray(R.array.slot_type_axis));
+            slotTypeArray = getResources().getStringArray(R.array.slot_type_axis);
+            npvSlotType.setDisplayedValues(slotTypeArray);
             npvSlotType.setMinValue(0);
             npvSlotType.setMaxValue(6);
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Device moves");
         } else if (deviceType == 2) {
-            npvSlotType.setDisplayedValues(getResources().getStringArray(R.array.slot_type_th));
+            slotTypeArray = getResources().getStringArray(R.array.slot_type_th);
+            npvSlotType.setDisplayedValues(slotTypeArray);
             npvSlotType.setMinValue(0);
             npvSlotType.setMaxValue(6);
             triggerTypes.add("Press button twice");
@@ -142,7 +148,8 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
             triggerTypes.add("Humidity above");
             triggerTypes.add("Humidity below");
         } else if (deviceType == 3) {
-            npvSlotType.setDisplayedValues(getResources().getStringArray(R.array.slot_type_all));
+            slotTypeArray = getResources().getStringArray(R.array.slot_type_all);
+            npvSlotType.setDisplayedValues(slotTypeArray);
             npvSlotType.setMinValue(0);
             npvSlotType.setMaxValue(7);
             triggerTypes.add("Press button twice");
@@ -154,16 +161,11 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
             triggerTypes.add("Device moves");
         }
         npvSlotType.setOnValueChangedListener(this);
-        if (deviceType != 2) {
-            npvSlotType.setValue(slotData.frameTypeEnum.ordinal());
-            showFragment(slotData.frameTypeEnum.ordinal());
-        } else {
-            if (slotData.frameTypeEnum.ordinal() == 7) {
-                npvSlotType.setValue(6);
-                showFragment(6);
-            } else {
-                npvSlotType.setValue(slotData.frameTypeEnum.ordinal());
-                showFragment(slotData.frameTypeEnum.ordinal());
+        for (int i = 0, l = slotTypeArray.length; i < l; i++) {
+            if (slotData.frameTypeEnum.getShowName().equals(slotTypeArray[i])) {
+                npvSlotType.setValue(i);
+                showFragment(i);
+                break;
             }
         }
         tvSlotTitle.setText(slotData.slotEnum.getTitle());
@@ -173,10 +175,10 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
             rlTriggerSwitch.setVisibility(View.GONE);
         }
         if (triggerType > 0) {
-            ivTrigger.setImageResource(R.drawable.connectable_checked);
+            ivTrigger.setImageResource(R.drawable.ic_checked);
             rlTrigger.setVisibility(View.VISIBLE);
         } else {
-            ivTrigger.setImageResource(R.drawable.connectable_unchecked);
+            ivTrigger.setImageResource(R.drawable.ic_unchecked);
             rlTrigger.setVisibility(View.GONE);
         }
         createTriggerFragments();
@@ -365,7 +367,8 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
             if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
             }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
-                ToastUtils.showToast(SlotDataActivity.this, "Successfully configure");
+                ToastUtils.showToast(SlotDataActivity.this, isConfigError ? "Error" : "Successfully configure");
+                isConfigError = false;
                 dismissSyncProgressDialog();
                 SlotDataActivity.this.setResult(SlotDataActivity.this.RESULT_OK);
                 SlotDataActivity.this.finish();
@@ -376,7 +379,14 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
                 int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 switch (orderCHAR) {
-                    case CHAR_ADV_INTERVAL:
+                    case CHAR_PARAMS:
+                        int length = value.length;
+                        if (length > 1) {
+                            int key = value[1] & 0xFF;
+                            if (key == 0x0D) {
+                                isConfigError = true;
+                            }
+                        }
                         break;
                 }
             }
@@ -444,134 +454,6 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
             mLoadingMessageDialog.dismissAllowingStateLoss();
     }
 
-    @OnClick({R.id.tv_back, R.id.iv_save, R.id.tv_trigger_type, R.id.iv_trigger})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.tv_back:
-                finish();
-                break;
-            case R.id.iv_save:
-                OrderTask orderTask = null;
-                // 发送触发条件
-                switch (triggerType) {
-                    case 0:
-                        orderTask = OrderTaskAssembler.setTriggerClose();
-                        break;
-                    case 1:
-                        orderTask = OrderTaskAssembler.setTHTrigger(triggerType, tempFragment.getTempType(), tempFragment.getData(), tempFragment.isStart());
-                        break;
-                    case 2:
-                        orderTask = OrderTaskAssembler.setTHTrigger(triggerType, humidityFragment.getHumidityType(), humidityFragment.getData(), humidityFragment.isStart());
-                        break;
-                    case 3:
-                    case 4:
-                        if (tappedFragment.getData() < 0) {
-                            return;
-                        }
-                        orderTask = OrderTaskAssembler.setTappedMovesTrigger(triggerType, tappedFragment.getData(), tappedFragment.isStart());
-                        break;
-                    case 5:
-                        if (movesFragment.getData() < 0) {
-                            return;
-                        }
-                        orderTask = OrderTaskAssembler.setTappedMovesTrigger(triggerType, movesFragment.getData(), movesFragment.isStart());
-                        break;
-                }
-                if (slotDataActionImpl == null) {
-                    byte[] noData = new byte[]{(byte) 0xFF};
-                    ArrayList<OrderTask> orderTasks = new ArrayList<>();
-                    orderTasks.add(OrderTaskAssembler.setSlot(slotData.slotEnum));
-                    orderTasks.add(OrderTaskAssembler.setSlotData(noData));
-                    orderTasks.add(orderTask);
-                    MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                    return;
-                }
-                if (!slotDataActionImpl.isValid()) {
-                    return;
-                }
-                showSyncingProgressDialog();
-                slotDataActionImpl.sendData();
-                if (orderTask != null) {
-                    MokoSupport.getInstance().sendOrder(orderTask);
-                }
-                break;
-            case R.id.tv_trigger_type:
-                // 选择触发条件
-                BottomDialog dialog = new BottomDialog();
-                dialog.setDatas(triggerTypes, triggerTypeSelected);
-                dialog.setListener(value -> {
-                    triggerTypeSelected = value;
-                    switch (triggerTypeSelected) {
-                        case 0:
-                            triggerType = 3;
-                            break;
-                        case 1:
-                            triggerType = 4;
-                            break;
-                        case 2:
-                            if (deviceType == 1) {
-                                triggerType = 5;
-                            } else {
-                                triggerType = 1;
-                            }
-                            break;
-                        case 3:
-                            triggerType = 1;
-                            break;
-                        case 4:
-                            triggerType = 2;
-                            break;
-                        case 5:
-                            triggerType = 2;
-                            break;
-                        case 6:
-                            triggerType = 5;
-                            break;
-                    }
-                    showTriggerFragment();
-                    switch (triggerTypeSelected) {
-                        case 0:
-                            tappedFragment.setIsDouble(true);
-                            tappedFragment.updateTips();
-                            break;
-                        case 1:
-                            tappedFragment.setIsDouble(false);
-                            tappedFragment.updateTips();
-                            break;
-                        case 2:
-                            if (deviceType != 1) {
-                                tempFragment.setTempTypeAndRefresh(true);
-                            }
-                            break;
-                        case 3:
-                            tempFragment.setTempTypeAndRefresh(false);
-                            break;
-                        case 4:
-                            humidityFragment.setHumidityTypeAndRefresh(true);
-                            break;
-                        case 5:
-                            humidityFragment.setHumidityTypeAndRefresh(false);
-                            break;
-                    }
-                    tvTriggerType.setText(triggerTypes.get(value));
-                });
-                dialog.show(getSupportFragmentManager());
-                break;
-            case R.id.iv_trigger:
-                if (triggerType > 0) {
-                    triggerType = 0;
-                    ivTrigger.setImageResource(R.drawable.connectable_unchecked);
-                    rlTrigger.setVisibility(View.GONE);
-                } else {
-                    ivTrigger.setImageResource(R.drawable.connectable_checked);
-                    rlTrigger.setVisibility(View.VISIBLE);
-                    triggerType = 3;
-                    showTriggerFragment();
-                }
-                break;
-        }
-    }
-
     @Override
     public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
         XLog.i(newVal + "");
@@ -580,17 +462,19 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
         if (slotDataActionImpl != null) {
             slotDataActionImpl.resetParams();
         }
-        if (SlotFrameTypeEnum.fromEnumOrdinal(newVal) != SlotFrameTypeEnum.NO_DATA) {
+        SlotFrameTypeEnum slotFrameTypeEnum = SlotFrameTypeEnum.fromShowName(slotTypeArray[newVal]);
+        if (slotFrameTypeEnum != SlotFrameTypeEnum.NO_DATA) {
             rlTriggerSwitch.setVisibility(View.VISIBLE);
         } else {
             rlTriggerSwitch.setVisibility(View.GONE);
         }
     }
 
-    private void showFragment(int newVal) {
+    private void showFragment(int index) {
+        SlotFrameTypeEnum slotFrameTypeEnum = SlotFrameTypeEnum.fromShowName(slotTypeArray[index]);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        switch (newVal) {
-            case 0:
+        switch (slotFrameTypeEnum) {
+            case TLM:
                 if (deviceType == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(iBeaconFragment).hide(deviceInfoFragment).show(tlmFragment).commit();
                     slotDataActionImpl = tlmFragment;
@@ -605,7 +489,7 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
                     slotDataActionImpl = tlmFragment;
                 }
                 break;
-            case 1:
+            case UID:
                 if (deviceType == 0) {
                     fragmentTransaction.hide(urlFragment).hide(iBeaconFragment).hide(tlmFragment).hide(deviceInfoFragment).show(uidFragment).commit();
                     slotDataActionImpl = uidFragment;
@@ -620,7 +504,7 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
                     slotDataActionImpl = uidFragment;
                 }
                 break;
-            case 2:
+            case URL:
                 if (deviceType == 0) {
                     fragmentTransaction.hide(uidFragment).hide(iBeaconFragment).hide(tlmFragment).hide(deviceInfoFragment).show(urlFragment).commit();
                     slotDataActionImpl = urlFragment;
@@ -635,7 +519,7 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
                     slotDataActionImpl = urlFragment;
                 }
                 break;
-            case 3:
+            case IBEACON:
                 if (deviceType == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(deviceInfoFragment).show(iBeaconFragment).commit();
                     slotDataActionImpl = iBeaconFragment;
@@ -650,7 +534,7 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
                     slotDataActionImpl = iBeaconFragment;
                 }
                 break;
-            case 4:
+            case DEVICE:
                 if (deviceType == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).show(deviceInfoFragment).commit();
                     slotDataActionImpl = deviceInfoFragment;
@@ -665,7 +549,7 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
                     slotDataActionImpl = deviceInfoFragment;
                 }
                 break;
-            case 5:
+            case NO_DATA:
                 if (deviceType == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).commit();
                     slotDataActionImpl = null;
@@ -680,28 +564,166 @@ public class SlotDataActivity extends FragmentActivity implements NumberPickerVi
                     slotDataActionImpl = null;
                 }
                 break;
-            case 6:
+            case AXIS:
                 if (deviceType == 1) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).show(axisFragment).commit();
                     slotDataActionImpl = axisFragment;
-                } else if (deviceType == 2) {
-                    fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).show(thFragment).commit();
-                    slotDataActionImpl = thFragment;
                 } else if (deviceType == 3) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).show(axisFragment).hide(thFragment).commit();
                     slotDataActionImpl = axisFragment;
                 }
                 break;
-            case 7:
-                fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).show(thFragment).hide(axisFragment).commit();
-                slotDataActionImpl = thFragment;
+            case TH:
+                if (deviceType == 2) {
+                    fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).show(thFragment).commit();
+                    slotDataActionImpl = thFragment;
+                } else if (deviceType == 3) {
+                    fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).show(thFragment).hide(axisFragment).commit();
+                    slotDataActionImpl = thFragment;
+                }
                 break;
 
         }
-        if (deviceType == 2 && newVal == 6) {
-            slotData.frameTypeEnum = SlotFrameTypeEnum.TH;
+        slotData.frameTypeEnum = slotFrameTypeEnum;
+    }
+
+    public void onTrigger(View view) {
+        if (isWindowLocked())
+            return;
+        if (triggerType > 0) {
+            triggerType = 0;
+            ivTrigger.setImageResource(R.drawable.ic_unchecked);
+            rlTrigger.setVisibility(View.GONE);
         } else {
-            slotData.frameTypeEnum = SlotFrameTypeEnum.fromEnumOrdinal(newVal);
+            ivTrigger.setImageResource(R.drawable.ic_checked);
+            rlTrigger.setVisibility(View.VISIBLE);
+            triggerType = 3;
+            showTriggerFragment();
+        }
+    }
+
+    public void onBack(View view) {
+        finish();
+    }
+
+    public void onSave(View view) {
+        if (isWindowLocked())
+            return;
+        OrderTask orderTask = null;
+        // 发送触发条件
+        switch (triggerType) {
+            case 0:
+                orderTask = OrderTaskAssembler.setTriggerClose();
+                break;
+            case 1:
+                orderTask = OrderTaskAssembler.setTHTrigger(triggerType, tempFragment.getTempType(), tempFragment.getData(), tempFragment.isStart());
+                break;
+            case 2:
+                orderTask = OrderTaskAssembler.setTHTrigger(triggerType, humidityFragment.getHumidityType(), humidityFragment.getData(), humidityFragment.isStart());
+                break;
+            case 3:
+            case 4:
+                if (tappedFragment.getData() < 0) {
+                    return;
+                }
+                orderTask = OrderTaskAssembler.setTappedMovesTrigger(triggerType, tappedFragment.getData(), tappedFragment.isStart());
+                break;
+            case 5:
+                if (movesFragment.getData() < 0) {
+                    return;
+                }
+                orderTask = OrderTaskAssembler.setTappedMovesTrigger(triggerType, movesFragment.getData(), movesFragment.isStart());
+                break;
+        }
+        if (slotDataActionImpl == null) {
+            byte[] noData = new byte[]{(byte) 0xFF};
+            ArrayList<OrderTask> orderTasks = new ArrayList<>();
+            orderTasks.add(OrderTaskAssembler.setSlot(slotData.slotEnum));
+            orderTasks.add(OrderTaskAssembler.setSlotData(noData));
+            orderTasks.add(orderTask);
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            return;
+        }
+        if (!slotDataActionImpl.isValid()) {
+            return;
+        }
+        showSyncingProgressDialog();
+        slotDataActionImpl.sendData();
+        if (orderTask != null) {
+            MokoSupport.getInstance().sendOrder(orderTask);
+        }
+    }
+
+    public void onTriggerType(View view) {
+        if (isWindowLocked())
+            return;
+        // 选择触发条件
+        BottomDialog dialog = new BottomDialog();
+        dialog.setDatas(triggerTypes, triggerTypeSelected);
+        dialog.setListener(value -> {
+            triggerTypeSelected = value;
+            switch (triggerTypeSelected) {
+                case 0:
+                    triggerType = 3;
+                    break;
+                case 1:
+                    triggerType = 4;
+                    break;
+                case 2:
+                    if (deviceType == 1) {
+                        triggerType = 5;
+                    } else {
+                        triggerType = 1;
+                    }
+                    break;
+                case 3:
+                    triggerType = 1;
+                    break;
+                case 4:
+                    triggerType = 2;
+                    break;
+                case 5:
+                    triggerType = 2;
+                    break;
+                case 6:
+                    triggerType = 5;
+                    break;
+            }
+            showTriggerFragment();
+            switch (triggerTypeSelected) {
+                case 0:
+                    tappedFragment.setIsDouble(true);
+                    tappedFragment.updateTips();
+                    break;
+                case 1:
+                    tappedFragment.setIsDouble(false);
+                    tappedFragment.updateTips();
+                    break;
+                case 2:
+                    if (deviceType != 1) {
+                        tempFragment.setTempTypeAndRefresh(true);
+                    }
+                    break;
+                case 3:
+                    tempFragment.setTempTypeAndRefresh(false);
+                    break;
+                case 4:
+                    humidityFragment.setHumidityTypeAndRefresh(true);
+                    break;
+                case 5:
+                    humidityFragment.setHumidityTypeAndRefresh(false);
+                    break;
+            }
+            tvTriggerType.setText(triggerTypes.get(value));
+        });
+        dialog.show(getSupportFragmentManager());
+    }
+
+    public void onSelectUrlScheme(View view) {
+        if (isWindowLocked())
+            return;
+        if (urlFragment != null) {
+            urlFragment.selectUrlScheme();
         }
     }
 }

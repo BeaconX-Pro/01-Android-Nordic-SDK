@@ -3,7 +3,6 @@ package com.moko.bxp.h6.entity;
 import android.text.TextUtils;
 
 public class ValidParams {
-    public String connectable;
     public String battery;
     public String mac;
     public String manufactureDate;
@@ -14,7 +13,6 @@ public class ValidParams {
     public String manufacture;
 
     public void reset() {
-        connectable = "";
         battery = "";
         mac = "";
         manufactureDate = "";
@@ -26,8 +24,7 @@ public class ValidParams {
     }
 
     public boolean isEmpty() {
-        if (TextUtils.isEmpty(connectable)
-                || TextUtils.isEmpty(battery)
+        if (TextUtils.isEmpty(battery)
                 || TextUtils.isEmpty(mac)
                 || TextUtils.isEmpty(manufactureDate)
                 || TextUtils.isEmpty(productModel)

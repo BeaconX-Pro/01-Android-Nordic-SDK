@@ -90,21 +90,21 @@
             android:layout_below="@id/tv_mac"
             android:layout_alignLeft="@id/tv_mac"
             android:layout_marginTop="5dp"
-            android:text="Tx Power:N/A"
+            android:text="Tx power:N/A"
             android:textColor="@color/grey_666666"
             android:textSize="10sp" />
 
-        <!--<TextView
-            android:id="@+id/tv_lock_state"
+        <TextView
+            android:id="@+id/tv_ranging_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_mac"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:layout_toRightOf="@id/tv_tx_power"
-            android:text="Lock State:N/A"
+            android:text="Ranging data:N/A"
             android:textColor="@color/grey_666666"
-            android:textSize="10sp" />-->
+            android:textSize="10sp" />
 
         <TextView
             android:id="@+id/tv_interval_time"

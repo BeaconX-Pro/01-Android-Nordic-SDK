@@ -13,7 +13,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Battery Voltage"
+            android:text="Battery voltage"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Mac Address"
+            android:text="Mac address"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
@@ -67,34 +67,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Manufacture Date"
-            android:textColor="@color/black_333333"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/tv_product_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:text=""
-            android:textColor="@color/grey_666666"
-            android:textSize="14sp" />
-
-        <View
-            style="@style/divider_line"
-            android:layout_alignParentBottom="true" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="Product Model"
+            android:text="Product model"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
@@ -121,7 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Software Version"
+            android:text="Software version"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
@@ -148,7 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Firmware Version"
+            android:text="Firmware version"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
@@ -175,7 +148,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Hardware Version"
+            android:text="Hardware version"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
@@ -199,11 +172,39 @@
         android:layout_height="50dp">
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="Manufacture date"
+            android:textColor="@color/black_333333"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tv_product_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text=""
+            android:textColor="@color/grey_666666"
+            android:textSize="14sp" />
+
+        <View
+            style="@style/divider_line"
+            android:layout_alignParentBottom="true" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <TextView
             android:id="@+id/manufacturer_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Manufacture"
+            android:text="Manufacturer"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
@@ -211,9 +212,9 @@
             android:id="@+id/tv_manufacturer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/manufacturer_title"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/manufacturer_title"
             android:gravity="right"
             android:text=""
             android:textColor="@color/grey_666666"

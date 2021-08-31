@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.activity.THDataActivity;
 import com.moko.bxp.h6.dialog.BottomDialog;
 import com.moko.ble.lib.utils.MokoUtils;
@@ -22,9 +23,9 @@ import butterknife.OnClick;
 public class StorageTempFragment extends Fragment {
 
     private static final String TAG = "StorageTempFragment";
-    @BindView(R.id.tv_storage_temp_only)
+    @BindView(R2.id.tv_storage_temp_only)
     TextView tvStorageTempOnly;
-    @BindView(R.id.tv_temp_only_tips)
+    @BindView(R2.id.tv_temp_only_tips)
     TextView tvTempOnlyTips;
     private ArrayList<String> mDatas;
 
@@ -77,8 +78,20 @@ public class StorageTempFragment extends Fragment {
         super.onDestroy();
     }
 
-    @OnClick(R.id.tv_storage_temp_only)
-    public void onViewClicked() {
+    private int mSelected;
+
+    public void setTempData(int data) {
+        mSelected = data;
+        String tempStr = mDatas.get(mSelected);
+        tvStorageTempOnly.setText(tempStr);
+        if (mSelected == 0) {
+            tvTempOnlyTips.setText(R.string.temp_only_tips_0);
+        } else {
+            tvTempOnlyTips.setText(getString(R.string.temp_only_tips_1, tempStr));
+        }
+    }
+
+    public void selectStorageTemp() {
         BottomDialog dialog = new BottomDialog();
         dialog.setDatas(mDatas, mSelected);
         dialog.setListener(value -> {
@@ -92,18 +105,5 @@ public class StorageTempFragment extends Fragment {
             activity.setSelectedTemp(value);
         });
         dialog.show(activity.getSupportFragmentManager());
-    }
-
-    private int mSelected;
-
-    public void setTempData(int data) {
-        mSelected = data;
-        String tempStr = mDatas.get(mSelected);
-        tvStorageTempOnly.setText(tempStr);
-        if (mSelected == 0) {
-            tvTempOnlyTips.setText(R.string.temp_only_tips_0);
-        } else {
-            tvTempOnlyTips.setText(getString(R.string.temp_only_tips_1, tempStr));
-        }
     }
 }

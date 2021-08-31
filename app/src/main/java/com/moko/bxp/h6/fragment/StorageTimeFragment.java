@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 import com.moko.bxp.h6.activity.THDataActivity;
 import com.moko.bxp.h6.dialog.BottomDialog;
 
@@ -21,9 +22,9 @@ import butterknife.OnClick;
 public class StorageTimeFragment extends Fragment {
 
     private static final String TAG = "StorageTimeFragment";
-    @BindView(R.id.tv_storage_time_only)
+    @BindView(R2.id.tv_storage_time_only)
     TextView tvStorageTimeOnly;
-    @BindView(R.id.tv_time_tips)
+    @BindView(R2.id.tv_time_tips)
     TextView tvTimeTips;
     private ArrayList<String> mDatas;
 
@@ -77,8 +78,15 @@ public class StorageTimeFragment extends Fragment {
         super.onDestroy();
     }
 
-    @OnClick(R.id.tv_storage_time_only)
-    public void onViewClicked() {
+    private int mSelected = 0;
+
+    public void setTimeData(int data) {
+        mSelected = data - 1;
+        tvStorageTimeOnly.setText(String.valueOf(data));
+        tvTimeTips.setText(getString(R.string.time_only_tips, data));
+    }
+
+    public void selectStorageTime() {
         BottomDialog dialog = new BottomDialog();
         dialog.setDatas(mDatas, mSelected);
         dialog.setListener(value -> {
@@ -88,13 +96,5 @@ public class StorageTimeFragment extends Fragment {
             activity.setSelectedTime(mSelected + 1);
         });
         dialog.show(activity.getSupportFragmentManager());
-    }
-
-    private int mSelected = 0;
-
-    public void setTimeData(int data) {
-        mSelected = data - 1;
-        tvStorageTimeOnly.setText(String.valueOf(data));
-        tvTimeTips.setText(getString(R.string.time_only_tips, data));
     }
 }

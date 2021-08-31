@@ -66,24 +66,30 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/rl_sensor_config"
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="50dp"
+        android:clickable="true"
+        android:onClick="onSensorConfig">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Connectable"
+            android:text="Sensor configurations"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
-        <ImageView
-            android:id="@+id/iv_connectable"
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/connectable_checked" />
+            android:drawableRight="@drawable/arrow_right"
+            android:drawablePadding="10dp"
+            android:text=""
+            android:textColor="@color/grey_666666"
+            android:textSize="14sp" />
 
         <View
             style="@style/divider_line"
@@ -92,23 +98,28 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="50dp"
+        android:clickable="true"
+        android:onClick="onQuickSwitch">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Remote Power OFF"
+            android:text="Quick switch"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
-        <ImageView
-            android:id="@+id/iv_power"
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/connectable_unchecked" />
+            android:drawableRight="@drawable/arrow_right"
+            android:drawablePadding="10dp"
+            android:text=""
+            android:textColor="@color/grey_666666"
+            android:textSize="14sp" />
 
         <View
             style="@style/divider_line"
@@ -117,23 +128,28 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="50dp"
+        android:clickable="true"
+        android:onClick="onTurnOffBeacon">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Button Power OFF"
+            android:text="Turn off Beacon"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
-        <ImageView
-            android:id="@+id/iv_button_power"
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/connectable_checked" />
+            android:drawableRight="@drawable/arrow_right"
+            android:drawablePadding="10dp"
+            android:text=""
+            android:textColor="@color/grey_666666"
+            android:textSize="14sp" />
 
         <View
             style="@style/divider_line"
@@ -141,24 +157,30 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/rl_reset_factory"
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="50dp"
+        android:clickable="true"
+        android:onClick="onResetBeacon">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Password Verification"
+            android:text="Reset Beacon"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
-        <ImageView
-            android:id="@+id/iv_password_verify"
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/connectable_unchecked" />
+            android:drawableRight="@drawable/arrow_right"
+            android:drawablePadding="10dp"
+            android:text=""
+            android:textColor="@color/grey_666666"
+            android:textSize="14sp" />
 
         <View
             style="@style/divider_line"
@@ -169,6 +191,8 @@
         android:id="@+id/rl_password"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:clickable="true"
+        android:onClick="onModifyPassword"
         android:visibility="gone">
 
         <TextView
@@ -196,71 +220,16 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/rl_reset_facotry"
-        android:layout_width="match_parent"
-        android:layout_height="50dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="Remote Reset"
-            android:textColor="@color/black_333333"
-            android:textSize="15sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:drawableRight="@drawable/arrow_right"
-            android:drawablePadding="10dp"
-            android:text=""
-            android:textColor="@color/grey_666666"
-            android:textSize="14sp" />
-
-        <View
-            style="@style/divider_line"
-            android:layout_alignParentBottom="true" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rl_hw_reset"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:visibility="gone">
+        android:clickable="true"
+        android:onClick="onDFU">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="HW Reset"
-            android:textColor="@color/black_333333"
-            android:textSize="15sp" />
-
-        <ImageView
-            android:id="@+id/iv_hw_reset"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/connectable_unchecked" />
-
-        <View
-            style="@style/divider_line"
-            android:layout_alignParentBottom="true" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rl_update_firmware"
-        android:layout_width="match_parent"
-        android:layout_height="50dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="OTA DFU"
+            android:text="DFU"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 

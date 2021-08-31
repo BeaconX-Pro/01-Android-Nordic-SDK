@@ -8,24 +8,20 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.moko.bxp.h6.R;
+import com.moko.bxp.h6.R2;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 
-/**
- * @Date 2018/1/18
- * @Author wenzheng.liu
- * @Description 扫描筛选对话框
- * @ClassPath com.moko.beaconx.dialog.ScanFilterDialog
- */
+
 public class ScanFilterDialog extends BaseDialog {
-    @BindView(R.id.et_filter_name)
+    @BindView(R2.id.et_filter_name)
     EditText etFilterName;
-    @BindView(R.id.et_filter_mac)
+    @BindView(R2.id.et_filter_mac)
     EditText etFilterMac;
-    @BindView(R.id.tv_rssi)
+    @BindView(R2.id.tv_rssi)
     TextView tvRssi;
-    @BindView(R.id.sb_rssi)
+    @BindView(R2.id.sb_rssi)
     SeekBar sbRssi;
 
     private int filterRssi;
@@ -74,20 +70,20 @@ public class ScanFilterDialog extends BaseDialog {
         setDismissEnable(true);
     }
 
-    @OnClick({R.id.iv_filter_name_delete, R.id.iv_filter_mac_delete, R.id.tv_done})
+    @OnClick(R2.id.iv_filter_name_delete)
+    public void onFilterNameDete(View view) {
+        etFilterName.setText("");
+    }
+
+    @OnClick(R2.id.iv_filter_mac_delete)
+    public void onFilterMacDelete(View view) {
+        etFilterMac.setText("");
+    }
+
+    @OnClick(R2.id.tv_done)
     public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.iv_filter_name_delete:
-                etFilterName.setText("");
-                break;
-            case R.id.iv_filter_mac_delete:
-                etFilterMac.setText("");
-                break;
-            case R.id.tv_done:
-                listener.onDone(etFilterName.getText().toString(), etFilterMac.getText().toString(), filterRssi);
-                dismiss();
-                break;
-        }
+        listener.onDone(etFilterName.getText().toString(), etFilterMac.getText().toString(), filterRssi);
+        dismiss();
     }
 
     private OnScanFilterListener listener;
