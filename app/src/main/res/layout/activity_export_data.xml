@@ -190,14 +190,14 @@
                     android:textColor="@color/blue_2f84d0"
                     android:textSize="13sp" />
 
-                <com.moko.bxp.h6.view.THChartView
+                <com.moko.bxp.nordic.view.THChartView
                     android:id="@+id/temp_chart_view"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:layout_marginTop="5dp"
                     app:ylineDesc="Temperature(℃)" />
 
-                <com.moko.bxp.h6.view.THChartView
+                <com.moko.bxp.nordic.view.THChartView
                     android:id="@+id/humi_chart_view"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"

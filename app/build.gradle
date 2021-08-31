@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         if (!isLibrary.toBoolean()) {
-            applicationId "com.moko.bxp.h6"
+            applicationId "com.moko.bxp.nordic"
         }
         minSdkVersion 18
         targetSdkVersion 29
@@ -58,9 +58,9 @@ android {
                 def outputFile = output.outputFile
                 if (outputFile != null && outputFile.name.endsWith('.apk')) {
                     def formatedDate = new Date().format("yyyyMMddHHmm")
-                    def apkFileName = "BXP-H6_${defaultConfig.versionName}_${formatedDate}.apk"
+                    def apkFileName = "BXP-NORDIC_${defaultConfig.versionName}_${formatedDate}.apk"
                     if (outputFile.name.contains('debug')) {
-                        apkFileName = "BXP-H6_${defaultConfig.versionName}_${formatedDate}_debug.apk"
+                        apkFileName = "BXP-NORDIC_${defaultConfig.versionName}_${formatedDate}_debug.apk"
                     }
                     outputFileName = apkFileName
                 }
@@ -72,7 +72,7 @@ android {
                 // 修改aar名称
                 variant.outputs.all { output ->
                     def formatedDate = new Date().format("yyyyMMddHHmm")
-                    outputFileName = "BXP-H6_${android.defaultConfig.versionName}_${formatedDate}.aar"
+                    outputFileName = "BXP-NORDIC_${android.defaultConfig.versionName}_${formatedDate}.aar"
                 }
                 // 复制aar到指定目录
                 variant.assemble.doLast {

@@ -38,7 +38,7 @@
             android:textSize="15sp" />
     </RelativeLayout>
 
-    <com.moko.bxp.h6.view.WheelView
+    <com.moko.bxp.nordic.view.WheelView
         android:id="@+id/wv_bottom"
         android:layout_width="0dp"
         android:layout_height="204dp"
