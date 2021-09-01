@@ -34,6 +34,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
+import androidx.cardview.widget.CardView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -59,6 +60,10 @@ public class QuickSwitchActivity extends BaseActivity {
     ImageView ivPasswordVerify;
     @BindView(R2.id.tv_password_verify)
     TextView tvPasswordVerify;
+    @BindView(R2.id.cv_hw_reset)
+    CardView cvHwReset;
+    @BindView(R2.id.cv_trigger_led_notify)
+    CardView cvTriggerLedNotify;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,12 +138,14 @@ public class QuickSwitchActivity extends BaseActivity {
                                     break;
                                 case GET_HW_RESET_ENABLE:
                                     if (value.length >= 4) {
+                                        cvHwReset.setVisibility(View.VISIBLE);
                                         int enable = value[4] & 0xFF;
                                         setHWResetEnable(enable);
                                     }
                                     break;
                                 case GET_TRIGGER_LED_NOTIFICATION:
                                     if (value.length >= 4) {
+                                        cvTriggerLedNotify.setVisibility(View.VISIBLE);
                                         int enable = value[4] & 0xFF;
                                         setTriggerLEDNotifyEnable(enable);
                                     }

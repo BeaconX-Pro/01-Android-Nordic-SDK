@@ -24,6 +24,8 @@ final class MokoBleConfig extends MokoBleManager {
     private BluetoothGattCharacteristic lockedCharacteristic;
     private BluetoothGattCharacteristic threeAxisCharacteristic;
     private BluetoothGattCharacteristic storeCharacteristic;
+    private BluetoothGattCharacteristic lightSensorNotifyCharacteristic;
+    private BluetoothGattCharacteristic lightSensorCurrentCharacteristic;
     private BluetoothGattCharacteristic disconnectCharacteristic;
 
     public MokoBleConfig(@NonNull Context context, MokoResponseCallback callback) {
@@ -40,6 +42,8 @@ final class MokoBleConfig extends MokoBleManager {
             threeAxisCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_THREE_AXIS_NOTIFY.getUuid());
             storeCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_STORE_NOTIFY.getUuid());
             disconnectCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_DISCONNECT.getUuid());
+            lightSensorNotifyCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_LIGHT_SENSOR_NOTIFY.getUuid());
+            lightSensorCurrentCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_LIGHT_SENSOR_CURRENT.getUuid());
             enableDisconnectNotify();
             enableLockedNotify();
             return true;
@@ -163,5 +167,41 @@ final class MokoBleConfig extends MokoBleManager {
 
     public void disableDisconnectNotify() {
         disableNotifications(disconnectCharacteristic).enqueue();
+    }
+
+    public void enableLightSensorNotify() {
+        if (lightSensorNotifyCharacteristic == null)
+            return;
+        setIndicationCallback(lightSensorNotifyCharacteristic).with((device, data) -> {
+            final byte[] value = data.getValue();
+            XLog.e("onDataReceived");
+            XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
+            mMokoResponseCallback.onCharacteristicChanged(lightSensorNotifyCharacteristic, value);
+        });
+        enableNotifications(lightSensorNotifyCharacteristic).enqueue();
+    }
+
+    public void disableLightSensorNotify() {
+        if (lightSensorNotifyCharacteristic == null)
+            return;
+        disableNotifications(lightSensorNotifyCharacteristic).enqueue();
+    }
+
+    public void enableLightSensorCurrentNotify() {
+        if (lightSensorCurrentCharacteristic == null)
+            return;
+        setIndicationCallback(lightSensorCurrentCharacteristic).with((device, data) -> {
+            final byte[] value = data.getValue();
+            XLog.e("onDataReceived");
+            XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
+            mMokoResponseCallback.onCharacteristicChanged(lightSensorCurrentCharacteristic, value);
+        });
+        enableNotifications(lightSensorCurrentCharacteristic).enqueue();
+    }
+
+    public void disableLightSensorCurrentNotify() {
+        if (lightSensorCurrentCharacteristic == null)
+            return;
+        disableNotifications(lightSensorCurrentCharacteristic).enqueue();
     }
 }

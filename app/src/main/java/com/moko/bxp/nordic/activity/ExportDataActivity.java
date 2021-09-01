@@ -489,7 +489,7 @@ public class ExportDataActivity extends BaseActivity {
             return;
         AlertMessageDialog dialog = new AlertMessageDialog();
         dialog.setTitle("Warning!");
-        dialog.setMessage("Are you sure to erase the saved T&H data?");
+        dialog.setMessage("Are you sure to erase all the saved T&H data?");
         dialog.setConfirm(R.string.ok);
         dialog.setOnAlertConfirmListener(new AlertMessageDialog.OnAlertConfirmListener() {
             @Override

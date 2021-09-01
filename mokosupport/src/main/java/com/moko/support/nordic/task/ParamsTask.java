@@ -36,6 +36,7 @@ public class ParamsTask extends OrderTask {
             case GET_TRIGGER_DATA:
             case GET_HW_RESET_ENABLE:
             case GET_TRIGGER_LED_NOTIFICATION:
+            case SET_LIGHT_SENSOR_EMPTY:
                 createGetConfigData(key.getParamsKey());
                 break;
         }
@@ -43,24 +44,6 @@ public class ParamsTask extends OrderTask {
 
     private void createGetConfigData(int configKey) {
         data = new byte[]{(byte) 0xEA, (byte) configKey, (byte) 0x00, (byte) 0x00};
-    }
-
-    public void setiBeaconData(int major, int minor, int advTxPower) {
-        String value = "EA" + MokoUtils.int2HexString(ParamsKeyEnum.SET_IBEACON_INFO.getParamsKey()) + "0005"
-                + String.format("%04X", major) + String.format("%04X", minor) + MokoUtils.int2HexString(Math.abs(advTxPower));
-        data = MokoUtils.hex2bytes(value);
-    }
-
-    public void setiBeaconUUID(String uuidHex) {
-        String value = "EA" + MokoUtils.int2HexString(ParamsKeyEnum.SET_IBEACON_UUID.getParamsKey()) + "0010"
-                + uuidHex;
-        data = MokoUtils.hex2bytes(value);
-    }
-
-    public void setConneactable(boolean isConnectable) {
-        String value = "EA" + MokoUtils.int2HexString(ParamsKeyEnum.SET_CONNECTABLE.getParamsKey()) + "0001"
-                + (isConnectable ? "01" : "00");
-        data = MokoUtils.hex2bytes(value);
     }
 
     public void setButtonPower(boolean enable) {
@@ -149,6 +132,21 @@ public class ParamsTask extends OrderTask {
         data = MokoUtils.hex2bytes(value);
     }
 
+    public void setTriggerData(int triggerType, int params, boolean isAlways, boolean isStart) {
+        byte[] paramsBytes = MokoUtils.toByteArray(params, 2);
+        data = new byte[]{
+                (byte) 0xEA,
+                (byte) ParamsKeyEnum.SET_TRIGGER_DATA.getParamsKey(),
+                (byte) 0x00,
+                (byte) 0x05,
+                (byte) triggerType,
+                paramsBytes[0],
+                paramsBytes[1],
+                isAlways ? (byte) 0x00 : (byte) 0x01,
+                isStart ? (byte) 0x01 : (byte) 0x02
+        };
+    }
+
     public void setHWResetEnable(int enable) {
         data = new byte[]{
                 (byte) 0xEA,
@@ -157,6 +155,7 @@ public class ParamsTask extends OrderTask {
                 (byte) 0x01,
                 (byte) enable
         };
+        response.responseValue = data;
     }
 
     public void setTriggerLEDNotifyEnable(int enable) {
@@ -167,5 +166,6 @@ public class ParamsTask extends OrderTask {
                 (byte) 0x01,
                 (byte) enable
         };
+        response.responseValue = data;
     }
 }

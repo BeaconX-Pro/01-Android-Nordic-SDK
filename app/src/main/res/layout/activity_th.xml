@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="@string/h_t"
+            android:text="@string/temperature_humidity"
             android:textColor="@color/white_ffffff"
             android:textSize="17sp" />
 

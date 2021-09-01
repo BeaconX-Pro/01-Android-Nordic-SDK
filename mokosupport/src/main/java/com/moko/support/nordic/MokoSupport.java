@@ -150,6 +150,12 @@ public class MokoSupport extends MokoBleLib {
         if (responseUUID.equals(OrderCHAR.CHAR_DISCONNECT.getUuid())) {
             orderCHAR = OrderCHAR.CHAR_DISCONNECT;
         }
+        if (responseUUID.equals(OrderCHAR.CHAR_LIGHT_SENSOR_CURRENT.getUuid())) {
+            orderCHAR = OrderCHAR.CHAR_LIGHT_SENSOR_CURRENT;
+        }
+        if (responseUUID.equals(OrderCHAR.CHAR_LIGHT_SENSOR_NOTIFY.getUuid())) {
+            orderCHAR = OrderCHAR.CHAR_LIGHT_SENSOR_NOTIFY;
+        }
         if (orderCHAR == null)
             return false;
         XLog.i(orderCHAR.name());
@@ -191,6 +197,26 @@ public class MokoSupport extends MokoBleLib {
     public void disableThreeAxisNotify() {
         if (mBleConfig != null)
             mBleConfig.disableThreeAxisNotify();
+    }
+
+    public void enableLightSensorNotify() {
+        if (mBleConfig != null)
+            mBleConfig.enableLightSensorNotify();
+    }
+
+    public void disableLightSensorNotify() {
+        if (mBleConfig != null)
+            mBleConfig.disableLightSensorNotify();
+    }
+
+    public void enableLightSensorCurrentNotify() {
+        if (mBleConfig != null)
+            mBleConfig.enableLightSensorCurrentNotify();
+    }
+
+    public void disableLightSensorCurrentNotify() {
+        if (mBleConfig != null)
+            mBleConfig.disableLightSensorCurrentNotify();
     }
 
     public static boolean isNewVersion = false;

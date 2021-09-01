@@ -263,7 +263,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
                         } else {
                             isPasswordError = true;
                             unLockResponse = "";
-                            ToastUtils.showToast(NordicMainActivity.this, "Password Incorrect");
+                            ToastUtils.showToast(NordicMainActivity.this, "Password Incorrect!");
                         }
                     } else if ("02".equals(valueStr)) {
                         // 不需要密码验证

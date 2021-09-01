@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 
+import com.moko.bxp.nordic.BuildConfig;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -59,7 +61,11 @@ public class Utils {
             intent = new Intent(Intent.ACTION_SEND);
             Uri uri;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                uri = FileProvider.getUriForFile(context, "com.moko.bxp.nordic.fileprovider", files[0]);
+                if (BuildConfig.IS_LIBRARY) {
+                    uri = FileProvider.getUriForFile(context, "com.moko.beaconxpro.fileprovider", files[0]);
+                } else {
+                    uri = FileProvider.getUriForFile(context, "com.moko.bxp.nordic.fileprovider", files[0]);
+                }
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             } else {
                 uri = Uri.fromFile(files[0]);

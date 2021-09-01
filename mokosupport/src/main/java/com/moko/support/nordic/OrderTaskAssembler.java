@@ -13,6 +13,7 @@ import com.moko.support.nordic.task.GetConnectableTask;
 import com.moko.support.nordic.task.GetDeviceTypeTask;
 import com.moko.support.nordic.task.GetFirmwareRevisionTask;
 import com.moko.support.nordic.task.GetHardwareRevisionTask;
+import com.moko.support.nordic.task.GetLightSensorCurrentTask;
 import com.moko.support.nordic.task.GetLockStateTask;
 import com.moko.support.nordic.task.GetManufacturerNameTask;
 import com.moko.support.nordic.task.GetModelNumberTask;
@@ -411,33 +412,6 @@ public class OrderTaskAssembler {
     }
 
     /**
-     * @Description 获取iBeaconUUID
-     */
-    public static OrderTask getiBeaconUUID() {
-        ParamsTask task = new ParamsTask();
-        task.setData(ParamsKeyEnum.GET_IBEACON_UUID);
-        return task;
-    }
-
-    /**
-     * @Description 设置iBeaconUUID
-     */
-    public static OrderTask setiBeaconUUID(String uuidHex) {
-        ParamsTask task = new ParamsTask();
-        task.setiBeaconUUID(uuidHex);
-        return task;
-    }
-
-    /**
-     * @Description 获取iBeaconInfo
-     */
-    public static OrderTask getiBeaconInfo() {
-        ParamsTask task = new ParamsTask();
-        task.setData(ParamsKeyEnum.GET_IBEACON_INFO);
-        return task;
-    }
-
-    /**
      * @Description 关机
      */
     public static OrderTask setClose() {
@@ -478,6 +452,12 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask setLightTrigger(int triggerType, int params, boolean isAlways, boolean isStart) {
+        ParamsTask task = new ParamsTask();
+        task.setTriggerData(triggerType, params, isAlways, isStart);
+        return task;
+    }
+
     public static OrderTask getHWResetEnable() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.GET_HW_RESET_ENABLE);
@@ -490,9 +470,22 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask getLightSensorCurrent() {
+        GetLightSensorCurrentTask task = new GetLightSensorCurrentTask();
+        return task;
+    }
+
     public static OrderTask getTriggerLEDNotifyEnable() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.GET_TRIGGER_LED_NOTIFICATION);
+        return task;
+    }
+
+
+
+    public static OrderTask setLightSensorEmpty() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.SET_LIGHT_SENSOR_EMPTY);
         return task;
     }
 

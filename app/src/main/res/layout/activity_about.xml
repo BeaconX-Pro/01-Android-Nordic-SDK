@@ -13,9 +13,11 @@
             android:id="@+id/tv_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:clickable="true"
             android:drawableLeft="@drawable/back"
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
+            android:onClick="onBack"
             android:paddingLeft="16dp"
             android:text=""
             android:textColor="@color/white_ffffff"
@@ -77,6 +79,8 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="15dp"
+        android:clickable="true"
+        android:onClick="onCompanyWebsite"
         android:text="@string/company_website"
         android:textColor="@color/blue_2f84d0"
         android:textSize="20sp" />
@@ -89,10 +93,13 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="60dp"
         android:background="@drawable/shape_radius_blue_btn_bg"
+        android:clickable="true"
         android:gravity="center"
+        android:onClick="onFeedback"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:text="Feedback log"
         android:textColor="@color/white_ffffff"
-        android:textSize="20dp" />
+        android:textSize="20dp"
+        android:visibility="gone" />
 </RelativeLayout>

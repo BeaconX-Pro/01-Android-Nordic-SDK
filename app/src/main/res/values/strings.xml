@@ -1,21 +1,21 @@
 <resources>
-    <string name="app_name">BXP-NORDIC</string>
+    <string name="app_name">BXP-Nordic</string>
 
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
     <string name="ok">OK</string>
 
     <string name="permission_storage_close_title">Storage permission is not available</string>
-    <string name="permission_storage_close_content">Please find it in cellphone setting- permission, and allow BXP-NORDIC use the Storage permission</string>
+    <string name="permission_storage_close_content">Please find it in cellphone setting- permission, and allow BXP-Nordic use the Storage permission</string>
     <string name="permission_open">OK</string>
     <string name="permission_storage_need_title">Please turn on Storage permissions</string>
-    <string name="permission_storage_need_content">BXP-NORDIC requires access to Location and Storage permission. If the permissions are not on, BXP-NORDIC cannot be used normally.</string>
+    <string name="permission_storage_need_content">BXP-Nordic requires access to Location and Storage permission. If the permissions are not on, BXP-Nordic cannot be used normally.</string>
     <string name="location_need_title">Turn on Location permission</string>
-    <string name="location_need_content">After that, BXP-NORDIC could search and connect with the BXP-NORDIC</string>
+    <string name="location_need_content">After that, BXP-Nordic could search and connect with the BXP-Nordic</string>
     <string name="permission_location_close_title">Location persission is not available</string>
-    <string name="permission_location_close_content">Please find it in cellphone setting- permission, and allow BXP-NORDIC use the Location and Storage permission</string>
+    <string name="permission_location_close_content">Please find it in cellphone setting- permission, and allow BXP-Nordic use the Location and Storage permission</string>
     <string name="permission_location_need_title">Turn on Location permission</string>
-    <string name="permission_location_need_content">After that, BXP-NORDIC could search and connect with the BXP-NORDIC</string>
+    <string name="permission_location_need_content">After that, BXP-Nordic could search and connect with the BXP-Nordic</string>
 
     <string name="main_exit_tips">Are you sure you want to quit?</string>
     <string name="setting_syncing">syncing</string>
@@ -50,6 +50,8 @@
     <!--    <string name="trigger_tapped_tips_3">*The Beacon will always stop advertising after press button %s times.</string>-->
     <string name="trigger_moved_tips_1">*The Beacon will start and keep advertising once a movement occurred.</string>
     <string name="trigger_moved_tips_2">*The Beacon will %1$s after device keep static for %2$s and it %3$s again once a movement occurred.</string>
+    <string name="trigger_light_detected_tips_1">*The Beacon will start and keep advertising after ambient light detected.</string>
+    <string name="trigger_light_detected_tips_2">*The Beacon will %1$s after ambient light continuously detected for %2$s.</string>
     <string name="rssi_filter_tips">* RSSI filtering is the highest priority filtering condition. BLE Name and MAC Address filtering must first meet the RSSI filtering condition.\n* There is an "OR" relationship between the BLE Name filtering and the MAC Address filtering.</string>
     <string name="th_chart_total">Total Data Points:%d</string>
     <string name="th_chart_display">Window Display Points:%d</string>

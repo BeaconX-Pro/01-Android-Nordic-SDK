@@ -28,6 +28,7 @@ public enum ParamsKeyEnum implements Serializable {
     SET_CLOSE(0x26),
     GET_HW_RESET_ENABLE(0x48),
     SET_HW_RESET_ENABLE(0x58),
+    SET_LIGHT_SENSOR_EMPTY(0x46),
     GET_TRIGGER_LED_NOTIFICATION(0x47),
     SET_TRIGGER_LED_NOTIFICATION(0x57),
     ;

@@ -16,6 +16,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.elvishew.xlog.XLog;
+import com.moko.ble.lib.MokoConstants;
+import com.moko.ble.lib.event.ConnectStatusEvent;
+import com.moko.ble.lib.event.OrderTaskResponseEvent;
+import com.moko.ble.lib.task.OrderTask;
+import com.moko.ble.lib.task.OrderTaskResponse;
+import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.R2;
@@ -28,18 +34,13 @@ import com.moko.bxp.nordic.fragment.IBeaconFragment;
 import com.moko.bxp.nordic.fragment.THFragment;
 import com.moko.bxp.nordic.fragment.TlmFragment;
 import com.moko.bxp.nordic.fragment.TriggerHumidityFragment;
+import com.moko.bxp.nordic.fragment.TriggerLightDetectedFragment;
 import com.moko.bxp.nordic.fragment.TriggerMovesFragment;
 import com.moko.bxp.nordic.fragment.TriggerTappedFragment;
 import com.moko.bxp.nordic.fragment.TriggerTempFragment;
 import com.moko.bxp.nordic.fragment.UidFragment;
 import com.moko.bxp.nordic.fragment.UrlFragment;
 import com.moko.bxp.nordic.utils.ToastUtils;
-import com.moko.ble.lib.MokoConstants;
-import com.moko.ble.lib.event.ConnectStatusEvent;
-import com.moko.ble.lib.event.OrderTaskResponseEvent;
-import com.moko.ble.lib.task.OrderTask;
-import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 import com.moko.support.nordic.entity.OrderCHAR;
@@ -58,6 +59,23 @@ import butterknife.ButterKnife;
 import cn.carbswang.android.numberpickerview.library.NumberPickerView;
 
 public class SlotDataActivity extends BaseActivity implements NumberPickerView.OnValueChangeListener {
+    private static final int TRIGGER_TYPE_NULL = 0;
+    private static final int TRIGGER_TYPE_TEMPERATURE = 1;
+    private static final int TRIGGER_TYPE_HUMIDITY = 2;
+    private static final int TRIGGER_TYPE_TRAP_DOUBLE = 3;
+    private static final int TRIGGER_TYPE_TRAP_TRIPLE = 4;
+    private static final int TRIGGER_TYPE_MOVE = 5;
+    private static final int TRIGGER_TYPE_LIGHT = 6;
+
+    private static final int DEVICE_TYPE_SENSOR_NULL = 0;
+    private static final int DEVICE_TYPE_SENSOR_AXIS = 1;
+    private static final int DEVICE_TYPE_SENSOR_TH = 2;
+    private static final int DEVICE_TYPE_SENSOR_AXIS_TH = 3;
+    private static final int DEVICE_TYPE_SENSOR_LIGHT = 4;
+    private static final int DEVICE_TYPE_SENSOR_AXIS_LIGHT = 5;
+    private static final int DEVICE_TYPE_SENSOR_TH_LIGHT = 6;
+    private static final int DEVICE_TYPE_SENSOR_AXIS_TH_LIGHT = 7;
+
     @BindView(R2.id.tv_slot_title)
     TextView tvSlotTitle;
     @BindView(R2.id.iv_save)
@@ -91,6 +109,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
     private TriggerHumidityFragment humidityFragment;
     private TriggerTappedFragment tappedFragment;
     private TriggerMovesFragment movesFragment;
+    private TriggerLightDetectedFragment lightDetectedFragment;
     private boolean mReceiverTag = false;
     private int triggerType;
     private byte[] triggerData;
@@ -119,37 +138,29 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         fragmentManager = getFragmentManager();
         createFragments();
         triggerTypes = new ArrayList<>();
-        if (deviceType == 0) {
+        if (deviceType == DEVICE_TYPE_SENSOR_NULL) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_no_sensor);
             npvSlotType.setDisplayedValues(slotTypeArray);
-            npvSlotType.setMinValue(0);
-            npvSlotType.setMaxValue(5);
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
-        } else if (deviceType == 1) {
+        } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_axis);
             npvSlotType.setDisplayedValues(slotTypeArray);
-            npvSlotType.setMinValue(0);
-            npvSlotType.setMaxValue(6);
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Device moves");
-        } else if (deviceType == 2) {
+        } else if (deviceType == DEVICE_TYPE_SENSOR_TH) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_th);
             npvSlotType.setDisplayedValues(slotTypeArray);
-            npvSlotType.setMinValue(0);
-            npvSlotType.setMaxValue(6);
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Temperature above");
             triggerTypes.add("Temperature below");
             triggerTypes.add("Humidity above");
             triggerTypes.add("Humidity below");
-        } else if (deviceType == 3) {
+        } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_all);
             npvSlotType.setDisplayedValues(slotTypeArray);
-            npvSlotType.setMinValue(0);
-            npvSlotType.setMaxValue(7);
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Temperature above");
@@ -157,9 +168,46 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             triggerTypes.add("Humidity above");
             triggerTypes.add("Humidity below");
             triggerTypes.add("Device moves");
+        } else if (deviceType == DEVICE_TYPE_SENSOR_LIGHT) {
+            slotTypeArray = getResources().getStringArray(R.array.slot_type_no_sensor);
+            npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Press button twice");
+            triggerTypes.add("Press button three times");
+            triggerTypes.add("Ambient light detected");
+        } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS_LIGHT) {
+            slotTypeArray = getResources().getStringArray(R.array.slot_type_no_sensor);
+            npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Press button twice");
+            triggerTypes.add("Press button three times");
+            triggerTypes.add("Device moves");
+            triggerTypes.add("Ambient light detected");
+        } else if (deviceType == DEVICE_TYPE_SENSOR_TH_LIGHT) {
+            slotTypeArray = getResources().getStringArray(R.array.slot_type_no_sensor);
+            npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Press button twice");
+            triggerTypes.add("Press button three times");
+            triggerTypes.add("Temperature above");
+            triggerTypes.add("Temperature below");
+            triggerTypes.add("Humidity above");
+            triggerTypes.add("Humidity below");
+            triggerTypes.add("Ambient light detected");
+        } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH_LIGHT) {
+            slotTypeArray = getResources().getStringArray(R.array.slot_type_no_sensor);
+            npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Press button twice");
+            triggerTypes.add("Press button three times");
+            triggerTypes.add("Temperature above");
+            triggerTypes.add("Temperature below");
+            triggerTypes.add("Humidity above");
+            triggerTypes.add("Humidity below");
+            triggerTypes.add("Device moves");
+            triggerTypes.add("Ambient light detected");
         }
+        final int length = slotTypeArray.length;
+        npvSlotType.setMinValue(0);
+        npvSlotType.setMaxValue(length - 1);
         npvSlotType.setOnValueChangedListener(this);
-        for (int i = 0, l = slotTypeArray.length; i < l; i++) {
+        for (int i = 0; i < length; i++) {
             if (slotData.frameTypeEnum.getShowName().equals(slotTypeArray[i])) {
                 npvSlotType.setValue(i);
                 showFragment(i);
@@ -198,75 +246,91 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
 
     private void setTriggerData() {
         switch (triggerType) {
-            case 1:
+            case TRIGGER_TYPE_TEMPERATURE:
                 boolean isTempAbove = (triggerData[0] & 0xff) == 1;
-                tvTriggerType.setText(isTempAbove ? triggerTypes.get(2) : triggerTypes.get(3));
-
                 triggerTypeSelected = isTempAbove ? 2 : 3;
+
                 tempFragment.setTempType(isTempAbove);
                 tempFragment.setData(MokoUtils.byte2short(Arrays.copyOfRange(triggerData, 1, 3)));
                 tempFragment.setStart((triggerData[3] & 0xff) == 1);
                 break;
-            case 2:
+            case TRIGGER_TYPE_HUMIDITY:
                 boolean isHumidityAbove = (triggerData[0] & 0xff) == 1;
-                tvTriggerType.setText(isHumidityAbove ? triggerTypes.get(4) : triggerTypes.get(5));
-
                 triggerTypeSelected = isHumidityAbove ? 4 : 5;
+
                 humidityFragment.setHumidityType(isHumidityAbove);
                 byte[] humidityBytes = Arrays.copyOfRange(triggerData, 1, 3);
                 humidityFragment.setData((MokoUtils.toInt(humidityBytes)));
                 humidityFragment.setStart((triggerData[3] & 0xff) == 1);
                 break;
-            case 3:
-                tvTriggerType.setText(triggerTypes.get(0));
-
+            case TRIGGER_TYPE_TRAP_DOUBLE:
                 triggerTypeSelected = 0;
+
                 tappedFragment.setIsDouble(true);
                 byte[] tappedDoubleBytes = Arrays.copyOfRange(triggerData, 0, 2);
                 tappedFragment.setData(MokoUtils.toInt(tappedDoubleBytes));
                 tappedFragment.setStart((triggerData[2] & 0xff) == 1);
                 break;
-            case 4:
-                tvTriggerType.setText(triggerTypes.get(1));
-
+            case TRIGGER_TYPE_TRAP_TRIPLE:
                 triggerTypeSelected = 1;
+
                 tappedFragment.setIsDouble(false);
-                byte[] tappedTrapleBytes = Arrays.copyOfRange(triggerData, 0, 2);
-                tappedFragment.setData(MokoUtils.toInt(tappedTrapleBytes));
+                byte[] tappedTripleBytes = Arrays.copyOfRange(triggerData, 0, 2);
+                tappedFragment.setData(MokoUtils.toInt(tappedTripleBytes));
                 tappedFragment.setStart((triggerData[2] & 0xff) == 1);
                 break;
-            case 5:
-                if (deviceType == 1) {
-                    tvTriggerType.setText(triggerTypes.get(2));
+            case TRIGGER_TYPE_MOVE:
+                if ((deviceType & 1) == 1 && (deviceType & 2) == 0) {
                     triggerTypeSelected = 2;
-                } else {
-                    tvTriggerType.setText(triggerTypes.get(6));
+                }
+                if ((deviceType & 1) == 1 && (deviceType & 2) == 1) {
                     triggerTypeSelected = 6;
                 }
                 byte[] movesBytes = Arrays.copyOfRange(triggerData, 0, 2);
                 movesFragment.setData(MokoUtils.toInt(movesBytes));
                 movesFragment.setStart((triggerData[2] & 0xff) == 2);
                 break;
+            case TRIGGER_TYPE_LIGHT:
+                if (deviceType == DEVICE_TYPE_SENSOR_LIGHT) {
+                    triggerTypeSelected = 2;
+                }
+                if (deviceType == DEVICE_TYPE_SENSOR_AXIS_LIGHT) {
+                    triggerTypeSelected = 3;
+                }
+                if (deviceType == DEVICE_TYPE_SENSOR_TH_LIGHT) {
+                    triggerTypeSelected = 6;
+                }
+                if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH_LIGHT) {
+                    triggerTypeSelected = 7;
+                }
+
+                byte[] lightBytes = Arrays.copyOfRange(triggerData, 0, 2);
+                lightDetectedFragment.setData(MokoUtils.toInt(lightBytes));
+                lightDetectedFragment.setAlwaysAdv((triggerData[2] & 0xff) == 0);
+                lightDetectedFragment.setStart((triggerData[3] & 0xff) == 1);
+                break;
         }
+        tvTriggerType.setText(triggerTypes.get(triggerTypeSelected));
     }
 
     private void showTriggerFragment() {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         switch (triggerType) {
-            case 1:
-                fragmentTransaction.show(tempFragment).hide(humidityFragment).hide(tappedFragment).hide(movesFragment).commit();
+            case TRIGGER_TYPE_TEMPERATURE:
+                fragmentTransaction.show(tempFragment).hide(humidityFragment).hide(tappedFragment).hide(movesFragment).hide(lightDetectedFragment).commit();
                 break;
-            case 2:
-                fragmentTransaction.hide(tempFragment).show(humidityFragment).hide(tappedFragment).hide(movesFragment).commit();
+            case TRIGGER_TYPE_HUMIDITY:
+                fragmentTransaction.hide(tempFragment).show(humidityFragment).hide(tappedFragment).hide(movesFragment).hide(lightDetectedFragment).commit();
                 break;
-            case 3:
-                fragmentTransaction.hide(tempFragment).hide(humidityFragment).show(tappedFragment).hide(movesFragment).commit();
+            case TRIGGER_TYPE_TRAP_DOUBLE:
+            case TRIGGER_TYPE_TRAP_TRIPLE:
+                fragmentTransaction.hide(tempFragment).hide(humidityFragment).show(tappedFragment).hide(movesFragment).hide(lightDetectedFragment).commit();
                 break;
-            case 4:
-                fragmentTransaction.hide(tempFragment).hide(humidityFragment).show(tappedFragment).hide(movesFragment).commit();
+            case TRIGGER_TYPE_MOVE:
+                fragmentTransaction.hide(tempFragment).hide(humidityFragment).hide(tappedFragment).show(movesFragment).hide(lightDetectedFragment).commit();
                 break;
-            case 5:
-                fragmentTransaction.hide(tempFragment).hide(humidityFragment).hide(tappedFragment).show(movesFragment).commit();
+            case TRIGGER_TYPE_LIGHT:
+                fragmentTransaction.hide(tempFragment).hide(humidityFragment).hide(tappedFragment).hide(movesFragment).show(lightDetectedFragment).commit();
                 break;
         }
     }
@@ -281,12 +345,14 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         fragmentTransaction.add(R.id.frame_trigger_container, tappedFragment);
         movesFragment = TriggerMovesFragment.newInstance();
         fragmentTransaction.add(R.id.frame_trigger_container, movesFragment);
+        lightDetectedFragment = TriggerLightDetectedFragment.newInstance();
+        fragmentTransaction.add(R.id.frame_trigger_container, lightDetectedFragment);
         fragmentTransaction.commit();
     }
 
     private void createFragments() {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        if (deviceType == 0) {
+        if ((deviceType & 1) == 0 && (deviceType & 2) == 0) {// 0、4
             uidFragment = UidFragment.newInstance();
             fragmentTransaction.add(R.id.frame_slot_container, uidFragment);
             urlFragment = UrlFragment.newInstance();
@@ -297,7 +363,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             fragmentTransaction.add(R.id.frame_slot_container, iBeaconFragment);
             deviceInfoFragment = DeviceInfoFragment.newInstance();
             fragmentTransaction.add(R.id.frame_slot_container, deviceInfoFragment);
-        } else if (deviceType == 1) {
+        } else if ((deviceType & 1) == 1 && (deviceType & 2) == 0) {// 1、5
             uidFragment = UidFragment.newInstance();
             fragmentTransaction.add(R.id.frame_slot_container, uidFragment);
             urlFragment = UrlFragment.newInstance();
@@ -310,7 +376,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             fragmentTransaction.add(R.id.frame_slot_container, deviceInfoFragment);
             axisFragment = AxisFragment.newInstance();
             fragmentTransaction.add(R.id.frame_slot_container, axisFragment);
-        } else if (deviceType == 2) {
+        } else if ((deviceType & 1) == 0 && (deviceType & 2) == 1) {// 2、6
             uidFragment = UidFragment.newInstance();
             fragmentTransaction.add(R.id.frame_slot_container, uidFragment);
             urlFragment = UrlFragment.newInstance();
@@ -323,7 +389,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             fragmentTransaction.add(R.id.frame_slot_container, deviceInfoFragment);
             thFragment = THFragment.newInstance();
             fragmentTransaction.add(R.id.frame_slot_container, thFragment);
-        } else if (deviceType == 3) {
+        } else if ((deviceType & 1) == 1 && (deviceType & 2) == 1) {// 3、7
             uidFragment = UidFragment.newInstance();
             fragmentTransaction.add(R.id.frame_slot_container, uidFragment);
             urlFragment = UrlFragment.newInstance();
@@ -473,97 +539,97 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         switch (slotFrameTypeEnum) {
             case TLM:
-                if (deviceType == 0) {
+                if ((deviceType & 1) == 0 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(iBeaconFragment).hide(deviceInfoFragment).show(tlmFragment).commit();
                     slotDataActionImpl = tlmFragment;
-                } else if (deviceType == 1) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(iBeaconFragment).hide(deviceInfoFragment).hide(axisFragment).show(tlmFragment).commit();
                     slotDataActionImpl = tlmFragment;
-                } else if (deviceType == 2) {
+                } else if ((deviceType & 1) == 0 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(iBeaconFragment).hide(deviceInfoFragment).hide(thFragment).show(tlmFragment).commit();
                     slotDataActionImpl = tlmFragment;
-                } else if (deviceType == 3) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(iBeaconFragment).hide(deviceInfoFragment).hide(axisFragment).hide(thFragment).show(tlmFragment).commit();
                     slotDataActionImpl = tlmFragment;
                 }
                 break;
             case UID:
-                if (deviceType == 0) {
+                if ((deviceType & 1) == 0 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(urlFragment).hide(iBeaconFragment).hide(tlmFragment).hide(deviceInfoFragment).show(uidFragment).commit();
                     slotDataActionImpl = uidFragment;
-                } else if (deviceType == 1) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(urlFragment).hide(iBeaconFragment).hide(tlmFragment).hide(deviceInfoFragment).hide(axisFragment).show(uidFragment).commit();
                     slotDataActionImpl = uidFragment;
-                } else if (deviceType == 2) {
+                } else if ((deviceType & 1) == 0 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(urlFragment).hide(iBeaconFragment).hide(tlmFragment).hide(deviceInfoFragment).hide(thFragment).show(uidFragment).commit();
                     slotDataActionImpl = uidFragment;
-                } else if (deviceType == 3) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(urlFragment).hide(iBeaconFragment).hide(tlmFragment).hide(deviceInfoFragment).hide(axisFragment).hide(thFragment).show(uidFragment).commit();
                     slotDataActionImpl = uidFragment;
                 }
                 break;
             case URL:
-                if (deviceType == 0) {
+                if ((deviceType & 1) == 0 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(uidFragment).hide(iBeaconFragment).hide(tlmFragment).hide(deviceInfoFragment).show(urlFragment).commit();
                     slotDataActionImpl = urlFragment;
-                } else if (deviceType == 1) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(uidFragment).hide(iBeaconFragment).hide(tlmFragment).hide(deviceInfoFragment).hide(axisFragment).show(urlFragment).commit();
                     slotDataActionImpl = urlFragment;
-                } else if (deviceType == 2) {
+                } else if ((deviceType & 1) == 0 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(iBeaconFragment).hide(tlmFragment).hide(deviceInfoFragment).hide(thFragment).show(urlFragment).commit();
                     slotDataActionImpl = urlFragment;
-                } else if (deviceType == 3) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(iBeaconFragment).hide(tlmFragment).hide(deviceInfoFragment).hide(axisFragment).hide(thFragment).show(urlFragment).commit();
                     slotDataActionImpl = urlFragment;
                 }
                 break;
             case IBEACON:
-                if (deviceType == 0) {
+                if ((deviceType & 1) == 0 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(deviceInfoFragment).show(iBeaconFragment).commit();
                     slotDataActionImpl = iBeaconFragment;
-                } else if (deviceType == 1) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(deviceInfoFragment).show(iBeaconFragment).hide(axisFragment).commit();
                     slotDataActionImpl = iBeaconFragment;
-                } else if (deviceType == 2) {
+                } else if ((deviceType & 1) == 0 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(deviceInfoFragment).show(iBeaconFragment).hide(thFragment).commit();
                     slotDataActionImpl = iBeaconFragment;
-                } else if (deviceType == 3) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(deviceInfoFragment).show(iBeaconFragment).hide(axisFragment).hide(thFragment).commit();
                     slotDataActionImpl = iBeaconFragment;
                 }
                 break;
             case DEVICE:
-                if (deviceType == 0) {
+                if ((deviceType & 1) == 0 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).show(deviceInfoFragment).commit();
                     slotDataActionImpl = deviceInfoFragment;
-                } else if (deviceType == 1) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).show(deviceInfoFragment).hide(axisFragment).commit();
                     slotDataActionImpl = deviceInfoFragment;
-                } else if (deviceType == 2) {
+                } else if ((deviceType & 1) == 0 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).show(deviceInfoFragment).hide(thFragment).commit();
                     slotDataActionImpl = deviceInfoFragment;
-                } else if (deviceType == 3) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).show(deviceInfoFragment).hide(axisFragment).hide(thFragment).commit();
                     slotDataActionImpl = deviceInfoFragment;
                 }
                 break;
             case NO_DATA:
-                if (deviceType == 0) {
+                if ((deviceType & 1) == 0 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).commit();
                     slotDataActionImpl = null;
-                } else if (deviceType == 1) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).hide(axisFragment).commit();
                     slotDataActionImpl = null;
-                } else if (deviceType == 2) {
+                } else if ((deviceType & 1) == 0 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).hide(thFragment).commit();
                     slotDataActionImpl = null;
-                } else if (deviceType == 3) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).hide(axisFragment).hide(thFragment).commit();
                     slotDataActionImpl = null;
                 }
                 break;
             case AXIS:
-                if (deviceType == 1) {
+                if ((deviceType & 1) == 1 && (deviceType & 2) == 0) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).show(axisFragment).commit();
                     slotDataActionImpl = axisFragment;
                 } else if (deviceType == 3) {
@@ -572,10 +638,10 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                 }
                 break;
             case TH:
-                if (deviceType == 2) {
+                if ((deviceType & 1) == 0 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).show(thFragment).commit();
                     slotDataActionImpl = thFragment;
-                } else if (deviceType == 3) {
+                } else if ((deviceType & 1) == 1 && (deviceType & 2) == 1) {
                     fragmentTransaction.hide(uidFragment).hide(urlFragment).hide(tlmFragment).hide(iBeaconFragment).hide(deviceInfoFragment).show(thFragment).hide(axisFragment).commit();
                     slotDataActionImpl = thFragment;
                 }
@@ -610,27 +676,33 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         OrderTask orderTask = null;
         // 发送触发条件
         switch (triggerType) {
-            case 0:
+            case TRIGGER_TYPE_NULL:
                 orderTask = OrderTaskAssembler.setTriggerClose();
                 break;
-            case 1:
+            case TRIGGER_TYPE_TEMPERATURE:
                 orderTask = OrderTaskAssembler.setTHTrigger(triggerType, tempFragment.getTempType(), tempFragment.getData(), tempFragment.isStart());
                 break;
-            case 2:
+            case TRIGGER_TYPE_HUMIDITY:
                 orderTask = OrderTaskAssembler.setTHTrigger(triggerType, humidityFragment.getHumidityType(), humidityFragment.getData(), humidityFragment.isStart());
                 break;
-            case 3:
-            case 4:
+            case TRIGGER_TYPE_TRAP_DOUBLE:
+            case TRIGGER_TYPE_TRAP_TRIPLE:
                 if (tappedFragment.getData() < 0) {
                     return;
                 }
                 orderTask = OrderTaskAssembler.setTappedMovesTrigger(triggerType, tappedFragment.getData(), tappedFragment.isStart());
                 break;
-            case 5:
+            case TRIGGER_TYPE_MOVE:
                 if (movesFragment.getData() < 0) {
                     return;
                 }
                 orderTask = OrderTaskAssembler.setTappedMovesTrigger(triggerType, movesFragment.getData(), movesFragment.isStart());
+                break;
+            case TRIGGER_TYPE_LIGHT:
+                if (movesFragment.getData() < 0) {
+                    return;
+                }
+                orderTask = OrderTaskAssembler.setLightTrigger(triggerType, lightDetectedFragment.getData(), lightDetectedFragment.isAlways(), movesFragment.isStart());
                 break;
         }
         if (slotDataActionImpl == null) {
@@ -662,29 +734,40 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             triggerTypeSelected = value;
             switch (triggerTypeSelected) {
                 case 0:
-                    triggerType = 3;
+                    triggerType = TRIGGER_TYPE_TRAP_DOUBLE;
                     break;
                 case 1:
-                    triggerType = 4;
+                    triggerType = TRIGGER_TYPE_TRAP_TRIPLE;
                     break;
                 case 2:
-                    if (deviceType == 1) {
-                        triggerType = 5;
+                    if (deviceType == DEVICE_TYPE_SENSOR_AXIS) {
+                        triggerType = TRIGGER_TYPE_MOVE;
+                    } else if (deviceType == DEVICE_TYPE_SENSOR_LIGHT) {
+                        triggerType = TRIGGER_TYPE_LIGHT;
                     } else {
-                        triggerType = 1;
+                        triggerType = TRIGGER_TYPE_TEMPERATURE;
                     }
                     break;
                 case 3:
-                    triggerType = 1;
+                    if (deviceType == DEVICE_TYPE_SENSOR_AXIS_LIGHT) {
+                        triggerType = TRIGGER_TYPE_LIGHT;
+                    } else {
+                        triggerType = TRIGGER_TYPE_TEMPERATURE;
+                    }
                     break;
                 case 4:
-                    triggerType = 2;
-                    break;
                 case 5:
-                    triggerType = 2;
+                    triggerType = TRIGGER_TYPE_HUMIDITY;
                     break;
                 case 6:
-                    triggerType = 5;
+                    if (deviceType == DEVICE_TYPE_SENSOR_TH_LIGHT) {
+                        triggerType = TRIGGER_TYPE_LIGHT;
+                    } else {
+                        triggerType = TRIGGER_TYPE_MOVE;
+                    }
+                    break;
+                case 7:
+                    triggerType = TRIGGER_TYPE_LIGHT;
                     break;
             }
             showTriggerFragment();
@@ -698,12 +781,14 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                     tappedFragment.updateTips();
                     break;
                 case 2:
-                    if (deviceType != 1) {
+                    if ((deviceType & 2) == 1) {
                         tempFragment.setTempTypeAndRefresh(true);
                     }
                     break;
                 case 3:
-                    tempFragment.setTempTypeAndRefresh(false);
+                    if ((deviceType & 2) == 1) {
+                        tempFragment.setTempTypeAndRefresh(false);
+                    }
                     break;
                 case 4:
                     humidityFragment.setHumidityTypeAndRefresh(true);

@@ -22,6 +22,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.elvishew.xlog.XLog;
+import com.moko.ble.lib.MokoConstants;
+import com.moko.ble.lib.event.ConnectStatusEvent;
+import com.moko.ble.lib.event.OrderTaskResponseEvent;
+import com.moko.ble.lib.task.OrderTask;
+import com.moko.ble.lib.task.OrderTaskResponse;
+import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.R2;
@@ -35,12 +41,6 @@ import com.moko.bxp.nordic.fragment.SlotFragment;
 import com.moko.bxp.nordic.service.DfuService;
 import com.moko.bxp.nordic.utils.FileUtils;
 import com.moko.bxp.nordic.utils.ToastUtils;
-import com.moko.ble.lib.MokoConstants;
-import com.moko.ble.lib.event.ConnectStatusEvent;
-import com.moko.ble.lib.event.OrderTaskResponseEvent;
-import com.moko.ble.lib.task.OrderTask;
-import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 import com.moko.support.nordic.entity.OrderCHAR;
@@ -92,6 +92,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     private int lockState;
     private boolean mReceiverTag = false;
     private int mDisconnectType;
+    private int mDeviceType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -234,6 +235,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                     case CHAR_DEVICE_TYPE:
                         if (value.length >= 1) {
                             int deviceType = value[0] & 0xff;
+                            mDeviceType = deviceType;
                             slotFragment.setDeviceType(deviceType);
                             settingFragment.setDeviceType(deviceType);
                         }
@@ -696,7 +698,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     public void onSensorConfig(View view) {
         if (isWindowLocked())
             return;
-        startActivity(new Intent(this, AxisDataActivity.class));
+        Intent intent = new Intent(this, SensorConfigActivity.class);
+        intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, mDeviceType);
+        startActivity(intent);
     }
 
     public void onQuickSwitch(View view) {
