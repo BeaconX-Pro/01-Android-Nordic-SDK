@@ -92,6 +92,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        MokoSupport.getInstance().init(getApplicationContext());
         beaconXInfoHashMap = new ConcurrentHashMap<>();
         beaconXInfos = new ArrayList<>();
         adapter = new BeaconXListAdapter();
@@ -173,8 +174,9 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
         if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
             // 设备连接成功，通知页面更新
             dismissLoadingProgressDialog();
-            BluetoothGattCharacteristic characteristic = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_DEVICE_TYPE);
-            if (characteristic == null) {
+            BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_MODEL_NUMBER);
+            BluetoothGattCharacteristic deviceTypeChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_DEVICE_TYPE);
+            if (modelNumberChar != null && deviceTypeChar != null) {
                 showLoadingMessageDialog();
                 mHandler.postDelayed(new Runnable() {
                     @Override

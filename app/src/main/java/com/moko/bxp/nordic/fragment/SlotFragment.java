@@ -219,6 +219,9 @@ public class SlotFragment extends Fragment {
     public void setAdvInterval(byte[] value) {
         advInterval = Integer.parseInt(MokoUtils.bytesToHexString(value), 16);
         slotData.advInterval = advInterval;
+    }
+
+    public void gotoSlotDataDetail() {
         Intent intent = new Intent(getActivity(), SlotDataActivity.class);
         intent.putExtra(AppConstants.EXTRA_KEY_SLOT_DATA, slotData);
         intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, deviceType);

@@ -324,6 +324,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                     case CHAR_ADV_INTERVAL:
                         if (value.length >= 2) {
                             slotFragment.setAdvInterval(value);
+                            tvTitle.postDelayed(() -> {
+                                slotFragment.gotoSlotDataDetail();
+                            }, 300);
                         }
                         break;
                     case CHAR_ADV_TX_POWER:

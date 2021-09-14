@@ -33,7 +33,6 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
         initXLog();
-        MokoSupport.getInstance().init(getApplicationContext());
         Thread.setDefaultUncaughtExceptionHandler(new BTUncaughtExceptionHandler());
     }
 
