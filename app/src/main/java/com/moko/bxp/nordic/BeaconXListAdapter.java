@@ -35,13 +35,15 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
     protected void convert(BaseViewHolder helper, BeaconXInfo item) {
         helper.setText(R.id.tv_name, TextUtils.isEmpty(item.name) ? "N/A" : item.name);
         helper.setText(R.id.tv_mac, "MAC:" + item.mac);
-        helper.setText(R.id.tv_rssi, item.rssi + "");
+        helper.setText(R.id.tv_rssi, String.format("%ddBm", item.rssi));
 //        helper.setText(R.id.tv_conn_state, item.connectState < 0 ? "N/A" : item.connectState == 0 ? "Unconnectable" : "Connectable");
 //        helper.setText(R.id.tv_lock_state, item.lockState < 0 ? "Lock State:N/A" : String.format("Lock State:0x%02x", item.lockState));
         helper.setText(R.id.tv_interval_time, item.intervalTime == 0 ? "<->N/A" : String.format("<->%dms", item.intervalTime));
         helper.setText(R.id.tv_battery, item.battery < 0 ? "N/A" : String.format("%dmV", item.battery));
         helper.addOnClickListener(R.id.tv_connect);
         helper.setGone(R.id.tv_connect, item.connectState > 0);
+        helper.setVisible(R.id.tv_tx_power, false);
+        helper.setVisible(R.id.tv_ranging_data, false);
         LinearLayout parent = helper.getView(R.id.ll_data);
         parent.removeAllViews();
         ArrayList<BeaconXInfo.ValidData> validDatas = new ArrayList<>(item.validDataHashMap.values());
@@ -67,10 +69,10 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TLM) {
                 parent.addView(createTLMView(BeaconXParser.getTLM(validData.data)));
-                if (validData.data.length() > 7) {
-                    int battery = Integer.parseInt(validData.data.substring(4, 8), 16);
-                    helper.setText(R.id.tv_battery, String.format("%dmV", battery));
-                }
+//                if (validData.data.length() > 7) {
+//                    int battery = Integer.parseInt(validData.data.substring(4, 8), 16);
+//                    helper.setText(R.id.tv_battery, String.format("%dmV", battery));
+//                }
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_IBEACON) {
                 BeaconXiBeacon beaconXiBeacon = BeaconXParser.getiBeacon(item.rssi, validData.data);
@@ -96,6 +98,8 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
                 parent.addView(createAxisView(beaconXAxis));
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_INFO) {
+                helper.setVisible(R.id.tv_tx_power, true);
+                helper.setVisible(R.id.tv_ranging_data, true);
                 helper.setText(R.id.tv_tx_power, String.format("Tx power:%ddBm", validData.txPower));
                 int rangingData = Integer.parseInt(validData.data.substring(2, 4), 16);
                 helper.setText(R.id.tv_ranging_data, String.format("Ranging data:%sdBm", String.valueOf((byte) rangingData)));

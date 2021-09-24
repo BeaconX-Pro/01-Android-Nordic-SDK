@@ -24,7 +24,7 @@
     <string name="about_title">ABOUT</string>
 
     <string name="company_website">www.mokoblue.com</string>
-    <string name="please_enter_password">Please enter password</string>
+    <string name="please_enter_password">Please enter the password</string>
     <string name="device_name_null">The device name cannot be empty!</string>
     <string name="password_length">Length should be 16 bits</string>
     <string name="slot_title">SLOT</string>
@@ -52,7 +52,7 @@
     <string name="trigger_moved_tips_2">*The Beacon will %1$s after device keep static for %2$s and it %3$s again once a movement occurred.</string>
     <string name="trigger_light_detected_tips_1">*The Beacon will start and keep advertising after ambient light detected.</string>
     <string name="trigger_light_detected_tips_2">*The Beacon will %1$s after ambient light continuously detected for %2$s.</string>
-    <string name="rssi_filter_tips">* RSSI filtering is the highest priority filtering condition. BLE Name and MAC Address filtering must first meet the RSSI filtering condition.\n* There is an "OR" relationship between the BLE Name filtering and the MAC Address filtering.</string>
+    <string name="rssi_filter_tips">* RSSI filtering is the highest priority filtering condition. BLE Name and MAC Address filtering must first meet the RSSI filtering condition.\n* There is an \"OR\" relationship between the BLE Name filtering and the MAC Address filtering.</string>
     <string name="th_chart_total">Total Data Points:%d</string>
     <string name="th_chart_display">Window Display Points:%d</string>
     <string name="temperature_humidity"><![CDATA[Temperature&Humidity]]></string>

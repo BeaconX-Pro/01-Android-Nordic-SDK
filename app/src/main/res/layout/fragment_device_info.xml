@@ -35,7 +35,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Device Name"
+                android:text="Device name"
                 android:textColor="@color/grey_666666"
                 android:textSize="15sp" />
 

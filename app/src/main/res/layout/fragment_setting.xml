@@ -199,7 +199,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Modify Password"
+            android:text="Modify password"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 

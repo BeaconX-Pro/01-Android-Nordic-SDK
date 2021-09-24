@@ -92,7 +92,8 @@
             android:layout_marginTop="5dp"
             android:text="Tx power:N/A"
             android:textColor="@color/grey_666666"
-            android:textSize="10sp" />
+            android:textSize="10sp"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/tv_ranging_data"
@@ -104,7 +105,8 @@
             android:layout_toRightOf="@id/tv_tx_power"
             android:text="Ranging data:N/A"
             android:textColor="@color/grey_666666"
-            android:textSize="10sp" />
+            android:textSize="10sp"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/tv_interval_time"
