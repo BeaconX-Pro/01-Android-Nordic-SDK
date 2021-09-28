@@ -15,13 +15,13 @@
             android:id="@+id/tv_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:clickable="true"
             android:drawableLeft="@drawable/back"
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
+            android:onClick="onBack"
             android:paddingLeft="16dp"
             android:text=""
-            android:onClick="onBack"
-            android:clickable="true"
             android:textColor="@color/white_ffffff"
             android:textSize="15sp" />
 
@@ -38,9 +38,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:paddingLeft="16dp"
-            android:onClick="onSave"
             android:clickable="true"
+            android:onClick="onSave"
+            android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:src="@drawable/save" />
     </RelativeLayout>
@@ -67,9 +67,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:onClick="onSync"
                     android:clickable="true"
                     android:gravity="center_horizontal"
+                    android:onClick="onSync"
                     android:orientation="vertical">
 
                     <ImageView
@@ -159,9 +159,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
-                    android:onClick="onAxisScale"
-                    android:clickable="true"
                     android:background="@drawable/shape_radius_blue_frame"
+                    android:clickable="true"
+                    android:onClick="onAxisScale"
                     android:paddingLeft="20dp"
                     android:paddingTop="5dp"
                     android:paddingRight="20dp"
@@ -190,9 +190,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:onClick="onAxisDataRate"
-                    android:clickable="true"
                     android:background="@drawable/shape_radius_blue_frame"
+                    android:clickable="true"
+                    android:onClick="onAxisDataRate"
                     android:paddingLeft="20dp"
                     android:paddingTop="5dp"
                     android:paddingRight="20dp"
@@ -218,8 +218,7 @@
                         android:layout_height="wrap_content"
                         android:text="Motion threshold"
                         android:textColor="@color/grey_666666"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:textSize="15sp" />
 
                     <SeekBar
                         android:id="@+id/sb_trigger_sensitivity"
