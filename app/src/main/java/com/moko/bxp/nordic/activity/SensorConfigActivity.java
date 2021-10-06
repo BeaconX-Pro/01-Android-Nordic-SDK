@@ -31,8 +31,8 @@ public class SensorConfigActivity extends BaseActivity {
         ButterKnife.bind(this);
         mDeviceType = getIntent().getIntExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, 0);
         rlAccelerationSensor.setVisibility((mDeviceType & 1) == 1 ? View.VISIBLE : View.GONE);
-        rlThSensor.setVisibility((mDeviceType & 2) == 1 ? View.VISIBLE : View.GONE);
-        rlLightSensor.setVisibility((mDeviceType & 4) == 1 ? View.VISIBLE : View.GONE);
+        rlThSensor.setVisibility((mDeviceType & 2) == 2 ? View.VISIBLE : View.GONE);
+        rlLightSensor.setVisibility((mDeviceType & 4) == 4 ? View.VISIBLE : View.GONE);
     }
 
 

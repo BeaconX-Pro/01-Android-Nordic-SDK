@@ -199,8 +199,8 @@ public class IBeaconFragment extends Fragment implements SeekBar.OnSeekBarChange
             return false;
         }
         int advIntervalInt = Integer.parseInt(advInterval);
-        if (advIntervalInt < 1 || advIntervalInt > 100) {
-            ToastUtils.showToast(activity, "The Adv interval range is 1~100");
+        if (advIntervalInt < 1 || advIntervalInt > 600) {
+            ToastUtils.showToast(activity, "The Adv interval range is 1~600");
             return false;
         }
         major = String.format("%04X", Integer.valueOf(majorStr));

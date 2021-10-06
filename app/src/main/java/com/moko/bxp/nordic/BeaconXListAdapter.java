@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.elvishew.xlog.XLog;
-import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.entity.BeaconXAxis;
 import com.moko.bxp.nordic.entity.BeaconXInfo;
 import com.moko.bxp.nordic.entity.BeaconXTH;
@@ -101,8 +100,13 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
                 helper.setVisible(R.id.tv_tx_power, true);
                 helper.setVisible(R.id.tv_ranging_data, true);
                 helper.setText(R.id.tv_tx_power, String.format("Tx power:%ddBm", validData.txPower));
-                int rangingData = Integer.parseInt(validData.data.substring(2, 4), 16);
-                helper.setText(R.id.tv_ranging_data, String.format("Ranging data:%sdBm", String.valueOf((byte) rangingData)));
+                if (item.ambientLightState < 0) {
+                    int rangingData = Integer.parseInt(validData.data.substring(2, 4), 16);
+                    helper.setText(R.id.tv_ranging_data, String.format("Ranging data:%sdBm", String.valueOf((byte) rangingData)));
+                } else {
+                    int ambientLightState = item.ambientLightState;
+                    helper.setText(R.id.tv_ranging_data, ambientLightState > 0 ? "Ambient light detected" : "Ambient light NOT detected");
+                }
             }
         }
     }

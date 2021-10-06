@@ -35,6 +35,8 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
         int battery = -1;
 //        int connectState = -1;
         int lockState = -1;
+//        int ambientLightSupport = -1;
+        int ambientLightState = -1;
         ScanResult result = deviceInfo.scanResult;
         ScanRecord record = result.getScanRecord();
         Map<ParcelUuid, byte[]> map = record.getServiceData();
@@ -83,7 +85,11 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                                     return null;
                                 type = BeaconXInfo.VALID_DATA_FRAME_TYPE_INFO;
                                 battery = MokoUtils.toInt(Arrays.copyOfRange(bytes, 3, 5));
-                                lockState = bytes[5] & 0xff;
+                                lockState = bytes[5] & 2;// 0 or 2
+                                int ambientLightSupport = bytes[5] & 4;// 0 or 4
+                                if (ambientLightSupport == 4) {
+                                    ambientLightState = bytes[6] & 2;
+                                }
 //                                connectState = bytes[6] & 0xff;
                                 // 40000a0d0d0001ff02030405063001
                                 break;
@@ -152,6 +158,9 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
             if (lockState >= 0) {
                 beaconXInfo.lockState = lockState;
             }
+            if (ambientLightState >= 0) {
+                beaconXInfo.ambientLightState = ambientLightState;
+            }
             if (result.isConnectable())
                 beaconXInfo.connectState = 1;
             beaconXInfo.scanRecord = deviceInfo.scanRecord;
@@ -173,6 +182,11 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                 beaconXInfo.lockState = -1;
             } else {
                 beaconXInfo.lockState = lockState;
+            }
+            if (ambientLightState < 0) {
+                beaconXInfo.ambientLightState = -1;
+            } else {
+                beaconXInfo.ambientLightState = ambientLightState;
             }
             if (result.isConnectable()) {
                 beaconXInfo.connectState = 1;

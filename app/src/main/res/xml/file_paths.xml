@@ -1,4 +1,4 @@
 <paths>
-    <external-path name="log" path="mokoBeaconXPro/"/>
+    <external-path name="log" path="BXP-NORDIC/"/>
     <external-path name="*" path="."/>
 </paths>

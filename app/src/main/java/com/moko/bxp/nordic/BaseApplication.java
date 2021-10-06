@@ -24,9 +24,9 @@ import java.io.Writer;
 
 public class BaseApplication extends Application {
 
-    private static final String TAG = "mokoBeaconXPro";
-    private static final String LOG_FILE = "mokoBeaconXPro.txt";
-    private static final String LOG_FOLDER = "mokoBeaconXPro";
+    private static final String TAG = "BXP-NORDIC";
+    private static final String LOG_FILE = "BXP-NORDIC.txt";
+    private static final String LOG_FOLDER = "BXP-NORDIC";
     public static String PATH_LOGCAT;
 
     @Override

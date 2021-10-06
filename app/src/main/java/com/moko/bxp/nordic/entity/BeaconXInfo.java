@@ -26,6 +26,8 @@ public class BeaconXInfo implements Serializable {
     public String scanRecord;
     public int battery;
     public int lockState;
+    public int ambientLightState;
+//    public int ambientLightSupport;
     public int connectState;
     public long intervalTime;
     public long scanTime;

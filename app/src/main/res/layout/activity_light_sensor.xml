@@ -51,9 +51,9 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/shape_radius_white_bg"
-        android:paddingLeft="25dp"
+        android:paddingLeft="12dp"
         android:paddingTop="10dp"
-        android:paddingRight="25dp"
+        android:paddingRight="12dp"
         android:paddingBottom="10dp">
 
         <TextView
@@ -70,11 +70,12 @@
         <TextView
             android:id="@+id/tv_light_sensor_status"
             android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:text="N/A"
+            android:text="Ambient light NOT detected"
             android:textColor="@color/black_333333"
-            android:textSize="15sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
 
@@ -87,9 +88,9 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/shape_radius_white_bg"
-        android:paddingLeft="25dp"
+        android:paddingLeft="12dp"
         android:paddingTop="10dp"
-        android:paddingRight="25dp"
+        android:paddingRight="12dp"
         android:paddingBottom="10dp">
 
         <TextView
@@ -137,9 +138,9 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/shape_radius_white_bg"
-        android:paddingLeft="25dp"
+        android:paddingLeft="12dp"
         android:paddingTop="10dp"
-        android:paddingRight="25dp"
+        android:paddingRight="12dp"
         android:paddingBottom="10dp">
 
         <LinearLayout

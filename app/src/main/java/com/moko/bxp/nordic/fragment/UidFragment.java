@@ -190,8 +190,8 @@ public class UidFragment extends Fragment implements SeekBar.OnSeekBarChangeList
             return false;
         }
         int advIntervalInt = Integer.parseInt(advInterval);
-        if (advIntervalInt < 1 || advIntervalInt > 100) {
-            ToastUtils.showToast(activity, "The Adv interval range is 1~100");
+        if (advIntervalInt < 1 || advIntervalInt > 600) {
+            ToastUtils.showToast(activity, "The Adv interval range is 1~600");
             return false;
         }
         String uidParamsStr = activity.slotData.frameTypeEnum.getFrameType() + namespace + instanceId;

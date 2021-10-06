@@ -20,7 +20,7 @@
             android:drawableLeft="@drawable/base_params"
             android:drawablePadding="10dp"
             android:gravity="center"
-            android:text="Adv parameters"
+            android:text="Parameters"
             android:textColor="@color/black_333333"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -47,7 +47,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@id/adv_interval"
-                android:text="(1~100)"
+                android:text="(1~600)"
                 android:textColor="@color/grey_b3b3b3"
                 android:textSize="12sp" />
 
