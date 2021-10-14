@@ -75,7 +75,7 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_IBEACON) {
                 BeaconXiBeacon beaconXiBeacon = BeaconXParser.getiBeacon(item.rssi, validData.data);
-                beaconXiBeacon.txPower = validData.txPower + "";
+                beaconXiBeacon.txPower = String.valueOf(validData.txPower);
                 parent.addView(createiBeaconView(beaconXiBeacon));
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TH) {
@@ -84,7 +84,7 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
                     int battery = Integer.parseInt(validData.data.substring(14, 18), 16);
                     helper.setText(R.id.tv_battery, String.format("%dmV", battery));
                 }
-                beaconXTH.txPower = validData.txPower + "";
+                beaconXTH.txPower = String.valueOf(validData.txPower);
                 parent.addView(createTHView(beaconXTH));
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_AXIS) {
@@ -93,15 +93,15 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
                     int battery = Integer.parseInt(validData.data.substring(24, 28), 16);
                     helper.setText(R.id.tv_battery, String.format("%dmV", battery));
                 }
-                beaconXAxis.txPower = validData.txPower + "";
+                beaconXAxis.txPower = String.valueOf(validData.txPower);
                 parent.addView(createAxisView(beaconXAxis));
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_INFO) {
                 helper.setVisible(R.id.tv_tx_power, true);
                 helper.setVisible(R.id.tv_ranging_data, true);
-                helper.setText(R.id.tv_tx_power, String.format("Tx power:%ddBm", validData.txPower));
+                helper.setText(R.id.tv_tx_power, String.format("Tx power:%ddBm", item.txPower));
                 if (item.ambientLightState < 0) {
-                    int rangingData = Integer.parseInt(validData.data.substring(2, 4), 16);
+                    int rangingData = item.rangingData;
                     helper.setText(R.id.tv_ranging_data, String.format("Ranging data:%sdBm", String.valueOf((byte) rangingData)));
                 } else {
                     int ambientLightState = item.ambientLightState;

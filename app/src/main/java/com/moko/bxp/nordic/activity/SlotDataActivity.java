@@ -702,7 +702,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                 if (movesFragment.getData() < 0) {
                     return;
                 }
-                orderTask = OrderTaskAssembler.setLightTrigger(triggerType, lightDetectedFragment.getData(), lightDetectedFragment.isAlways(), movesFragment.isStart());
+                orderTask = OrderTaskAssembler.setLightTrigger(triggerType, lightDetectedFragment.getData(), lightDetectedFragment.isAlways(), lightDetectedFragment.isStart());
                 break;
         }
         if (slotDataActionImpl == null) {

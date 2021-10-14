@@ -36,7 +36,7 @@ import butterknife.ButterKnife;
 public class UrlFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, ISlotDataAction {
 
     private static final String TAG = "UrlFragment";
-    private final String FILTER_ASCII = "[ -~]*";
+    private final String FILTER_ASCII = "[!-~]*";
     @BindView(R2.id.et_url)
     EditText etUrl;
     @BindView(R2.id.sb_adv_tx_power)
@@ -209,8 +209,8 @@ public class UrlFragment extends Fragment implements SeekBar.OnSeekBarChangeList
             return false;
         }
         int advIntervalInt = Integer.parseInt(advInterval);
-        if (advIntervalInt < 1 || advIntervalInt > 600) {
-            ToastUtils.showToast(activity, "The Adv interval range is 1~600");
+        if (advIntervalInt < 1 || advIntervalInt > 100) {
+            ToastUtils.showToast(activity, "The Adv interval range is 1~100");
             return false;
         }
         String urlContentHex;

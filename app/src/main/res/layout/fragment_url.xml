@@ -110,7 +110,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@id/adv_interval"
-                android:text="(1~600)"
+                android:text="(1~100)"
                 android:textColor="@color/grey_b3b3b3"
                 android:textSize="12sp" />
 

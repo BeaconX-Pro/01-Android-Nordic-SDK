@@ -71,7 +71,7 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
         sbTriggerTemp.setProgress(mProgress);
         String tempStr = String.format("%d℃", mProgress - 20);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "stop advertising for" : "stop advertising for", "temperature", mIsAbove ? "above" : "below", tempStr));
+                mIsStart ? "start advertising" : "stop advertising", "temperature", mIsAbove ? "above" : "below", tempStr));
 //        triggerTemp.setText(mIsAbove ? "Temperature Above" : "Temperature Below");
         return view;
     }
@@ -101,7 +101,7 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
         String tempStr = String.format("%d℃", progress - 20);
         tvTriggerTemp.setText(tempStr);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "stop advertising for" : "stop advertising for", "temperature", mIsAbove ? "above" : "below", tempStr));
+                mIsStart ? "start advertising" : "stop advertising", "temperature", mIsAbove ? "above" : "below", tempStr));
     }
 
     @Override
@@ -127,7 +127,7 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
         }
         String tempStr = String.format("%d℃", mProgress - 20);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "stop advertising for" : "stop advertising for", "temperature", mIsAbove ? "above" : "below", tempStr));
+                mIsStart ? "start advertising" : "stop advertising", "temperature", mIsAbove ? "above" : "below", tempStr));
     }
 
     public void setStart(boolean isStart) {
@@ -154,7 +154,7 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
         mIsAbove = isAbove;
         String tempStr = String.format("%d℃", mProgress - 20);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "stop advertising for" : "stop advertising for", "temperature", mIsAbove ? "above" : "below", tempStr));
+                mIsStart ? "start advertising" : "stop advertising", "temperature", mIsAbove ? "above" : "below", tempStr));
     }
 
     public boolean getTempType() {

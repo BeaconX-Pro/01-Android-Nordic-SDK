@@ -63,10 +63,10 @@ public class BeaconXParser {
         int tempInt = temp1 > 128 ? temp1 - 256 : temp1;
         float tempDecimal = temp2 / 256.0f;
         float temperature = tempInt + tempDecimal;
-        String tempStr = MokoUtils.getDecimalFormat("0.#").format(temperature);
+        String tempStr = MokoUtils.getDecimalFormat("0.0").format(temperature);
         tlm.temp = String.format("%s°C", tempStr);
         tlm.adv_cnt = Long.parseLong(data.substring(12, 20), 16) + "";
-        long seconds = Long.parseLong(data.substring(20, 28), 16) / 10;
+        float seconds = Long.parseLong(data.substring(20, 28), 16) * 0.1f;
         int day = 0, hours = 0, minutes = 0;
         day = (int) (seconds / (60 * 60 * 24));
         seconds -= day * 60 * 60 * 24;
@@ -74,7 +74,7 @@ public class BeaconXParser {
         seconds -= hours * 60 * 60;
         minutes = (int) (seconds / 60);
         seconds -= minutes * 60;
-        tlm.sec_cnt = String.format("%dd%dh%dm%ds", day, hours, minutes, seconds);
+        tlm.sec_cnt = String.format("%dd%dh%dm%ss", day, hours, minutes, MokoUtils.getDecimalFormat("0.0").format(seconds));
         return tlm;
     }
 

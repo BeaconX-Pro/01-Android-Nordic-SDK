@@ -160,8 +160,8 @@ public class AxisFragment extends Fragment implements SeekBar.OnSeekBarChangeLis
             return false;
         }
         int advIntervalInt = Integer.parseInt(advInterval);
-        if (advIntervalInt < 1 || advIntervalInt > 600) {
-            ToastUtils.showToast(activity, "The Adv interval range is 1~600");
+        if (advIntervalInt < 1 || advIntervalInt > 100) {
+            ToastUtils.showToast(activity, "The Adv interval range is 1~100");
             return false;
         }
         advIntervalBytes = MokoUtils.toByteArray(advIntervalInt * 100, 2);

@@ -72,7 +72,7 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
         sbTriggerHumidity.setProgress(mProgress);
         String humidityStr = String.format("%d%%", mProgress);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "stop advertising for" : "stop advertising for", "humidity", mIsAbove ? "above" : "below", humidityStr));
+                mIsStart ? "start advertising" : "stop advertising", "humidity", mIsAbove ? "above" : "below", humidityStr));
 //        triggerHumidiy.setText(mIsAbove ? "Humidity Above" : "Humidity Below");
         return view;
     }
@@ -102,7 +102,7 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
         String humidityStr = String.format("%d%%", progress);
         tvTriggerHumidiy.setText(humidityStr);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "stop advertising for" : "stop advertising for", "humidity", mIsAbove ? "above" : "below", humidityStr));
+                mIsStart ? "start advertising" : "stop advertising", "humidity", mIsAbove ? "above" : "below", humidityStr));
     }
 
     @Override
@@ -128,7 +128,7 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
         }
         String humidityStr = String.format("%d%%", mProgress);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "stop advertising for" : "stop advertising for", "humidity", mIsAbove ? "above" : "below", humidityStr));
+                mIsStart ? "start advertising" : "stop advertising", "humidity", mIsAbove ? "above" : "below", humidityStr));
     }
 
     public void setStart(boolean isStart) {
@@ -155,7 +155,7 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
         mIsAbove = isAbove;
         String humidityStr = String.format("%d%%", mProgress);
         tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
-                mIsStart ? "stop advertising for" : "stop advertising for", "humidity", mIsAbove ? "above" : "below", humidityStr));
+                mIsStart ? "start advertising" : "stop advertising", "humidity", mIsAbove ? "above" : "below", humidityStr));
     }
 
     public boolean getHumidityType() {

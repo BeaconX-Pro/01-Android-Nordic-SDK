@@ -167,9 +167,10 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
                                             if (mSelectedScale == 3) {
                                                 sbTriggerSensitivity.setMax(159);
                                             }
-                                            tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("#.#g").format(mSelectedSensitivity * 0.1));
+                                            tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("0.0g").format(mSelectedSensitivity * 0.1));
                                         } else {
                                             sbTriggerSensitivity.setProgress(mSelectedSensitivity - 7);
+                                            sbTriggerSensitivity.setMax(248);
                                             tvTriggerSensitivity.setText(String.valueOf(mSelectedSensitivity));
                                         }
                                     }
@@ -274,8 +275,13 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        mSelectedSensitivity = progress + 1;
-        tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("#.#g").format(mSelectedSensitivity * 0.1));
+        if (MokoSupport.isNewVersion) {
+            mSelectedSensitivity = progress + 1;
+            tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("0.0g").format(mSelectedSensitivity * 0.1));
+        } else {
+            mSelectedSensitivity = progress + 7;
+            tvTriggerSensitivity.setText(mSelectedSensitivity + "");
+        }
     }
 
     @Override

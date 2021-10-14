@@ -333,7 +333,7 @@
                     android:id="@+id/trigger_led_notify"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Trigger LED notification"
+                    android:text="Trigger LED indicator"
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     app:layout_constraintLeft_toLeftOf="parent"

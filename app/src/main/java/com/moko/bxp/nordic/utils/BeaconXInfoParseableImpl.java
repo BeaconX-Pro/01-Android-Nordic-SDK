@@ -4,8 +4,8 @@ import android.os.ParcelUuid;
 import android.os.SystemClock;
 import android.text.TextUtils;
 
-import com.moko.bxp.nordic.entity.BeaconXInfo;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.bxp.nordic.entity.BeaconXInfo;
 import com.moko.support.nordic.entity.DeviceInfo;
 import com.moko.support.nordic.service.DeviceInfoParseable;
 
@@ -199,27 +199,28 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
             beaconXInfoHashMap.put(deviceInfo.mac, beaconXInfo);
         }
         String data = MokoUtils.bytesToHexString(values);
-        if (beaconXInfo.validDataHashMap.containsKey(data)) {
-            return beaconXInfo;
-        } else {
-            BeaconXInfo.ValidData validData = new BeaconXInfo.ValidData();
-            validData.data = data;
-            validData.type = type;
+        BeaconXInfo.ValidData validData = new BeaconXInfo.ValidData();
+        validData.data = data;
+        validData.type = type;
+        if (type != BeaconXInfo.VALID_DATA_FRAME_TYPE_INFO) {
             validData.txPower = record.getTxPowerLevel();
-            if (type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TLM) {
-                beaconXInfo.validDataHashMap.put(type + "", validData);
-                return beaconXInfo;
-            }
-            if (type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TH) {
-                beaconXInfo.validDataHashMap.put(type + "", validData);
-                return beaconXInfo;
-            }
-            if (type == BeaconXInfo.VALID_DATA_FRAME_TYPE_AXIS) {
-                beaconXInfo.validDataHashMap.put(type + "", validData);
-                return beaconXInfo;
-            }
-            beaconXInfo.validDataHashMap.put(data, validData);
+        } else {
+            beaconXInfo.txPower = record.getTxPowerLevel();
+            beaconXInfo.rangingData = Integer.parseInt(data.substring(2, 4), 16);
         }
+        if (type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TLM) {
+            beaconXInfo.validDataHashMap.put(type + "", validData);
+            return beaconXInfo;
+        }
+        if (type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TH) {
+            beaconXInfo.validDataHashMap.put(type + "", validData);
+            return beaconXInfo;
+        }
+        if (type == BeaconXInfo.VALID_DATA_FRAME_TYPE_AXIS) {
+            beaconXInfo.validDataHashMap.put(type + "", validData);
+            return beaconXInfo;
+        }
+        beaconXInfo.validDataHashMap.put(data, validData);
         return beaconXInfo;
     }
 }

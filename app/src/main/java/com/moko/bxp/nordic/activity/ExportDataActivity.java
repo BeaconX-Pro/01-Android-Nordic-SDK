@@ -22,6 +22,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.elvishew.xlog.XLog;
+import com.moko.ble.lib.MokoConstants;
+import com.moko.ble.lib.event.ConnectStatusEvent;
+import com.moko.ble.lib.event.OrderTaskResponseEvent;
+import com.moko.ble.lib.task.OrderTask;
+import com.moko.ble.lib.task.OrderTaskResponse;
+import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.BuildConfig;
 import com.moko.bxp.nordic.R;
@@ -31,12 +37,6 @@ import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.bxp.nordic.utils.Utils;
 import com.moko.bxp.nordic.view.THChartView;
-import com.moko.ble.lib.MokoConstants;
-import com.moko.ble.lib.event.ConnectStatusEvent;
-import com.moko.ble.lib.event.OrderTaskResponseEvent;
-import com.moko.ble.lib.task.OrderTask;
-import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 import com.moko.support.nordic.entity.OrderCHAR;
@@ -257,7 +257,7 @@ public class ExportDataActivity extends BaseActivity {
                             tvTime1.setText(time1);
                             tvTemp1.setText(tempStr1);
                             tvHumidity1.setText(humidityStr1);
-                            llData.addView(v1);
+                            llData.addView(v1, 1);
                             storeString.append(String.format("%s T%s H%s", time1, tempStr1, humidityStr1));
                             storeString.append("\n");
 
@@ -290,7 +290,7 @@ public class ExportDataActivity extends BaseActivity {
                             tvTime2.setText(time2);
                             tvTemp2.setText(tempStr2);
                             tvHumidity2.setText(humidityStr2);
-                            llData.addView(v2);
+                            llData.addView(v2, 1);
                             storeString.append(String.format("%s T%s H%s", time2, tempStr2, humidityStr2));
                             storeString.append("\n");
                         } else if (value.length > 9) {
@@ -323,7 +323,7 @@ public class ExportDataActivity extends BaseActivity {
                             tvTime.setText(time);
                             tvTemp.setText(tempStr);
                             tvHumidity.setText(humidityStr);
-                            llData.addView(v);
+                            llData.addView(v, 1);
                             storeString.append(String.format("%s T%s H%s", time, tempStr, humidityStr));
                             storeString.append("\n");
                         }

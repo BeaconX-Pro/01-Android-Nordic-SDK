@@ -24,7 +24,7 @@
     <string name="about_title">ABOUT</string>
 
     <string name="company_website">www.mokoblue.com</string>
-    <string name="please_enter_password">Please enter the password</string>
+    <string name="please_enter_password">Please enter password</string>
     <string name="device_name_null">The device name cannot be empty!</string>
     <string name="password_length">Length should be 16 bits</string>
     <string name="slot_title">SLOT</string>

@@ -73,13 +73,13 @@ public class TriggerLightDetectedFragment extends Fragment implements RadioGroup
         } else {
             if (mIsStart) {
                 rbStartAdvertising.setChecked(true);
-                etStop.setText(mDuration + "");
-                etStop.setSelection((mDuration + "").length());
+                etStart.setText(mDuration + "");
+                etStart.setSelection((mDuration + "").length());
                 tvTriggerTips.setText(getString(R.string.trigger_light_detected_tips_2, "start advertising", String.format("%ds", mDuration)));
             } else {
                 rbStopAdvertising.setChecked(true);
-                etStart.setText(mDuration + "");
-                etStart.setSelection((mDuration + "").length());
+                etStop.setText(mDuration + "");
+                etStop.setSelection((mDuration + "").length());
                 tvTriggerTips.setText(getString(R.string.trigger_light_detected_tips_2, "stop advertising", String.format("%ds", mDuration)));
             }
         }

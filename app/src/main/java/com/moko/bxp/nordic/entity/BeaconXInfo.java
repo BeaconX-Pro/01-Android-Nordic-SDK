@@ -31,6 +31,8 @@ public class BeaconXInfo implements Serializable {
     public int connectState;
     public long intervalTime;
     public long scanTime;
+    public int txPower;
+    public int rangingData;
     public HashMap<String, ValidData> validDataHashMap;
 
     @Override

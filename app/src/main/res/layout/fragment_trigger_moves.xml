@@ -61,7 +61,7 @@
                 android:gravity="bottom">
 
                 <EditText
-                    android:id="@+id/et_start"
+                    android:id="@+id/et_stop"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -90,7 +90,7 @@
                 android:gravity="bottom">
 
                 <EditText
-                    android:id="@+id/et_stop"
+                    android:id="@+id/et_start"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
