@@ -28,7 +28,7 @@
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/tv_storage_time_only"
         android:gravity="center"
-        android:text="min(s)"
+        android:text="min"
         android:textColor="@color/black_333333"
         android:textSize="15sp" />
 

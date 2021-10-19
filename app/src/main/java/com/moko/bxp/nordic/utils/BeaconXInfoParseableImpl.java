@@ -45,6 +45,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
         boolean isBeaconXPro = false;
         byte[] values = null;
         int type = -1;
+        int needParseData = -1;
         if (map != null && !map.isEmpty()) {
             Iterator iterator = map.keySet().iterator();
             if (iterator.hasNext()) {
@@ -102,7 +103,11 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                             case BeaconXInfo.VALID_DATA_FRAME_TYPE_AXIS:
                                 if (bytes.length != 12 && bytes.length != 21)
                                     return null;
+                                if (bytes.length == 12) {
+                                    needParseData = 0;
+                                }
                                 if (bytes.length == 21) {
+                                    needParseData = 1;
                                     battery = MokoUtils.toInt(Arrays.copyOfRange(bytes, 12, 14));
                                 }
                                 type = BeaconXInfo.VALID_DATA_FRAME_TYPE_AXIS;
@@ -158,6 +163,9 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
             if (lockState >= 0) {
                 beaconXInfo.lockState = lockState;
             }
+            if (needParseData >= 0) {
+                beaconXInfo.needParseData = needParseData;
+            }
             if (ambientLightState >= 0) {
                 beaconXInfo.ambientLightState = ambientLightState;
             }
@@ -192,6 +200,11 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                 beaconXInfo.connectState = 1;
             } else {
                 beaconXInfo.connectState = 0;
+            }
+            if (needParseData < 0) {
+                beaconXInfo.needParseData = -1;
+            } else {
+                beaconXInfo.needParseData = needParseData;
             }
             beaconXInfo.scanRecord = deviceInfo.scanRecord;
             beaconXInfo.scanTime = SystemClock.elapsedRealtime();

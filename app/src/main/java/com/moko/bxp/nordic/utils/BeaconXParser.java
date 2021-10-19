@@ -114,7 +114,7 @@ public class BeaconXParser {
         return beaconXTH;
     }
 
-    public static BeaconXAxis getAxis(String data) {
+    public static BeaconXAxis getAxis(int needParseData, String data) {
         // 60f60e010007f600d5002e00
         BeaconXAxis beaconXAxis = new BeaconXAxis();
         int rssi_0m = Integer.parseInt(data.substring(2, 4), 16);
@@ -123,19 +123,25 @@ public class BeaconXParser {
         int scaleIndex = Integer.parseInt(data.substring(8, 10), 16);
         beaconXAxis.scale = AxisScaleEnum.fromEnumOrdinal(scaleIndex).getScale();
         beaconXAxis.sensitivity = MokoUtils.getDecimalFormat("#.#g").format(Integer.parseInt(data.substring(10, 12), 16) * 0.1);
-        double scale = Math.pow(2, scaleIndex + 1);
-        int x = Integer.parseInt(data.substring(12, 16), 16);
-        short x_short = (short) (x >> 4);
-        double x_d = x_short * (scale / 2048);
-        int y = Integer.parseInt(data.substring(16, 20), 16);
-        short y_short = (short) (y >> 4);
-        double y_d = y_short * (scale / 2048);
-        int z = Integer.parseInt(data.substring(20, 24), 16);
-        short z_short = (short) (z >> 4);
-        double z_d = z_short * (scale / 2048);
-        beaconXAxis.x_data = String.valueOf(Math.round(x_d * 1000));
-        beaconXAxis.y_data = String.valueOf(Math.round(y_d * 1000));
-        beaconXAxis.z_data = String.valueOf(Math.round(z_d * 1000));
+        if (needParseData == 1) {
+            double scale = Math.pow(2, scaleIndex + 1);
+            short x = MokoUtils.byte2short(MokoUtils.hex2bytes(data.substring(12, 16)));
+            short x_short = (short) (x >> 4);
+            double x_d = x_short * (scale / 2048);
+            short y = MokoUtils.byte2short(MokoUtils.hex2bytes(data.substring(16, 20)));
+            short y_short = (short) (y >> 4);
+            double y_d = y_short * (scale / 2048);
+            short z = MokoUtils.byte2short(MokoUtils.hex2bytes(data.substring(20, 24)));
+            short z_short = (short) (z >> 4);
+            double z_d = z_short * (scale / 2048);
+            beaconXAxis.x_data = String.valueOf(Math.round(x_d * 1000));
+            beaconXAxis.y_data = String.valueOf(Math.round(y_d * 1000));
+            beaconXAxis.z_data = String.valueOf(Math.round(z_d * 1000));
+        } else {
+            beaconXAxis.x_data = data.substring(12, 16);
+            beaconXAxis.y_data = data.substring(16, 20);
+            beaconXAxis.z_data = data.substring(20, 24);
+        }
         return beaconXAxis;
     }
 

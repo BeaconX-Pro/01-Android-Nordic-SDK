@@ -88,13 +88,13 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
                 parent.addView(createTHView(beaconXTH));
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_AXIS) {
-                BeaconXAxis beaconXAxis = BeaconXParser.getAxis(validData.data);
+                BeaconXAxis beaconXAxis = BeaconXParser.getAxis(item.needParseData, validData.data);
                 if (validData.data.length() > 27) {
                     int battery = Integer.parseInt(validData.data.substring(24, 28), 16);
                     helper.setText(R.id.tv_battery, String.format("%dmV", battery));
                 }
                 beaconXAxis.txPower = String.valueOf(validData.txPower);
-                parent.addView(createAxisView(beaconXAxis));
+                parent.addView(createAxisView(item.needParseData, beaconXAxis));
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_INFO) {
                 helper.setVisible(R.id.tv_tx_power, true);
@@ -183,7 +183,7 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
         return view;
     }
 
-    private View createAxisView(BeaconXAxis beaconXAxis) {
+    private View createAxisView(int needParseData, BeaconXAxis beaconXAxis) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.beaconx_axis, null);
         TextView tv_tx_power = view.findViewById(R.id.tv_tx_power);
         TextView tv_rssi_0m = view.findViewById(R.id.tv_rssi_0m);
@@ -197,7 +197,11 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
         tv_data_rate.setText(beaconXAxis.dataRate);
         tv_scale.setText(beaconXAxis.scale);
         tv_sensitivity.setText(beaconXAxis.sensitivity);
-        tv_sampled_data.setText(String.format("X:%smg Y:%smg Z:%smg", beaconXAxis.x_data, beaconXAxis.y_data, beaconXAxis.z_data));
+        if (needParseData == 1) {
+            tv_sampled_data.setText(String.format("X:%smg Y:%smg Z:%smg", beaconXAxis.x_data, beaconXAxis.y_data, beaconXAxis.z_data));
+        } else {
+            tv_sampled_data.setText(String.format("X:0x%s Y:0x%s Z:0x%s", beaconXAxis.x_data.toUpperCase(), beaconXAxis.y_data.toUpperCase(), beaconXAxis.z_data.toUpperCase()));
+        }
         return view;
     }
 }
