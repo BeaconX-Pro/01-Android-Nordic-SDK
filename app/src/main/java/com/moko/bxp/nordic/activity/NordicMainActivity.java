@@ -27,7 +27,7 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
-import com.moko.bxp.nordic.BeaconXListAdapter;
+import com.moko.bxp.nordic.adapter.BeaconXListAdapter;
 import com.moko.bxp.nordic.BuildConfig;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.R2;

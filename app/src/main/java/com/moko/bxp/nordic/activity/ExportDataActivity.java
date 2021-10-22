@@ -11,14 +11,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.elvishew.xlog.XLog;
@@ -32,6 +30,7 @@ import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.BuildConfig;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.R2;
+import com.moko.bxp.nordic.adapter.THDataListAdapter;
 import com.moko.bxp.nordic.dialog.AlertMessageDialog;
 import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.utils.ToastUtils;
@@ -41,6 +40,7 @@ import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 import com.moko.support.nordic.entity.OrderCHAR;
 import com.moko.support.nordic.entity.ParamsKeyEnum;
+import com.moko.support.nordic.entity.THStoreData;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -54,20 +54,20 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ExportDataActivity extends BaseActivity {
 
-    private static final String TRACKED_FILE = "th.txt";
+    private static final String TRACKED_FILE = "T&HDatas.txt";
 
     private static String PATH_LOGCAT;
     @BindView(R2.id.iv_sync)
     ImageView ivSync;
     @BindView(R2.id.tv_export)
     TextView tvExport;
-    @BindView(R2.id.ll_data)
-    LinearLayout llData;
     @BindView(R2.id.tv_sync)
     TextView tvSync;
     @BindView(R2.id.cb_data_show)
@@ -78,20 +78,24 @@ public class ExportDataActivity extends BaseActivity {
     THChartView tempChartView;
     @BindView(R2.id.humi_chart_view)
     THChartView humiChartView;
-    @BindView(R2.id.sv_th_data)
-    ScrollView svTHData;
     @BindView(R2.id.th_chart_total)
     TextView thChartTotal;
     @BindView(R2.id.th_chart_display)
     TextView thChartDisplay;
+    @BindView(R2.id.rv_th_data)
+    RecyclerView rvThData;
+    @BindView(R2.id.ll_th_data)
+    LinearLayout llThData;
 
     private boolean mReceiverTag = false;
-    private StringBuffer storeString = new StringBuffer();
     private boolean mIsShown;
     private boolean isSync;
     private Handler mHandler;
     private List<Float> mHumiList;
     private List<Float> mTempList;
+    private StringBuilder thStoreString;
+    private ArrayList<THStoreData> thStoreData;
+    private THDataListAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +115,7 @@ public class ExportDataActivity extends BaseActivity {
         cbDataShow.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 // 绘制折线图并展示
-                svTHData.setVisibility(View.GONE);
+                llThData.setVisibility(View.GONE);
                 llTHChartView.setVisibility(View.VISIBLE);
                 tempChartView.setxValue(mTempList);
                 humiChartView.setxValue(mHumiList);
@@ -120,10 +124,36 @@ public class ExportDataActivity extends BaseActivity {
                 thChartDisplay.setText(getString(R.string.th_chart_display, length > 1000 ? 1000 : length));
             } else {
                 // 隐藏折线图
-                svTHData.setVisibility(View.VISIBLE);
+                llThData.setVisibility(View.VISIBLE);
                 llTHChartView.setVisibility(View.GONE);
             }
         });
+        mAdapter = new THDataListAdapter();
+        thStoreData = MokoSupport.getInstance().thStoreData;
+        thStoreString = MokoSupport.getInstance().thStoreString;
+        if (thStoreData != null && thStoreData.size() > 0 && thStoreString != null) {
+            tvExport.setEnabled(true);
+            if (!mIsShown) {
+                mIsShown = true;
+                llThData.setVisibility(View.VISIBLE);
+                Drawable top = getResources().getDrawable(R.drawable.ic_download_checked);
+                tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+            }
+            for (THStoreData item : thStoreData) {
+                float temp = Float.parseFloat(item.temp);
+                float humidity = Float.parseFloat(item.humidity);
+                mTempList.add(0, temp);
+                mHumiList.add(0, humidity);
+            }
+
+        } else {
+            thStoreData = new ArrayList<>();
+            thStoreString = new StringBuilder();
+        }
+        mAdapter.replaceData(thStoreData);
+        rvThData.setLayoutManager(new LinearLayoutManager(this));
+        rvThData.setAdapter(mAdapter);
+
         mHandler = new Handler();
         EventBus.getDefault().register(this);
         // 注册广播接收器
@@ -187,11 +217,12 @@ public class ExportDataActivity extends BaseActivity {
                             switch (configKeyEnum) {
                                 case SET_TH_EMPTY:
                                     if (value.length > 3 && value[3] == 0) {
-                                        storeString = new StringBuffer();
+                                        thStoreString = new StringBuilder();
                                         writeTHFile("");
                                         mIsShown = false;
-                                        llData.removeViews(1, llData.getChildCount() - 1);
-                                        llData.setVisibility(View.GONE);
+                                        thStoreData.clear();
+                                        mAdapter.replaceData(thStoreData);
+                                        llThData.setVisibility(View.GONE);
                                         Drawable top = getResources().getDrawable(R.drawable.ic_download);
                                         tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
                                         ToastUtils.showToast(ExportDataActivity.this, "Erase success!");
@@ -220,7 +251,7 @@ public class ExportDataActivity extends BaseActivity {
                     case CHAR_STORE_NOTIFY:
                         if (!mIsShown) {
                             mIsShown = true;
-                            llData.setVisibility(View.VISIBLE);
+                            llThData.setVisibility(View.VISIBLE);
                             Drawable top = getResources().getDrawable(R.drawable.ic_download_checked);
                             tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
                         }
@@ -247,19 +278,16 @@ public class ExportDataActivity extends BaseActivity {
                             calendar1.set(Calendar.HOUR_OF_DAY, hour1);
                             calendar1.set(Calendar.MINUTE, minute1);
                             calendar1.set(Calendar.SECOND, second1);
-                            View v1 = getLayoutInflater().inflate(R.layout.item_export_data, llData, false);
-                            TextView tvTime1 = v1.findViewById(R.id.tv_time);
-                            TextView tvTemp1 = v1.findViewById(R.id.tv_temp);
-                            TextView tvHumidity1 = v1.findViewById(R.id.tv_humidity);
                             String time1 = Utils.calendar2strDate(calendar1, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS);
                             String tempStr1 = MokoUtils.getDecimalFormat("0.0").format(temp1);
                             String humidityStr1 = MokoUtils.getDecimalFormat("0.0").format(humidity1);
-                            tvTime1.setText(time1);
-                            tvTemp1.setText(tempStr1);
-                            tvHumidity1.setText(humidityStr1);
-                            llData.addView(v1, 1);
-                            storeString.append(String.format("%s T%s H%s", time1, tempStr1, humidityStr1));
-                            storeString.append("\n");
+                            THStoreData data1 = new THStoreData();
+                            data1.time = time1;
+                            data1.temp = tempStr1;
+                            data1.humidity = humidityStr1;
+                            thStoreData.add(0, data1);
+                            thStoreString.append(String.format("%s T%s H%s", time1, tempStr1, humidityStr1));
+                            thStoreString.append("\n");
 
                             int year2 = value2[0] & 0xff;
                             int month2 = value2[1] & 0xff;
@@ -280,19 +308,17 @@ public class ExportDataActivity extends BaseActivity {
                             calendar2.set(Calendar.HOUR_OF_DAY, hour2);
                             calendar2.set(Calendar.MINUTE, minute2);
                             calendar2.set(Calendar.SECOND, second2);
-                            View v2 = getLayoutInflater().inflate(R.layout.item_export_data, llData, false);
-                            TextView tvTime2 = v2.findViewById(R.id.tv_time);
-                            TextView tvTemp2 = v2.findViewById(R.id.tv_temp);
-                            TextView tvHumidity2 = v2.findViewById(R.id.tv_humidity);
                             String time2 = Utils.calendar2strDate(calendar2, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS);
                             String tempStr2 = MokoUtils.getDecimalFormat("0.0").format(temp2);
                             String humidityStr2 = MokoUtils.getDecimalFormat("0.0").format(humidity2);
-                            tvTime2.setText(time2);
-                            tvTemp2.setText(tempStr2);
-                            tvHumidity2.setText(humidityStr2);
-                            llData.addView(v2, 1);
-                            storeString.append(String.format("%s T%s H%s", time2, tempStr2, humidityStr2));
-                            storeString.append("\n");
+                            THStoreData data2 = new THStoreData();
+                            data2.time = time2;
+                            data2.temp = tempStr2;
+                            data2.humidity = humidityStr2;
+                            thStoreData.add(0, data2);
+                            mAdapter.replaceData(thStoreData);
+                            thStoreString.append(String.format("%s T%s H%s", time2, tempStr2, humidityStr2));
+                            thStoreString.append("\n");
                         } else if (value.length > 9) {
                             int year = value[0] & 0xff;
                             int month = value[1] & 0xff;
@@ -313,19 +339,17 @@ public class ExportDataActivity extends BaseActivity {
                             calendar.set(Calendar.HOUR_OF_DAY, hour);
                             calendar.set(Calendar.MINUTE, minute);
                             calendar.set(Calendar.SECOND, second);
-                            View v = getLayoutInflater().inflate(R.layout.item_export_data, llData, false);
-                            TextView tvTime = v.findViewById(R.id.tv_time);
-                            TextView tvTemp = v.findViewById(R.id.tv_temp);
-                            TextView tvHumidity = v.findViewById(R.id.tv_humidity);
                             String time = Utils.calendar2strDate(calendar, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS);
                             String tempStr = MokoUtils.getDecimalFormat("0.0").format(temp);
                             String humidityStr = MokoUtils.getDecimalFormat("0.0").format(humidity);
-                            tvTime.setText(time);
-                            tvTemp.setText(tempStr);
-                            tvHumidity.setText(humidityStr);
-                            llData.addView(v, 1);
-                            storeString.append(String.format("%s T%s H%s", time, tempStr, humidityStr));
-                            storeString.append("\n");
+                            THStoreData data = new THStoreData();
+                            data.time = time;
+                            data.temp = tempStr;
+                            data.humidity = humidityStr;
+                            thStoreData.add(0, data);
+                            mAdapter.replaceData(thStoreData);
+                            thStoreString.append(String.format("%s T%s H%s", time, tempStr, humidityStr));
+                            thStoreString.append("\n");
                         }
                         if (mHandler.hasMessages(0))
                             mHandler.removeMessages(0);
@@ -396,16 +420,14 @@ public class ExportDataActivity extends BaseActivity {
     private void back() {
         // 关闭通知
         MokoSupport.getInstance().disableStoreNotify();
+        MokoSupport.getInstance().thStoreData = thStoreData;
+        MokoSupport.getInstance().thStoreString = thStoreString;
         finish();
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            back();
-            return false;
-        }
-        return super.onKeyDown(keyCode, event);
+    public void onBackPressed() {
+        back();
     }
 
     public static void writeTHFile(String thLog) {
@@ -451,6 +473,8 @@ public class ExportDataActivity extends BaseActivity {
             cbDataShow.setChecked(false);
             cbDataShow.setEnabled(false);
         } else {
+            if (mHandler.hasMessages(0))
+                mHandler.removeMessages(0);
             MokoSupport.getInstance().disableStoreNotify();
             isSync = false;
             ivSync.clearAnimation();
@@ -469,7 +493,7 @@ public class ExportDataActivity extends BaseActivity {
                 @Override
                 public void run() {
                     dismissSyncProgressDialog();
-                    String log = storeString.toString();
+                    String log = thStoreString.toString();
                     if (!TextUtils.isEmpty(log)) {
                         writeTHFile(log);
                         File file = getTHFile();

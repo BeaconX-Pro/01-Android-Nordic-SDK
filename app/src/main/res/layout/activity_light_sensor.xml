@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey_f2f2f2"
@@ -70,9 +71,9 @@
         <TextView
             android:id="@+id/tv_light_sensor_status"
             android:layout_width="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:text="Ambient light NOT detected"
             android:textColor="@color/black_333333"
             android:textSize="13sp"
@@ -194,44 +195,43 @@
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
-
-        <ScrollView
-            android:id="@+id/sv_light_data"
+        <LinearLayout
+            android:id="@+id/ll_data"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/ll_sync"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
-            android:layout_weight="1.0">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <LinearLayout
-                android:id="@+id/ll_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.3"
+                    android:gravity="center"
+                    android:text="Time"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.0"
+                    android:gravity="center"
+                    android:text="Sensor status"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_light_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1.0"
-                        android:gravity="center"
-                        android:text="Time"
-                        android:textSize="11sp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1.0"
-                        android:gravity="center"
-                        android:text="Sensor status"
-                        android:textSize="11sp" />
-                </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
+                android:layout_marginTop="5dp"
+                tools:listitem="@layout/item_export_data_light" />
+        </LinearLayout>
     </RelativeLayout>
 </LinearLayout>

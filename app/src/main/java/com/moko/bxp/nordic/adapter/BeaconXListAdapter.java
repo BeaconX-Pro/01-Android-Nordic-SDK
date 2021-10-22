@@ -1,4 +1,4 @@
-package com.moko.bxp.nordic;
+package com.moko.bxp.nordic.adapter;
 
 import android.content.Intent;
 import android.graphics.Paint;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.elvishew.xlog.XLog;
+import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.entity.BeaconXAxis;
 import com.moko.bxp.nordic.entity.BeaconXInfo;
 import com.moko.bxp.nordic.entity.BeaconXTH;

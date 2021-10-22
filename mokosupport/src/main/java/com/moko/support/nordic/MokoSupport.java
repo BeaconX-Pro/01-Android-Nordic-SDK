@@ -13,11 +13,14 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
+import com.moko.support.nordic.entity.LightSensorStoreData;
 import com.moko.support.nordic.entity.OrderCHAR;
+import com.moko.support.nordic.entity.THStoreData;
 import com.moko.support.nordic.handler.MokoCharacteristicHandler;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -220,4 +223,9 @@ public class MokoSupport extends MokoBleLib {
     }
 
     public static boolean isNewVersion = false;
+    public ArrayList<THStoreData> thStoreData;
+    public StringBuilder thStoreString;
+    public ArrayList<LightSensorStoreData> lightSensorStoreData;
+    public StringBuilder lightSensorStoreString;
+
 }

@@ -11,7 +11,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.elvishew.xlog.XLog;
@@ -25,12 +24,14 @@ import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.BuildConfig;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.R2;
+import com.moko.bxp.nordic.adapter.LightSensorDataListAdapter;
 import com.moko.bxp.nordic.dialog.AlertMessageDialog;
 import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.bxp.nordic.utils.Utils;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
+import com.moko.support.nordic.entity.LightSensorStoreData;
 import com.moko.support.nordic.entity.OrderCHAR;
 import com.moko.support.nordic.entity.ParamsKeyEnum;
 
@@ -44,6 +45,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -64,12 +67,17 @@ public class LightSensorDataActivity extends BaseActivity {
     TextView tvExport;
     @BindView(R2.id.ll_data)
     LinearLayout llData;
+    @BindView(R2.id.rv_light_data)
+    RecyclerView rvLightData;
 
 
-    private StringBuffer storeString = new StringBuffer();
     private boolean mIsShown;
     private boolean isSync;
     private Handler mHandler;
+    private StringBuilder lightSensorStoreString;
+    private ArrayList<LightSensorStoreData> lightSensorStoreData;
+    private LightSensorDataListAdapter mAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +91,26 @@ public class LightSensorDataActivity extends BaseActivity {
             // 如果SD卡不存在，就保存到本应用的目录下
             PATH_LOGCAT = getFilesDir().getAbsolutePath() + File.separator + File.separator + (BuildConfig.IS_LIBRARY ? "mokoBeaconXPro" : "BXP-NORDIC") + File.separator + TRACKED_FILE;
         }
+
+        mAdapter = new LightSensorDataListAdapter();
+        lightSensorStoreData = MokoSupport.getInstance().lightSensorStoreData;
+        lightSensorStoreString = MokoSupport.getInstance().lightSensorStoreString;
+        if (lightSensorStoreData != null && lightSensorStoreData.size() > 0 && lightSensorStoreString != null) {
+            tvExport.setEnabled(true);
+            if (!mIsShown) {
+                mIsShown = true;
+                Drawable top = getResources().getDrawable(R.drawable.ic_download_checked);
+                tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+            }
+            llData.setVisibility(View.VISIBLE);
+        } else {
+            lightSensorStoreData = new ArrayList<>();
+            lightSensorStoreString = new StringBuilder();
+        }
+        mAdapter.replaceData(lightSensorStoreData);
+        rvLightData.setLayoutManager(new LinearLayoutManager(this));
+        rvLightData.setAdapter(mAdapter);
+
         mHandler = new Handler();
         EventBus.getDefault().register(this);
         MokoSupport.getInstance().enableLightSensorCurrentNotify();
@@ -164,10 +192,11 @@ public class LightSensorDataActivity extends BaseActivity {
                                     break;
                                 case SET_LIGHT_SENSOR_EMPTY:
                                     if (value.length > 3 && value[3] == 0) {
-                                        storeString = new StringBuffer();
+                                        lightSensorStoreString = new StringBuilder();
                                         writeLightSensorFile("");
                                         mIsShown = false;
-                                        llData.removeViews(1, llData.getChildCount() - 1);
+                                        lightSensorStoreData.clear();
+                                        mAdapter.replaceData(lightSensorStoreData);
                                         llData.setVisibility(View.GONE);
                                         Drawable top = getResources().getDrawable(R.drawable.ic_download);
                                         tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
@@ -222,16 +251,16 @@ public class LightSensorDataActivity extends BaseActivity {
                             calendar.set(Calendar.HOUR_OF_DAY, hour);
                             calendar.set(Calendar.MINUTE, minute);
                             calendar.set(Calendar.SECOND, second);
-                            View v = getLayoutInflater().inflate(R.layout.item_export_data_light, llData, false);
-                            TextView tvTime = v.findViewById(R.id.tv_time);
-                            TextView tvLightSensorStatus = v.findViewById(R.id.tv_light_sensor_status);
                             String time = Utils.calendar2strDate(calendar, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS);
                             String statusStr = status == 1 ? "Ambient light detected" : "Ambient light NOT detected";
-                            tvTime.setText(time);
                             tvLightSensorStatus.setText(statusStr);
-                            llData.addView(v);
-                            storeString.append(String.format("%s %s", time, statusStr));
-                            storeString.append("\n");
+                            LightSensorStoreData data = new LightSensorStoreData();
+                            data.time = time;
+                            data.status = statusStr;
+                            lightSensorStoreData.add(data);
+                            mAdapter.replaceData(lightSensorStoreData);
+                            lightSensorStoreString.append(String.format("%s %s", time, statusStr));
+                            lightSensorStoreString.append("\n");
                         }
                         if (mHandler.hasMessages(0))
                             mHandler.removeMessages(0);
@@ -247,9 +276,12 @@ public class LightSensorDataActivity extends BaseActivity {
             }
         });
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mHandler.hasMessages(0))
+            mHandler.removeMessages(0);
         EventBus.getDefault().unregister(this);
     }
 
@@ -271,7 +303,10 @@ public class LightSensorDataActivity extends BaseActivity {
         // 关闭通知
         MokoSupport.getInstance().disableLightSensorCurrentNotify();
         MokoSupport.getInstance().disableLightSensorNotify();
+        MokoSupport.getInstance().lightSensorStoreData = lightSensorStoreData;
+        MokoSupport.getInstance().lightSensorStoreString = lightSensorStoreString;
         finish();
+
     }
 
     @Override
@@ -308,6 +343,8 @@ public class LightSensorDataActivity extends BaseActivity {
             ivSync.startAnimation(animation);
             tvSync.setText("Stop");
         } else {
+            if (mHandler.hasMessages(0))
+                mHandler.removeMessages(0);
             MokoSupport.getInstance().disableLightSensorNotify();
             isSync = false;
             ivSync.clearAnimation();
@@ -339,7 +376,7 @@ public class LightSensorDataActivity extends BaseActivity {
             writeLightSensorFile("");
             tvExport.postDelayed(() -> {
                 dismissSyncProgressDialog();
-                String log = storeString.toString();
+                String log = lightSensorStoreString.toString();
                 if (!TextUtils.isEmpty(log)) {
                     writeLightSensorFile(log);
                     File file = getLightSensorFile();

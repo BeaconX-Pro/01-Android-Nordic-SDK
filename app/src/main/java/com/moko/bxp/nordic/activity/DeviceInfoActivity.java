@@ -138,6 +138,14 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         final String action = event.getAction();
         runOnUiThread(() -> {
             if (MokoConstants.ACTION_DISCONNECTED.equals(action)) {
+                if (MokoSupport.getInstance().thStoreData != null) {
+                    MokoSupport.getInstance().thStoreData.clear();
+                    MokoSupport.getInstance().thStoreString = null;
+                }
+                if (MokoSupport.getInstance().lightSensorStoreData != null) {
+                    MokoSupport.getInstance().lightSensorStoreData.clear();
+                    MokoSupport.getInstance().lightSensorStoreString = null;
+                }
                 // 设备断开，通知页面更新
                 if (mIsClose)
                     return;
