@@ -17,31 +17,31 @@ We divide the communications between SDK and devices into three stages: Scanning
 
 ### 1.Scanning stage
 
-**`com.moko.support.MokoBleScanner`**
+**`com.moko.support.nordic.MokoBleScanner`**
 
 Scanning processing class, support to open scan, close scan and get the raw data of the scanned device.
 
-**`com.moko.support.callback.MokoScanDeviceCallback`**
+**`com.moko.support.nordic.callback.MokoScanDeviceCallback`**
 
 Scanning callback interface,this interface can be used to obtain the scan status and device data.
 
-**`com.moko.support.service.DeviceInfoParseable`**
+**`com.moko.support.nordic.service.DeviceInfoParseable`**
 
 Parsed data interface,this interface can parsed the device broadcast frame, get the specific data. the implementation can refer to `BeaconXInfoParseableImpl` in the project,the `DeviceInfo` will be parsed to `BeaconXInfo`.
 
-**`com.moko.beaconxpro.utils.BeaconXParser`**
+**`com.moko.bxp.nordic.utils.BeaconXParser`**
 
 Parsed data utils class, use this class to convert `BeaconXInfo.ValidData` to UID, URL, TLM, IBeacon, T&H, 3-Axis.
 
 ### 2.Connection stage
 
-**`com.moko.support.MokoSupport`**
+**`com.moko.support.nordic.MokoSupport`**
 
 BLE operation core class, extends from `Mokoblelib`.It can connect the device, disconnect the device, send the device connection status, turn on Bluetooth, turn off Bluetooth, judge whether Bluetooth is on or not, receive data from the device and send data to the device, notify the page data update, turn on and off characteristic notification.
 
 ### 3.Communication stage
 
-**`com.moko.support.OrderTaskAssembler`**
+**`com.moko.support.nordic.OrderTaskAssembler`**
 
 We assemble read data and write data to `OrderTask`, send the task to the device through `MokoSupport`, and receive the resopnse.
 
@@ -280,7 +280,7 @@ MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
 ```
 How to parse the returned results, please refer to the code of the sample project and documentation.
 
-The current data of T&H, 3-Axes and storage are sent to APP by notification. you need to turn on and off the notification function of characteristic
+The current data of T&H, 3-Axes,storage and light sensor are sent to APP by notification. you need to turn on and off the notification function of characteristic
 
 ```
 MokoSupport.getInstance().enableTHNotify();
@@ -289,6 +289,8 @@ MokoSupport.getInstance().enableStoreNotify();
 MokoSupport.getInstance().disableStoreNotify();
 MokoSupport.getInstance().enableThreeAxisNotify();
 MokoSupport.getInstance().disableThreeAxisNotify();
+MokoSupport.getInstance().enableLightSensorNotify();
+MokoSupport.getInstance().disableLightSensorNotify();
 ```
 
 **OTA**
@@ -368,6 +370,9 @@ public boolean orderNotify(BluetoothGattCharacteristic characteristic, byte[] va
 
 ## Change log
 
+* 2021.11.30 mokosupport version:3.0
+	*  Change the SDK package name
+	*  support light sensor data
 * 2021.03.11 mokosupport version:2.0
 	* Change the SDK structure
     * Support Android API 29
