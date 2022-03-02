@@ -124,16 +124,16 @@ public class BeaconXParser {
         beaconXAxis.scale = AxisScaleEnum.fromEnumOrdinal(scaleIndex).getScale();
         beaconXAxis.sensitivity = MokoUtils.getDecimalFormat("#.#g").format(Integer.parseInt(data.substring(10, 12), 16) * 0.1);
         if (needParseData == 1) {
-            double scale = Math.pow(2, scaleIndex + 1);
+            double scale = scaleIndex == 3 ? 12 : Math.pow(2, scaleIndex);
             short x = MokoUtils.byte2short(MokoUtils.hex2bytes(data.substring(12, 16)));
             short x_short = (short) (x >> 4);
-            double x_d = x_short * (scale / 2048);
+            double x_d = x_short * (scale / 1000);
             short y = MokoUtils.byte2short(MokoUtils.hex2bytes(data.substring(16, 20)));
             short y_short = (short) (y >> 4);
-            double y_d = y_short * (scale / 2048);
+            double y_d = y_short * (scale / 1000);
             short z = MokoUtils.byte2short(MokoUtils.hex2bytes(data.substring(20, 24)));
             short z_short = (short) (z >> 4);
-            double z_d = z_short * (scale / 2048);
+            double z_d = z_short * (scale / 1000);
             beaconXAxis.x_data = String.valueOf(Math.round(x_d * 1000));
             beaconXAxis.y_data = String.valueOf(Math.round(y_d * 1000));
             beaconXAxis.z_data = String.valueOf(Math.round(z_d * 1000));
