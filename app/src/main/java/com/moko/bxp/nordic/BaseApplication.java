@@ -3,6 +3,7 @@ package com.moko.bxp.nordic;
 import android.app.Application;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
 
 import com.elvishew.xlog.LogConfiguration;
@@ -13,9 +14,8 @@ import com.elvishew.xlog.printer.AndroidPrinter;
 import com.elvishew.xlog.printer.Printer;
 import com.elvishew.xlog.printer.file.FilePrinter;
 import com.elvishew.xlog.printer.file.naming.ChangelessFileNameGenerator;
-import com.moko.bxp.nordic.utils.IOUtils;
 import com.moko.ble.lib.log.ClearLogBackStrategy;
-import com.moko.support.nordic.MokoSupport;
+import com.moko.bxp.nordic.utils.IOUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -40,7 +40,11 @@ public class BaseApplication extends Application {
         // 初始化Xlog
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             // 优先保存到SD卡中
-            PATH_LOGCAT = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + LOG_FOLDER;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                PATH_LOGCAT = getExternalFilesDir(null).getAbsolutePath() + File.separator + LOG_FOLDER;
+            } else {
+                PATH_LOGCAT = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + LOG_FOLDER;
+            }
         } else {
             // 如果SD卡不存在，就保存到本应用的目录下
             PATH_LOGCAT = getFilesDir().getAbsolutePath() + File.separator + LOG_FOLDER;
@@ -82,7 +86,7 @@ public class BaseApplication extends Application {
                 errorReport.append("\r\n");
             }
             errorReport.append(result.toString());
-            IOUtils.setCrashLog(errorReport.toString());
+            IOUtils.setCrashLog(errorReport.toString(), getApplicationContext());
             XLog.e("uncaughtException errorReport=" + errorReport);
             android.os.Process.killProcess(android.os.Process.myPid());
         }

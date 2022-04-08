@@ -103,13 +103,8 @@ public class ExportDataActivity extends BaseActivity {
         setContentView(R.layout.activity_export_data);
         ButterKnife.bind(this);
 
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            // 优先保存到SD卡中
-            PATH_LOGCAT = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "mokoBeaconXPro" : "BXP-NORDIC") + File.separator + TRACKED_FILE;
-        } else {
-            // 如果SD卡不存在，就保存到本应用的目录下
-            PATH_LOGCAT = getFilesDir().getAbsolutePath() + File.separator + File.separator + (BuildConfig.IS_LIBRARY ? "mokoBeaconXPro" : "BXP-NORDIC") + File.separator + TRACKED_FILE;
-        }
+        PATH_LOGCAT = NordicMainActivity.PATH_LOGCAT + File.separator + TRACKED_FILE;
+
         mHumiList = new ArrayList<>();
         mTempList = new ArrayList<>();
         cbDataShow.setOnCheckedChangeListener((buttonView, isChecked) -> {
