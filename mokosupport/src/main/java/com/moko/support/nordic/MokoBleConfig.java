@@ -70,8 +70,8 @@ final class MokoBleConfig extends MokoBleManager {
 
     @Override
     public void onDeviceConnecting(@NonNull BluetoothDevice device) {
-
     }
+
 
     @Override
     public void onDeviceConnected(@NonNull BluetoothDevice device) {

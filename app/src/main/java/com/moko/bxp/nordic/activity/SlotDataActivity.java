@@ -673,6 +673,14 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
     public void onSave(View view) {
         if (isWindowLocked())
             return;
+        if (slotDataActionImpl == null) {
+            byte[] noData = new byte[]{(byte) 0xFF};
+            ArrayList<OrderTask> orderTasks = new ArrayList<>();
+            orderTasks.add(OrderTaskAssembler.setSlot(slotData.slotEnum));
+            orderTasks.add(OrderTaskAssembler.setSlotData(noData));
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            return;
+        }
         OrderTask orderTask = null;
         // 发送触发条件
         switch (triggerType) {
@@ -704,15 +712,6 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                 }
                 orderTask = OrderTaskAssembler.setLightTrigger(triggerType, lightDetectedFragment.getData(), lightDetectedFragment.isAlways(), lightDetectedFragment.isStart());
                 break;
-        }
-        if (slotDataActionImpl == null) {
-            byte[] noData = new byte[]{(byte) 0xFF};
-            ArrayList<OrderTask> orderTasks = new ArrayList<>();
-            orderTasks.add(OrderTaskAssembler.setSlot(slotData.slotEnum));
-            orderTasks.add(OrderTaskAssembler.setSlotData(noData));
-            orderTasks.add(orderTask);
-            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-            return;
         }
         if (!slotDataActionImpl.isValid()) {
             return;

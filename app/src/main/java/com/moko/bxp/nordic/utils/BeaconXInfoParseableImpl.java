@@ -3,6 +3,7 @@ package com.moko.bxp.nordic.utils;
 import android.os.ParcelUuid;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.SparseArray;
 
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.entity.BeaconXInfo;
@@ -142,8 +143,26 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                         }
                     }
                     values = bytes;
+                } else if (parcelUuid.toString().startsWith("0000eb01")) {
+                    isBeaconXPro = true;
+                    type = BeaconXInfo.VALID_DATA_FRAME_TYPE_IBEACON;
+                    byte[] bytes = map.get(parcelUuid);
+                    if (bytes != null && bytes.length == 8) {
+                        battery = MokoUtils.toInt(Arrays.copyOfRange(bytes, 0, 2));
+                    }
+                    SparseArray<byte[]> manufacturer = result.getScanRecord().getManufacturerSpecificData();
+                    if (manufacturer == null || manufacturer.size() == 0) {
+                        return null;
+                    }
+                    String manufacturerSpecificData = MokoUtils.bytesToHexString(result.getScanRecord().getManufacturerSpecificData(manufacturer.keyAt(0)));
+                    if (TextUtils.isEmpty(manufacturerSpecificData) || !manufacturerSpecificData.startsWith("0215")) {
+                        return null;
+                    }
+                    String iBeaconBytesHex = "50" +
+                            manufacturerSpecificData.substring(manufacturerSpecificData.length() - 2) +
+                            "0A" + manufacturerSpecificData.substring(4, manufacturerSpecificData.length() - 2);
+                    values = MokoUtils.hex2bytes(iBeaconBytesHex);
                 }
-
             }
         }
         if ((!isEddystone && !isBeaconXPro) || values == null || type == -1) {
