@@ -45,8 +45,8 @@
     <!--    <string name="t_h_tips_2"><![CDATA[*The device stores T&H data when the temperature changed ≥ %s ℃ or humidity changes arbitrarily.]]></string>-->
     <!--    <string name="t_h_tips_3"><![CDATA[*The device stores T&H data when the temperature or humidity changes arbitrarily.]]></string>-->
     <string name="trigger_t_h_tips">*The Beacon will %1$s when the %2$s is %3$s %4$s.</string>
-    <string name="trigger_tapped_tips_1">*The Beacon will start and keep advertising after press the button %s.</string>
-    <string name="trigger_tapped_tips_2">*The Beacon will %1$s for %2$s after press the button %3$s.</string>
+    <string name="trigger_tapped_tips_1">*The Beacon will start and keep advertising after %s.</string>
+    <string name="trigger_tapped_tips_2">*The Beacon will %1$s for %2$s after %3$s.</string>
     <!--    <string name="trigger_tapped_tips_3">*The Beacon will always stop advertising after press button %s times.</string>-->
     <string name="trigger_moved_tips_1">*The Beacon will start and keep advertising once a movement occurred.</string>
     <string name="trigger_moved_tips_2">*The Beacon will %1$s after device keep static for %2$s and it %3$s again once a movement occurred.</string>

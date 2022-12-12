@@ -225,6 +225,10 @@ public class ExportDataActivity extends BaseActivity {
                                         ToastUtils.showToast(ExportDataActivity.this, "Failed");
                                     }
                                     break;
+                                case SET_ERROR:
+                                    if (isWindowLocked()) return;
+                                    ToastUtils.showToast(this, "Failed");
+                                    break;
                             }
                         }
                         break;

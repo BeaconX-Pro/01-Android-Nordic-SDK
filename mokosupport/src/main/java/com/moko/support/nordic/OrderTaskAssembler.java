@@ -38,6 +38,8 @@ import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import androidx.annotation.IntRange;
+
 public class OrderTaskAssembler {
 
     /**
@@ -492,6 +494,18 @@ public class OrderTaskAssembler {
     public static OrderTask setTriggerLEDNotifyEnable(int enable) {
         ParamsTask task = new ParamsTask();
         task.setTriggerLEDNotifyEnable(enable);
+        return task;
+    }
+
+    public static OrderTask getEffectiveClickInterval() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.GET_EFFECTIVE_CLICK_INTERVAL);
+        return task;
+    }
+
+    public static OrderTask setEffectiveClickInterval(@IntRange(from = 500, to = 1500) int interval) {
+        ParamsTask task = new ParamsTask();
+        task.setEffectiveClickInterval(interval);
         return task;
     }
 }

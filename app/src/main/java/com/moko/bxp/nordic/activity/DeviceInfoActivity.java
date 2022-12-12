@@ -16,6 +16,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -54,6 +55,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import androidx.annotation.IdRes;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -79,6 +81,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     RadioGroup rgOptions;
     @BindView(R2.id.tv_title)
     TextView tvTitle;
+    @BindView(R2.id.iv_save)
+    ImageView ivSave;
     private FragmentManager fragmentManager;
     private SlotFragment slotFragment;
     private SettingFragment settingFragment;
@@ -279,9 +283,20 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                     }
                                     break;
                                 case GET_TRIGGER_DATA:
-                                    if (value.length >= 4) {
-                                        slotFragment.setTriggerData(value);
+                                    slotFragment.setTriggerData(value);
+                                    break;
+                                case GET_EFFECTIVE_CLICK_INTERVAL:
+                                    if (length == 2) {
+                                        int interval = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 6));
+                                        settingFragment.setEffectiveClickInterval(interval);
                                     }
+                                    break;
+                                case SET_EFFECTIVE_CLICK_INTERVAL:
+                                    ToastUtils.showToast(this, "Success");
+                                    break;
+                                case SET_ERROR:
+                                    if (isWindowLocked()) return;
+                                    ToastUtils.showToast(this, "Failed");
                                     break;
 
                             }
@@ -518,6 +533,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     private void showSlotFragment() {
         if (slotFragment != null) {
+            ivSave.setVisibility(View.GONE);
             fragmentManager.beginTransaction()
                     .hide(settingFragment)
                     .hide(deviceFragment)
@@ -529,6 +545,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     private void showSettingFragment() {
         if (settingFragment != null) {
+            ivSave.setVisibility(View.VISIBLE);
             fragmentManager.beginTransaction()
                     .hide(slotFragment)
                     .hide(deviceFragment)
@@ -540,6 +557,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     private void showDeviceFragment() {
         if (deviceFragment != null) {
+            ivSave.setVisibility(View.GONE);
             fragmentManager.beginTransaction()
                     .hide(slotFragment)
                     .hide(settingFragment)
@@ -557,6 +575,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         } else if (checkedId == R.id.radioBtn_setting) {
             showSettingFragment();
             getDeviceInfo();
+            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getEffectiveClickInterval());
         } else if (checkedId == R.id.radioBtn_device) {
             showDeviceFragment();
             getDeviceInfo();
@@ -776,6 +795,19 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     public void onBack(View view) {
         back();
+    }
+
+    public void onSave(View view) {
+        if (isWindowLocked())
+            return;
+        if (radioBtnSetting.isChecked()) {
+            if (settingFragment.isValid()) {
+                showSyncingProgressDialog();
+                settingFragment.saveParams();
+            } else {
+                ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
+            }
+        }
     }
 
     public void onSlot1(View view) {

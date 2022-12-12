@@ -205,6 +205,10 @@ public class LightSensorDataActivity extends BaseActivity {
                                         ToastUtils.showToast(this, "Failed");
                                     }
                                     break;
+                                case SET_ERROR:
+                                    if (isWindowLocked()) return;
+                                    ToastUtils.showToast(this, "Failed");
+                                    break;
                             }
                         }
                         break;

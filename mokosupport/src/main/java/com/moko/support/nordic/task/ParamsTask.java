@@ -5,6 +5,8 @@ import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.nordic.entity.OrderCHAR;
 import com.moko.support.nordic.entity.ParamsKeyEnum;
 
+import androidx.annotation.IntRange;
+
 
 public class ParamsTask extends OrderTask {
     public byte[] data;
@@ -36,6 +38,7 @@ public class ParamsTask extends OrderTask {
             case GET_TRIGGER_DATA:
             case GET_HW_RESET_ENABLE:
             case GET_TRIGGER_LED_NOTIFICATION:
+            case GET_EFFECTIVE_CLICK_INTERVAL:
             case SET_LIGHT_SENSOR_EMPTY:
                 createGetConfigData(key.getParamsKey());
                 break;
@@ -128,6 +131,10 @@ public class ParamsTask extends OrderTask {
                 value = "EA" + MokoUtils.int2HexString(ParamsKeyEnum.SET_TRIGGER_DATA.getParamsKey()) + "0004"
                         + "05" + String.format("%04X", params) + (isStart ? "02" : "01");
                 break;
+            case 7:
+                value = "EA" + MokoUtils.int2HexString(ParamsKeyEnum.SET_TRIGGER_DATA.getParamsKey()) + "0004"
+                        + "07" + String.format("%04X", params) + (isStart ? "01" : "02");
+                break;
         }
         data = MokoUtils.hex2bytes(value);
     }
@@ -165,6 +172,19 @@ public class ParamsTask extends OrderTask {
                 (byte) 0x00,
                 (byte) 0x01,
                 (byte) enable
+        };
+        response.responseValue = data;
+    }
+
+    public void setEffectiveClickInterval(@IntRange(from = 500, to = 1500) int interval) {
+        byte[] paramsBytes = MokoUtils.toByteArray(interval, 2);
+        data = new byte[]{
+                (byte) 0xEA,
+                (byte) ParamsKeyEnum.SET_EFFECTIVE_CLICK_INTERVAL.getParamsKey(),
+                (byte) 0x00,
+                (byte) 0x02,
+                paramsBytes[0],
+                paramsBytes[1],
         };
         response.responseValue = data;
     }

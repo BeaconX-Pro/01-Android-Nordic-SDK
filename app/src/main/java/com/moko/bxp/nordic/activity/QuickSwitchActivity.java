@@ -155,6 +155,10 @@ public class QuickSwitchActivity extends BaseActivity {
                                 case SET_TRIGGER_LED_NOTIFICATION:
                                     ToastUtils.showToast(this, "Success!");
                                     break;
+                                case SET_ERROR:
+                                    if (isWindowLocked()) return;
+                                    ToastUtils.showToast(this, "Failed");
+                                    break;
                             }
                         }
                         break;

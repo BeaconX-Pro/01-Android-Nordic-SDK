@@ -15,17 +15,17 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
-import com.moko.bxp.nordic.dialog.BottomDialog;
-import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
-import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.bxp.nordic.R;
+import com.moko.bxp.nordic.R2;
+import com.moko.bxp.nordic.dialog.BottomDialog;
+import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
+import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 import com.moko.support.nordic.entity.OrderCHAR;
@@ -181,6 +181,10 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
                                     } else {
                                         ToastUtils.showToast(AxisDataActivity.this, "Failed");
                                     }
+                                    break;
+                                case SET_ERROR:
+                                    if (isWindowLocked()) return;
+                                    ToastUtils.showToast(this, "Failed");
                                     break;
                             }
                         }

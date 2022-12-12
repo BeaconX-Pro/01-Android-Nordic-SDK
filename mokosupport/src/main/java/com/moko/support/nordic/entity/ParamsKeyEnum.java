@@ -31,6 +31,9 @@ public enum ParamsKeyEnum implements Serializable {
     SET_LIGHT_SENSOR_EMPTY(0x46),
     GET_TRIGGER_LED_NOTIFICATION(0x47),
     SET_TRIGGER_LED_NOTIFICATION(0x57),
+    GET_EFFECTIVE_CLICK_INTERVAL(0x4D),
+    SET_EFFECTIVE_CLICK_INTERVAL(0x5D),
+    SET_ERROR(0x0D),
     ;
 
     private int paramsKey;

@@ -10,13 +10,13 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.moko.ble.lib.task.OrderTask;
+import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.R2;
 import com.moko.bxp.nordic.activity.DeviceInfoActivity;
 import com.moko.bxp.nordic.activity.SlotDataActivity;
-import com.moko.ble.lib.task.OrderTask;
-import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 import com.moko.support.nordic.entity.SlotData;

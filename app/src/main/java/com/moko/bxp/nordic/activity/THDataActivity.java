@@ -292,6 +292,10 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
                                         ToastUtils.showToast(THDataActivity.this, "Failed");
                                     }
                                     break;
+                                case SET_ERROR:
+                                    if (isWindowLocked()) return;
+                                    ToastUtils.showToast(this, "Failed");
+                                    break;
                             }
                         }
                         break;

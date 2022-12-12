@@ -66,6 +66,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
     private static final int TRIGGER_TYPE_TRAP_TRIPLE = 4;
     private static final int TRIGGER_TYPE_MOVE = 5;
     private static final int TRIGGER_TYPE_LIGHT = 6;
+    private static final int TRIGGER_TYPE_TRAP_SINGLE = 7;
 
     private static final int DEVICE_TYPE_SENSOR_NULL = 0;
     private static final int DEVICE_TYPE_SENSOR_AXIS = 1;
@@ -115,7 +116,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
     private byte[] triggerData;
     private String[] slotTypeArray;
     private ArrayList<String> triggerTypes;
-    private int triggerTypeSelected;
+    private int triggerTypeSelected = 1;
     public SlotFrameTypeEnum currentFrameTypeEnum;
     public boolean isConfigError;
 
@@ -141,17 +142,20 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         if (deviceType == DEVICE_TYPE_SENSOR_NULL) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_no_sensor);
             npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
         } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_axis);
             npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Device moves");
         } else if (deviceType == DEVICE_TYPE_SENSOR_TH) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_th);
             npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Temperature above");
@@ -161,6 +165,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_all);
             npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Temperature above");
@@ -171,12 +176,14 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         } else if (deviceType == DEVICE_TYPE_SENSOR_LIGHT) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_no_sensor);
             npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Ambient light detected");
         } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS_LIGHT) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_axis);
             npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Device moves");
@@ -184,6 +191,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         } else if (deviceType == DEVICE_TYPE_SENSOR_TH_LIGHT) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_th);
             npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Temperature above");
@@ -194,6 +202,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH_LIGHT) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_all);
             npvSlotType.setDisplayedValues(slotTypeArray);
+            triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Temperature above");
@@ -248,7 +257,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         switch (triggerType) {
             case TRIGGER_TYPE_TEMPERATURE:
                 boolean isTempAbove = (triggerData[0] & 0xff) == 1;
-                triggerTypeSelected = isTempAbove ? 2 : 3;
+                triggerTypeSelected = isTempAbove ? 3 : 4;
 
                 tempFragment.setTempType(isTempAbove);
                 tempFragment.setData(MokoUtils.byte2short(Arrays.copyOfRange(triggerData, 1, 3)));
@@ -256,35 +265,43 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                 break;
             case TRIGGER_TYPE_HUMIDITY:
                 boolean isHumidityAbove = (triggerData[0] & 0xff) == 1;
-                triggerTypeSelected = isHumidityAbove ? 4 : 5;
+                triggerTypeSelected = isHumidityAbove ? 5 : 6;
 
                 humidityFragment.setHumidityType(isHumidityAbove);
                 byte[] humidityBytes = Arrays.copyOfRange(triggerData, 1, 3);
                 humidityFragment.setData((MokoUtils.toInt(humidityBytes)));
                 humidityFragment.setStart((triggerData[3] & 0xff) == 1);
                 break;
-            case TRIGGER_TYPE_TRAP_DOUBLE:
+            case TRIGGER_TYPE_TRAP_SINGLE:
                 triggerTypeSelected = 0;
 
-                tappedFragment.setIsDouble(true);
+                tappedFragment.setTrapType(0);
+                byte[] tappedSingleBytes = Arrays.copyOfRange(triggerData, 0, 2);
+                tappedFragment.setData(MokoUtils.toInt(tappedSingleBytes));
+                tappedFragment.setStart((triggerData[2] & 0xff) == 1);
+                break;
+            case TRIGGER_TYPE_TRAP_DOUBLE:
+                triggerTypeSelected = 1;
+
+                tappedFragment.setTrapType(1);
                 byte[] tappedDoubleBytes = Arrays.copyOfRange(triggerData, 0, 2);
                 tappedFragment.setData(MokoUtils.toInt(tappedDoubleBytes));
                 tappedFragment.setStart((triggerData[2] & 0xff) == 1);
                 break;
             case TRIGGER_TYPE_TRAP_TRIPLE:
-                triggerTypeSelected = 1;
+                triggerTypeSelected = 2;
 
-                tappedFragment.setIsDouble(false);
+                tappedFragment.setTrapType(2);
                 byte[] tappedTripleBytes = Arrays.copyOfRange(triggerData, 0, 2);
                 tappedFragment.setData(MokoUtils.toInt(tappedTripleBytes));
                 tappedFragment.setStart((triggerData[2] & 0xff) == 1);
                 break;
             case TRIGGER_TYPE_MOVE:
                 if ((deviceType & 1) == 1 && (deviceType & 2) == 0) {
-                    triggerTypeSelected = 2;
+                    triggerTypeSelected = 3;
                 }
                 if ((deviceType & 1) == 1 && (deviceType & 2) == 2) {
-                    triggerTypeSelected = 6;
+                    triggerTypeSelected = 7;
                 }
                 byte[] movesBytes = Arrays.copyOfRange(triggerData, 0, 2);
                 movesFragment.setData(MokoUtils.toInt(movesBytes));
@@ -292,16 +309,16 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                 break;
             case TRIGGER_TYPE_LIGHT:
                 if (deviceType == DEVICE_TYPE_SENSOR_LIGHT) {
-                    triggerTypeSelected = 2;
-                }
-                if (deviceType == DEVICE_TYPE_SENSOR_AXIS_LIGHT) {
                     triggerTypeSelected = 3;
                 }
+                if (deviceType == DEVICE_TYPE_SENSOR_AXIS_LIGHT) {
+                    triggerTypeSelected = 4;
+                }
                 if (deviceType == DEVICE_TYPE_SENSOR_TH_LIGHT) {
-                    triggerTypeSelected = 6;
+                    triggerTypeSelected = 7;
                 }
                 if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH_LIGHT) {
-                    triggerTypeSelected = 7;
+                    triggerTypeSelected = 8;
                 }
 
                 byte[] lightBytes = Arrays.copyOfRange(triggerData, 0, 2);
@@ -322,6 +339,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             case TRIGGER_TYPE_HUMIDITY:
                 fragmentTransaction.hide(tempFragment).show(humidityFragment).hide(tappedFragment).hide(movesFragment).hide(lightDetectedFragment).commit();
                 break;
+            case TRIGGER_TYPE_TRAP_SINGLE:
             case TRIGGER_TYPE_TRAP_DOUBLE:
             case TRIGGER_TYPE_TRAP_TRIPLE:
                 fragmentTransaction.hide(tempFragment).hide(humidityFragment).show(tappedFragment).hide(movesFragment).hide(lightDetectedFragment).commit();
@@ -655,13 +673,13 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         if (isWindowLocked())
             return;
         if (triggerType > 0) {
-            triggerType = 0;
+            triggerType = TRIGGER_TYPE_NULL;
             ivTrigger.setImageResource(R.drawable.ic_unchecked);
             rlTrigger.setVisibility(View.GONE);
         } else {
             ivTrigger.setImageResource(R.drawable.ic_checked);
             rlTrigger.setVisibility(View.VISIBLE);
-            triggerType = 3;
+            triggerType = TRIGGER_TYPE_TRAP_DOUBLE;
             showTriggerFragment();
         }
     }
@@ -693,6 +711,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             case TRIGGER_TYPE_HUMIDITY:
                 orderTask = OrderTaskAssembler.setTHTrigger(triggerType, humidityFragment.getHumidityType(), humidityFragment.getData(), humidityFragment.isStart());
                 break;
+            case TRIGGER_TYPE_TRAP_SINGLE:
             case TRIGGER_TYPE_TRAP_DOUBLE:
             case TRIGGER_TYPE_TRAP_TRIPLE:
                 if (tappedFragment.getData() < 0) {
@@ -733,12 +752,15 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             triggerTypeSelected = value;
             switch (triggerTypeSelected) {
                 case 0:
-                    triggerType = TRIGGER_TYPE_TRAP_DOUBLE;
+                    triggerType = TRIGGER_TYPE_TRAP_SINGLE;
                     break;
                 case 1:
-                    triggerType = TRIGGER_TYPE_TRAP_TRIPLE;
+                    triggerType = TRIGGER_TYPE_TRAP_DOUBLE;
                     break;
                 case 2:
+                    triggerType = TRIGGER_TYPE_TRAP_TRIPLE;
+                    break;
+                case 3:
                     if (deviceType == DEVICE_TYPE_SENSOR_AXIS
                             || deviceType == DEVICE_TYPE_SENSOR_AXIS_LIGHT) {
                         triggerType = TRIGGER_TYPE_MOVE;
@@ -748,52 +770,56 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                         triggerType = TRIGGER_TYPE_TEMPERATURE;
                     }
                     break;
-                case 3:
+                case 4:
                     if (deviceType == DEVICE_TYPE_SENSOR_AXIS_LIGHT) {
                         triggerType = TRIGGER_TYPE_LIGHT;
                     } else {
                         triggerType = TRIGGER_TYPE_TEMPERATURE;
                     }
                     break;
-                case 4:
                 case 5:
+                case 6:
                     triggerType = TRIGGER_TYPE_HUMIDITY;
                     break;
-                case 6:
+                case 7:
                     if (deviceType == DEVICE_TYPE_SENSOR_TH_LIGHT) {
                         triggerType = TRIGGER_TYPE_LIGHT;
                     } else {
                         triggerType = TRIGGER_TYPE_MOVE;
                     }
                     break;
-                case 7:
+                case 8:
                     triggerType = TRIGGER_TYPE_LIGHT;
                     break;
             }
             showTriggerFragment();
             switch (triggerTypeSelected) {
                 case 0:
-                    tappedFragment.setIsDouble(true);
+                    tappedFragment.setTrapType(0);
                     tappedFragment.updateTips();
                     break;
                 case 1:
-                    tappedFragment.setIsDouble(false);
+                    tappedFragment.setTrapType(1);
                     tappedFragment.updateTips();
                     break;
                 case 2:
+                    tappedFragment.setTrapType(2);
+                    tappedFragment.updateTips();
+                    break;
+                case 3:
                     if ((deviceType & 2) == 2) {
                         tempFragment.setTempTypeAndRefresh(true);
                     }
                     break;
-                case 3:
+                case 4:
                     if ((deviceType & 2) == 2) {
                         tempFragment.setTempTypeAndRefresh(false);
                     }
                     break;
-                case 4:
+                case 5:
                     humidityFragment.setHumidityTypeAndRefresh(true);
                     break;
-                case 5:
+                case 6:
                     humidityFragment.setHumidityTypeAndRefresh(false);
                     break;
             }
