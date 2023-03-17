@@ -193,7 +193,7 @@ public class IOUtils {
      * @param displayName：显示的文件名字
      * @return 返回插入数据对应的uri
      */
-    @RequiresApi(api = Build.VERSION_CODES.R)
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     public static void queryAndDeleteFile(Context context, String displayName) {
         Uri external = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
         ContentResolver resolver = context.getContentResolver();
@@ -217,7 +217,7 @@ public class IOUtils {
      * @param context
      * @return 返回插入数据对应的uri
      */
-    @RequiresApi(api = Build.VERSION_CODES.R)
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     public static Uri insertDownloadFile(Context context, File file) {
         // 保存前先检查文件是否已存在
         queryAndDeleteFile(context, file.getName());

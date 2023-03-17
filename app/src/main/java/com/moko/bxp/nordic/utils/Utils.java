@@ -35,7 +35,7 @@ public class Utils {
         if (files.length == 1) {
             intent = new Intent(Intent.ACTION_SEND);
             Uri uri;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 uri = IOUtils.insertDownloadFile(context, files[0]);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 if (BuildConfig.IS_LIBRARY) {
@@ -52,7 +52,7 @@ public class Utils {
         } else {
             ArrayList<Uri> uris = new ArrayList<>();
             for (int i = 0; i < files.length; i++) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     Uri fileUri = IOUtils.insertDownloadFile(context, files[i]);
                     uris.add(fileUri);
                 } else {

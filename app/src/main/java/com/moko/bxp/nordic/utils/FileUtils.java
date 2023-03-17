@@ -35,7 +35,7 @@ public class FileUtils {
 
         // DocumentProvider
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
-                && Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+                && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
                 && DocumentsContract.isDocumentUri(context, uri)) {
             // LocalStorageProvider
             if (isLocalStorageDocument(uri)) {
@@ -117,7 +117,7 @@ public class FileUtils {
                 return getDataColumn(context, contentUri, selection, selectionArgs);
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             return uriToFileApiQ(context, uri);
         }
         // MediaStore (and general)
@@ -224,7 +224,7 @@ public class FileUtils {
      * @param uri
      * @return
      */
-    @RequiresApi(api = Build.VERSION_CODES.R)
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private static String uriToFileApiQ(Context context, Uri uri) {
         File file = null;
         //android10以上转换
