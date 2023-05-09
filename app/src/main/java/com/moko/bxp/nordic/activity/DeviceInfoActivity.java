@@ -245,12 +245,13 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 byte[] value = response.responseValue;
                 switch (orderCHAR) {
                     case CHAR_DEVICE_TYPE:
-                        if (value.length >= 1) {
-                            int deviceType = value[0] & 0xff;
-                            mDeviceType = deviceType;
-                            slotFragment.setDeviceType(deviceType);
-                            settingFragment.setDeviceType(deviceType);
+                        if (value.length == 1) {
+                            mDeviceType = value[0] & 0xff;
+                        } else {
+                            mDeviceType = value[1] & 0xff;
                         }
+                        slotFragment.setDeviceType(mDeviceType);
+                        settingFragment.setDeviceType(mDeviceType);
                         break;
                     case CHAR_SLOT_TYPE:
                         if (value.length >= 6) {
