@@ -1,11 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
+        namespace = "com.moko.support.nordic"
         minSdkVersion 18
-        targetSdkVersion 31
+        targetSdkVersion 33
         versionCode 4
         versionName "4.0"
     }

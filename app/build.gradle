@@ -6,17 +6,19 @@ if (!isLibrary.toBoolean()) {
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "29.0.3"
+    compileSdkVersion 33
 
     defaultConfig {
         if (!isLibrary.toBoolean()) {
-            applicationId "com.moko.bxp.nordic"
+            applicationId = "com.moko.bxp.nordic"
         }
+        namespace = "com.moko.bxp.nordic"
         minSdkVersion 18
-        targetSdkVersion 31
-        versionCode 7
-        versionName "1.0.6"
+        targetSdkVersion 33
+        versionCode 8
+        versionName "1.0.7"
+        def formatDate = new Date().format("yyyyMMddHHmm")
+        setProperty("archivesBaseName", "BXP-NORDIC_${versionName}_${formatDate}")
     }
 
     buildTypes {
@@ -61,21 +63,7 @@ android {
         abortOnError false
     }
 
-    if (!isLibrary.toBoolean()) {
-        applicationVariants.all { variant ->
-            variant.outputs.all { output ->
-                def outputFile = output.outputFile
-                if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                    def formatedDate = new Date().format("yyyyMMddHHmm")
-                    def apkFileName = "BXP-NORDIC_${defaultConfig.versionName}_${formatedDate}.apk"
-                    if (outputFile.name.contains('debug')) {
-                        apkFileName = "BXP-NORDIC_${defaultConfig.versionName}_${formatedDate}_debug.apk"
-                    }
-                    outputFileName = apkFileName
-                }
-            }
-        }
-    } else {
+    if (isLibrary.toBoolean()) {
         libraryVariants.all { variant ->
             if (variant.buildType.name == "release") {
                 // 修改aar名称
@@ -116,7 +104,7 @@ dependencies {
         implementation project(path: ':mokosupport')
     } else {
         implementation files('libs/mokoSupport.jar')
-        provided files('libs/mokoBleLib.jar')
+        compileOnly files('libs/mokoBleLib.jar')
         implementation 'no.nordicsemi.android.support.v18:scanner:1.6.0'
         implementation 'no.nordicsemi.android:dfu:0.6.2'
         implementation 'org.greenrobot:eventbus:3.2.0'
