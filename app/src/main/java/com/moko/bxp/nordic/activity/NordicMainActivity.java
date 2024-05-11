@@ -191,9 +191,9 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
         if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
             // 设备连接成功，通知页面更新
             dismissLoadingProgressDialog();
-            BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_MODEL_NUMBER);
-            BluetoothGattCharacteristic deviceTypeChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_DEVICE_TYPE);
-            if (modelNumberChar != null && deviceTypeChar != null) {
+//            BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_MODEL_NUMBER);
+//            BluetoothGattCharacteristic deviceTypeChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_DEVICE_TYPE);
+//            if (modelNumberChar != null && deviceTypeChar != null) {
                 showLoadingMessageDialog();
                 mHandler.postDelayed(new Runnable() {
                     @Override
@@ -211,16 +211,16 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
                     }
                 }, 500);
 
-            } else {
-                MokoSupport.getInstance().disConnectBle();
-                AlertMessageDialog dialog = new AlertMessageDialog();
-                dialog.setMessage("The firmware version selected is incorrect. Please back to the firmware version options and select again.");
-                dialog.setConfirm(R.string.ok);
-                dialog.setOnAlertConfirmListener(() -> {
-                    back();
-                });
-                dialog.show(getSupportFragmentManager());
-            }
+//            } else {
+//                MokoSupport.getInstance().disConnectBle();
+//                AlertMessageDialog dialog = new AlertMessageDialog();
+//                dialog.setMessage("The firmware version selected is incorrect. Please back to the firmware version options and select again.");
+//                dialog.setConfirm(R.string.ok);
+//                dialog.setOnAlertConfirmListener(() -> {
+//                    back();
+//                });
+//                dialog.show(getSupportFragmentManager());
+//            }
         }
     }
 

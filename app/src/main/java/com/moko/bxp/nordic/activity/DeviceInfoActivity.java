@@ -124,12 +124,12 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             orderTasks.add(OrderTaskAssembler.getSlotType());
             orderTasks.add(OrderTaskAssembler.getDeviceMac());
             orderTasks.add(OrderTaskAssembler.getConnectable());
-            orderTasks.add(OrderTaskAssembler.getManufacturer());
-            orderTasks.add(OrderTaskAssembler.getDeviceModel());
-            orderTasks.add(OrderTaskAssembler.getProductDate());
-            orderTasks.add(OrderTaskAssembler.getHardwareVersion());
-            orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
-            orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
+//            orderTasks.add(OrderTaskAssembler.getManufacturer());
+//            orderTasks.add(OrderTaskAssembler.getDeviceModel());
+//            orderTasks.add(OrderTaskAssembler.getProductDate());
+//            orderTasks.add(OrderTaskAssembler.getHardwareVersion());
+//            orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
+//            orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
             orderTasks.add(OrderTaskAssembler.getBattery());
             orderTasks.add(OrderTaskAssembler.getLockState());
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
@@ -231,12 +231,12 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
-                if (validParams.isEmpty() && validCount < 2) {
-                    validCount++;
-                    getDeviceInfo();
-                } else {
-                    validCount = 0;
-                }
+//                if (validParams.isEmpty() && validCount < 2) {
+//                    validCount++;
+//                    getDeviceInfo();
+//                } else {
+//                    validCount = 0;
+//                }
             }
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
@@ -575,11 +575,11 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             getSlotType();
         } else if (checkedId == R.id.radioBtn_setting) {
             showSettingFragment();
-            getDeviceInfo();
+//            getDeviceInfo();
             MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getEffectiveClickInterval());
         } else if (checkedId == R.id.radioBtn_device) {
             showDeviceFragment();
-            getDeviceInfo();
+//            getDeviceInfo();
         }
     }
 

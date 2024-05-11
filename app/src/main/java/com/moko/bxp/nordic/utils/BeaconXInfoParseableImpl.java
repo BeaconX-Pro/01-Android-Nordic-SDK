@@ -44,9 +44,17 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
         // filter
         boolean isEddystone = false;
         boolean isBeaconXPro = false;
+        boolean isBeacon = false;
         byte[] values = null;
         int type = -1;
         int needParseData = -1;
+        byte[] manufacturerBytes = record.getManufacturerSpecificData(0x004C);
+        if (null != manufacturerBytes && manufacturerBytes.length ==23) {
+            isBeacon = true;
+            type = BeaconXInfo.VALID_DATA_TYPE_IBEACON_APPLE;
+            values = manufacturerBytes;
+        }
+
         if (map != null && !map.isEmpty()) {
             Iterator iterator = map.keySet().iterator();
             if (iterator.hasNext()) {
@@ -165,7 +173,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                 }
             }
         }
-        if ((!isEddystone && !isBeaconXPro) || values == null || type == -1) {
+        if ((!isEddystone && !isBeaconXPro && !isBeacon) || values == null || type == -1) {
             return null;
         }
         // avoid repeat

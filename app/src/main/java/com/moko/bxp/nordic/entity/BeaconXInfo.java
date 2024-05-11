@@ -15,6 +15,7 @@ public class BeaconXInfo implements Serializable {
     public static final int VALID_DATA_FRAME_TYPE_URL = 0x10;
     public static final int VALID_DATA_FRAME_TYPE_TLM = 0x20;
     public static final int VALID_DATA_FRAME_TYPE_IBEACON = 0x50;
+    public static final int VALID_DATA_TYPE_IBEACON_APPLE = 0x02;
     public static final int VALID_DATA_FRAME_TYPE_INFO = 0x40;
     public static final int VALID_DATA_FRAME_TYPE_AXIS = 0x60;
     public static final int VALID_DATA_FRAME_TYPE_TH = 0x70;

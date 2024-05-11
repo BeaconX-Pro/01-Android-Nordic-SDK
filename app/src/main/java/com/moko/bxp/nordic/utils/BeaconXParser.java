@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.entity.BeaconXAxis;
 import com.moko.bxp.nordic.entity.BeaconXDevice;
+import com.moko.bxp.nordic.entity.BeaconXInfo;
 import com.moko.bxp.nordic.entity.BeaconXTH;
 import com.moko.bxp.nordic.entity.BeaconXTLM;
 import com.moko.bxp.nordic.entity.BeaconXUID;
@@ -78,29 +79,53 @@ public class BeaconXParser {
         return tlm;
     }
 
-    public static BeaconXiBeacon getiBeacon(int rssi, String data) {
+    public static BeaconXiBeacon getIBeacon(int rssi, String data,int type) {
         // 50ee0c0102030405060708090a0b0c0d0e0f1000010002
         BeaconXiBeacon iBeacon = new BeaconXiBeacon();
-        int rssi_1m = Integer.parseInt(data.substring(2, 4), 16);
-        iBeacon.rangingData = (byte) rssi_1m + "";
-        StringBuilder stringBuilder = new StringBuilder(data.substring(6, 38).toLowerCase());
-        stringBuilder.insert(8, "-");
-        stringBuilder.insert(13, "-");
-        stringBuilder.insert(18, "-");
-        stringBuilder.insert(23, "-");
-        iBeacon.uuid = stringBuilder.toString();
-        iBeacon.major = Integer.parseInt(data.substring(38, 42), 16) + "";
-        iBeacon.minor = Integer.parseInt(data.substring(42, 46), 16) + "";
-        double distance = MokoUtils.getDistance(rssi, Math.abs((byte) rssi_1m));
-        String distanceDesc = "Unknown";
-        if (distance <= 0.1) {
-            distanceDesc = "Immediate";
-        } else if (distance > 0.1 && distance <= 1.0) {
-            distanceDesc = "Near";
-        } else if (distance > 1.0) {
-            distanceDesc = "Far";
+        if (type == BeaconXInfo.VALID_DATA_FRAME_TYPE_IBEACON && data.length() == 46) {
+            int rssi_1m = Integer.parseInt(data.substring(2, 4), 16);
+            iBeacon.rangingData = (byte) rssi_1m + "";
+            StringBuilder stringBuilder = new StringBuilder(data.substring(6, 38).toLowerCase());
+            stringBuilder.insert(8, "-");
+            stringBuilder.insert(13, "-");
+            stringBuilder.insert(18, "-");
+            stringBuilder.insert(23, "-");
+            iBeacon.uuid = stringBuilder.toString();
+            iBeacon.major = Integer.parseInt(data.substring(38, 42), 16) + "";
+            iBeacon.minor = Integer.parseInt(data.substring(42, 46), 16) + "";
+            double distance = MokoUtils.getDistance(rssi, Math.abs((byte) rssi_1m));
+            String distanceDesc = "Unknown";
+            if (distance <= 0.1) {
+                distanceDesc = "Immediate";
+            } else if (distance > 0.1 && distance <= 1.0) {
+                distanceDesc = "Near";
+            } else if (distance > 1.0) {
+                distanceDesc = "Far";
+            }
+            iBeacon.distanceDesc = distanceDesc;
+        }else if (type == BeaconXInfo.VALID_DATA_TYPE_IBEACON_APPLE && data.length() == 46){
+            String uuid = data.substring(4, 36).toLowerCase();
+            StringBuilder stringBuilder = new StringBuilder(uuid);
+            stringBuilder.insert(8, "-");
+            stringBuilder.insert(13, "-");
+            stringBuilder.insert(18, "-");
+            stringBuilder.insert(23, "-");
+            iBeacon.uuid = stringBuilder.toString();
+            iBeacon.major = Integer.parseInt(data.substring(36, 40), 16) + "";
+            iBeacon.minor = Integer.parseInt(data.substring(40, 44), 16) + "";
+            int rssi_1m = Integer.parseInt(data.substring(44, 46), 16);
+            iBeacon.rangingData = (byte) rssi_1m + "";
+            double distance = MokoUtils.getDistance(rssi, Math.abs((byte) rssi_1m));
+            String distanceDesc = "Unknown";
+            if (distance <= 0.1) {
+                distanceDesc = "Immediate";
+            } else if (distance > 0.1 && distance <= 1.0) {
+                distanceDesc = "Near";
+            } else if (distance > 1.0) {
+                distanceDesc = "Far";
+            }
+            iBeacon.distanceDesc = distanceDesc;
         }
-        iBeacon.distanceDesc = distanceDesc;
         return iBeacon;
     }
 

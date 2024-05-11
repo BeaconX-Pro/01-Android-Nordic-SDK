@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
-import com.elvishew.xlog.XLog;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.entity.BeaconXAxis;
 import com.moko.bxp.nordic.entity.BeaconXInfo;
@@ -47,20 +46,16 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
         LinearLayout parent = helper.getView(R.id.ll_data);
         parent.removeAllViews();
         ArrayList<BeaconXInfo.ValidData> validDatas = new ArrayList<>(item.validDataHashMap.values());
-        Collections.sort(validDatas, new Comparator<BeaconXInfo.ValidData>() {
-            @Override
-            public int compare(BeaconXInfo.ValidData lhs, BeaconXInfo.ValidData rhs) {
-                if (lhs.type > rhs.type) {
-                    return 1;
-                } else if (lhs.type < rhs.type) {
-                    return -1;
-                }
-                return 0;
+        Collections.sort(validDatas, (lhs, rhs) -> {
+            if (lhs.type > rhs.type) {
+                return 1;
+            } else if (lhs.type < rhs.type) {
+                return -1;
             }
+            return 0;
         });
 
         for (BeaconXInfo.ValidData validData : validDatas) {
-            XLog.i(validData.toString());
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_UID) {
                 parent.addView(createUIDView(BeaconXParser.getUID(validData.data)));
             }
@@ -69,14 +64,10 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TLM) {
                 parent.addView(createTLMView(BeaconXParser.getTLM(validData.data)));
-//                if (validData.data.length() > 7) {
-//                    int battery = Integer.parseInt(validData.data.substring(4, 8), 16);
-//                    helper.setText(R.id.tv_battery, String.format("%dmV", battery));
-//                }
             }
-            if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_IBEACON) {
-                BeaconXiBeacon beaconXiBeacon = BeaconXParser.getiBeacon(item.rssi, validData.data);
-                beaconXiBeacon.txPower = String.valueOf(validData.txPower);
+            if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_IBEACON || validData.type == BeaconXInfo.VALID_DATA_TYPE_IBEACON_APPLE) {
+                BeaconXiBeacon beaconXiBeacon = BeaconXParser.getIBeacon(item.rssi, validData.data, validData.type);
+                beaconXiBeacon.txPower = validData.txPower == Integer.MIN_VALUE ? "N/A" : String.valueOf(validData.txPower);
                 parent.addView(createiBeaconView(beaconXiBeacon));
             }
             if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TH) {
@@ -162,7 +153,8 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
         TextView tv_proximity_state = view.findViewById(R.id.tv_proximity_state);
 
         tv_rssi_1m.setText(String.format("%sdBm", iBeacon.rangingData));
-        tv_tx_power.setText(String.format("%sdBm", iBeacon.txPower));
+        String txPower = "N/A".equals(iBeacon.txPower) ? iBeacon.txPower : iBeacon.txPower + "dBm";
+        tv_tx_power.setText(txPower);
         tv_proximity_state.setText(iBeacon.distanceDesc);
         tv_uuid.setText(iBeacon.uuid);
         tv_major.setText(iBeacon.major);
