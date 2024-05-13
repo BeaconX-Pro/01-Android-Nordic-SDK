@@ -15,8 +15,8 @@ android {
         namespace = "com.moko.bxp.nordic"
         minSdkVersion 18
         targetSdkVersion 33
-        versionCode 8
-        versionName "1.0.7"
+        versionCode 9
+        versionName "1.0.8"
         def formatDate = new Date().format("yyyyMMddHHmm")
         setProperty("archivesBaseName", "BXP-NORDIC_${versionName}_${formatDate}")
     }

@@ -40,9 +40,26 @@ public class ParamsTask extends OrderTask {
             case GET_TRIGGER_LED_NOTIFICATION:
             case GET_EFFECTIVE_CLICK_INTERVAL:
             case SET_LIGHT_SENSOR_EMPTY:
+            case GET_NEW_MANUFACTURER_NAME:
+            case GET_NEW_FIRMWARE_VERSION:
+            case GET_NEW_SOFTWARE_VERSION:
+            case GET_NEW_HARDWARE_VERSION:
+            case GET_NEW_PRODUCT_MODE:
+            case GET_NEW_PRODUCT_DATE:
+            case GET_RESPONSE_PACKAGE_SWITCH:
                 createGetConfigData(key.getParamsKey());
                 break;
         }
+    }
+
+    public void setResponsePackageSwitch(int enable) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xEA,
+                (byte) ParamsKeyEnum.SET_RESPONSE_PACKAGE_SWITCH.getParamsKey(),
+                0x00,
+                0x01,
+                (byte) enable
+        };
     }
 
     private void createGetConfigData(int configKey) {

@@ -59,6 +59,7 @@ import java.util.Arrays;
 
 import androidx.annotation.IdRes;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import no.nordicsemi.android.dfu.DfuProgressListener;
@@ -97,6 +98,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     private boolean mReceiverTag = false;
     private int mDisconnectType;
     private int mDeviceType;
+    private boolean isNewVersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +116,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
+        isNewVersion = getIntent().getBooleanExtra(AppConstants.IS_NEW_VERSION, true);
         if (!MokoSupport.getInstance().isBluetoothOpen()) {
             // 蓝牙未打开，开启蓝牙
             MokoSupport.getInstance().enableBluetooth();
@@ -124,12 +127,21 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             orderTasks.add(OrderTaskAssembler.getSlotType());
             orderTasks.add(OrderTaskAssembler.getDeviceMac());
             orderTasks.add(OrderTaskAssembler.getConnectable());
-//            orderTasks.add(OrderTaskAssembler.getManufacturer());
-//            orderTasks.add(OrderTaskAssembler.getDeviceModel());
-//            orderTasks.add(OrderTaskAssembler.getProductDate());
-//            orderTasks.add(OrderTaskAssembler.getHardwareVersion());
-//            orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
-//            orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
+            if (isNewVersion) {
+                orderTasks.add(OrderTaskAssembler.getNewManufacturer());
+                orderTasks.add(OrderTaskAssembler.getNewDeviceModel());
+                orderTasks.add(OrderTaskAssembler.getNewProductDate());
+                orderTasks.add(OrderTaskAssembler.getNewHardwareVersion());
+                orderTasks.add(OrderTaskAssembler.getNewFirmwareVersion());
+                orderTasks.add(OrderTaskAssembler.getNewSoftwareVersion());
+            } else {
+                orderTasks.add(OrderTaskAssembler.getManufacturer());
+                orderTasks.add(OrderTaskAssembler.getDeviceModel());
+                orderTasks.add(OrderTaskAssembler.getProductDate());
+                orderTasks.add(OrderTaskAssembler.getHardwareVersion());
+                orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
+                orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
+            }
             orderTasks.add(OrderTaskAssembler.getBattery());
             orderTasks.add(OrderTaskAssembler.getLockState());
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
@@ -183,7 +195,6 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     }
 
-
     private String unLockResponse;
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 100)
@@ -231,12 +242,12 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                 dismissSyncProgressDialog();
-//                if (validParams.isEmpty() && validCount < 2) {
-//                    validCount++;
-//                    getDeviceInfo();
-//                } else {
-//                    validCount = 0;
-//                }
+                if (validParams.isEmpty() && validCount < 2) {
+                    validCount++;
+                    getDeviceInfo();
+                } else {
+                    validCount = 0;
+                }
             }
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
@@ -298,6 +309,53 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                 case SET_ERROR:
                                     if (isWindowLocked()) return;
                                     ToastUtils.showToast(this, "Failed");
+                                    break;
+
+                                case GET_NEW_MANUFACTURER_NAME:
+                                    if (length > 0) {
+                                        deviceFragment.setManufacturer(Arrays.copyOfRange(value, 4, value.length));
+                                        validParams.manufacture = "1";
+                                    }
+                                    break;
+
+                                case GET_NEW_PRODUCT_MODE:
+                                    if (length > 0) {
+                                        deviceFragment.setDeviceModel(Arrays.copyOfRange(value, 4, value.length));
+                                        validParams.productModel = "1";
+                                    }
+                                    break;
+
+                                case GET_NEW_PRODUCT_DATE:
+                                    if (length > 0) {
+                                        int year = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 6));
+                                        String month = String.valueOf(value[6] & 0xff);
+                                        String day = String.valueOf(value[7] & 0xff);
+                                        String monthStr = month.length() == 1 ? "0" + month : month;
+                                        String dayStr = day.length() == 1 ? "0" + day : day;
+                                        deviceFragment.setProductDateStr(year + "/" + monthStr + "/" + dayStr);
+                                        validParams.manufactureDate = "1";
+                                    }
+                                    break;
+
+                                case GET_NEW_HARDWARE_VERSION:
+                                    if (length > 0) {
+                                        deviceFragment.setHardwareVersion(Arrays.copyOfRange(value, 4, value.length));
+                                        validParams.hardwareVersion = "1";
+                                    }
+                                    break;
+
+                                case GET_NEW_FIRMWARE_VERSION:
+                                    if (length > 0) {
+                                        deviceFragment.setFirmwareVersion(Arrays.copyOfRange(value, 4, value.length));
+                                        validParams.firmwareVersion = "1";
+                                    }
+                                    break;
+
+                                case GET_NEW_SOFTWARE_VERSION:
+                                    if (length > 0) {
+                                        deviceFragment.setSoftwareVersion(Arrays.copyOfRange(value, 4, value.length));
+                                        validParams.softwareVersion = "1";
+                                    }
                                     break;
 
                             }
@@ -391,12 +449,21 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         validParams.reset();
         ArrayList<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.getDeviceMac());
-        orderTasks.add(OrderTaskAssembler.getManufacturer());
-        orderTasks.add(OrderTaskAssembler.getDeviceModel());
-        orderTasks.add(OrderTaskAssembler.getProductDate());
-        orderTasks.add(OrderTaskAssembler.getHardwareVersion());
-        orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
-        orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
+        if (isNewVersion) {
+            orderTasks.add(OrderTaskAssembler.getNewManufacturer());
+            orderTasks.add(OrderTaskAssembler.getNewDeviceModel());
+            orderTasks.add(OrderTaskAssembler.getNewProductDate());
+            orderTasks.add(OrderTaskAssembler.getNewHardwareVersion());
+            orderTasks.add(OrderTaskAssembler.getNewFirmwareVersion());
+            orderTasks.add(OrderTaskAssembler.getNewSoftwareVersion());
+        } else {
+            orderTasks.add(OrderTaskAssembler.getManufacturer());
+            orderTasks.add(OrderTaskAssembler.getDeviceModel());
+            orderTasks.add(OrderTaskAssembler.getProductDate());
+            orderTasks.add(OrderTaskAssembler.getHardwareVersion());
+            orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
+            orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
+        }
         orderTasks.add(OrderTaskAssembler.getBattery());
         orderTasks.add(OrderTaskAssembler.getLockState());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
@@ -428,12 +495,21 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                             ArrayList<OrderTask> orderTasks = new ArrayList<>();
                             orderTasks.add(OrderTaskAssembler.getSlotType());
                             orderTasks.add(OrderTaskAssembler.getDeviceMac());
-                            orderTasks.add(OrderTaskAssembler.getManufacturer());
-                            orderTasks.add(OrderTaskAssembler.getDeviceModel());
-                            orderTasks.add(OrderTaskAssembler.getProductDate());
-                            orderTasks.add(OrderTaskAssembler.getHardwareVersion());
-                            orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
-                            orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
+                            if (isNewVersion) {
+                                orderTasks.add(OrderTaskAssembler.getNewManufacturer());
+                                orderTasks.add(OrderTaskAssembler.getNewDeviceModel());
+                                orderTasks.add(OrderTaskAssembler.getNewProductDate());
+                                orderTasks.add(OrderTaskAssembler.getNewHardwareVersion());
+                                orderTasks.add(OrderTaskAssembler.getNewFirmwareVersion());
+                                orderTasks.add(OrderTaskAssembler.getNewSoftwareVersion());
+                            } else {
+                                orderTasks.add(OrderTaskAssembler.getManufacturer());
+                                orderTasks.add(OrderTaskAssembler.getDeviceModel());
+                                orderTasks.add(OrderTaskAssembler.getProductDate());
+                                orderTasks.add(OrderTaskAssembler.getHardwareVersion());
+                                orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
+                                orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
+                            }
                             orderTasks.add(OrderTaskAssembler.getBattery());
                             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
                             break;
@@ -575,11 +651,11 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             getSlotType();
         } else if (checkedId == R.id.radioBtn_setting) {
             showSettingFragment();
-//            getDeviceInfo();
+            getDeviceInfo();
             MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getEffectiveClickInterval());
         } else if (checkedId == R.id.radioBtn_device) {
             showDeviceFragment();
-//            getDeviceInfo();
+            getDeviceInfo();
         }
     }
 
@@ -727,54 +803,46 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     };
 
     public void onSensorConfig(View view) {
-        if (isWindowLocked())
-            return;
+        if (isWindowLocked()) return;
         Intent intent = new Intent(this, SensorConfigActivity.class);
         intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, mDeviceType);
         startActivity(intent);
     }
 
     public void onQuickSwitch(View view) {
-        if (isWindowLocked())
-            return;
-        startActivityForResult(new Intent(this, QuickSwitchActivity.class), AppConstants.REQUEST_CODE_QUICK_SWITCH);
+        if (isWindowLocked()) return;
+        Intent intent = new Intent(this, QuickSwitchActivity.class);
+        intent.putExtra(AppConstants.IS_NEW_VERSION, isNewVersion);
+        startActivityForResult(intent, AppConstants.REQUEST_CODE_QUICK_SWITCH);
     }
 
     public void onTurnOffBeacon(View view) {
-        if (isWindowLocked())
-            return;
+        if (isWindowLocked()) return;
         AlertMessageDialog powerAlertDialog = new AlertMessageDialog();
         powerAlertDialog.setTitle("Warning！");
         powerAlertDialog.setMessage("Are you sure to turn off the Beacon?Please make sure the Beacon has a button to turn on!");
         powerAlertDialog.setConfirm(R.string.ok);
-        powerAlertDialog.setOnAlertConfirmListener(() -> {
-            setClose();
-        });
+        powerAlertDialog.setOnAlertConfirmListener(() -> setClose());
         powerAlertDialog.show(getSupportFragmentManager());
     }
 
     public void onResetBeacon(View view) {
-        if (isWindowLocked())
-            return;
+        if (isWindowLocked()) return;
         AlertMessageDialog resetDeviceDialog = new AlertMessageDialog();
         resetDeviceDialog.setTitle("Warning！");
         resetDeviceDialog.setMessage("Are you sure to reset the Beacon？");
         resetDeviceDialog.setConfirm(R.string.ok);
-        resetDeviceDialog.setOnAlertConfirmListener(() -> {
-            resetDevice();
-        });
+        resetDeviceDialog.setOnAlertConfirmListener(() -> resetDevice());
         resetDeviceDialog.show(getSupportFragmentManager());
     }
 
     public void onDFU(View view) {
-        if (isWindowLocked())
-            return;
+        if (isWindowLocked()) return;
         chooseFirmwareFile();
     }
 
     public void onModifyPassword(View view) {
-        if (isWindowLocked())
-            return;
+        if (isWindowLocked()) return;
         final ModifyPasswordDialog modifyPasswordDialog = new ModifyPasswordDialog();
         modifyPasswordDialog.setOnModifyPasswordClicked(new ModifyPasswordDialog.ModifyPasswordClickListener() {
             @Override

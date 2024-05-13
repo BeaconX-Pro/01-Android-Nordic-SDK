@@ -33,8 +33,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.cardview.widget.CardView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -64,6 +66,12 @@ public class QuickSwitchActivity extends BaseActivity {
     CardView cvHwReset;
     @BindView(R2.id.cv_trigger_led_notify)
     CardView cvTriggerLedNotify;
+    @BindView(R2.id.cv_scan_response_indicator)
+    CardView cvResponseSwitch;
+    @BindView(R2.id.iv_scan_response_indicator)
+    ImageView ivScanResponseIndicator;
+    @BindView(R2.id.tv_scan_response_indicator)
+    TextView tvScanResponseIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +80,12 @@ public class QuickSwitchActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         EventBus.getDefault().register(this);
-
+        boolean isNewVersion = getIntent().getBooleanExtra(AppConstants.IS_NEW_VERSION,true);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
+        if (isNewVersion) cvResponseSwitch.setVisibility(View.VISIBLE);
         if (!MokoSupport.getInstance().isBluetoothOpen()) {
             // 蓝牙未打开，开启蓝牙
             MokoSupport.getInstance().enableBluetooth();
@@ -87,6 +96,7 @@ public class QuickSwitchActivity extends BaseActivity {
             orderTasks.add(OrderTaskAssembler.getTriggerLEDNotifyEnable());
             orderTasks.add(OrderTaskAssembler.getButtonPower());
             orderTasks.add(OrderTaskAssembler.getHWResetEnable());
+            if (isNewVersion) orderTasks.add(OrderTaskAssembler.getResponsePackageSwitch());
             orderTasks.add(OrderTaskAssembler.getLockState());
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         }
@@ -150,9 +160,15 @@ public class QuickSwitchActivity extends BaseActivity {
                                         setTriggerLEDNotifyEnable(enable);
                                     }
                                     break;
+                                case GET_RESPONSE_PACKAGE_SWITCH:
+                                    if (value.length >= 4) {
+                                        setScanResponseIndicator(value[4] & 0xff);
+                                    }
+                                    break;
                                 case SET_BUTTON_POWER:
                                 case SET_HW_RESET_ENABLE:
                                 case SET_TRIGGER_LED_NOTIFICATION:
+                                case SET_RESPONSE_PACKAGE_SWITCH:
                                     ToastUtils.showToast(this, "Success!");
                                     break;
                                 case SET_ERROR:
@@ -317,6 +333,28 @@ public class QuickSwitchActivity extends BaseActivity {
         } else {
             setDirectedConnectable(false);
         }
+    }
+
+    private boolean enableScanResponse;
+
+    public void setScanResponseIndicator(int enable) {
+        enableScanResponse = enable == 1;
+        ivScanResponseIndicator.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+        tvScanResponseIndicator.setText(enable == 1 ? "Enable" : "Disable");
+        tvScanResponseIndicator.setEnabled(enable == 1);
+    }
+
+    public void onChangeScanResponseIndicator(View view) {
+        if (isWindowLocked()) return;
+        setChangeScanResponseIndicator(!enableScanResponse);
+    }
+
+    private void setChangeScanResponseIndicator(boolean enable) {
+        showSyncingProgressDialog();
+        List<OrderTask> orderTasks = new ArrayList<>();
+        orderTasks.add(OrderTaskAssembler.setResponsePackageSwitch(enable ? 1 : 0));
+        orderTasks.add(OrderTaskAssembler.getResponsePackageSwitch());
+        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
 

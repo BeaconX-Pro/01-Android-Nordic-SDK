@@ -63,6 +63,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -141,7 +142,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
     }
 
     private String unLockResponse;
-    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -194,22 +195,19 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
 //            BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_MODEL_NUMBER);
 //            BluetoothGattCharacteristic deviceTypeChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_DEVICE_TYPE);
 //            if (modelNumberChar != null && deviceTypeChar != null) {
-                showLoadingMessageDialog();
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (TextUtils.isEmpty(mPassword)) {
-                            ArrayList<OrderTask> orderTasks = new ArrayList<>();
-                            orderTasks.add(OrderTaskAssembler.getLockState());
-                            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                        } else {
-                            XLog.i("锁定状态，获取unLock，解锁");
-                            ArrayList<OrderTask> orderTasks = new ArrayList<>();
-                            orderTasks.add(OrderTaskAssembler.getUnLock());
-                            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                        }
-                    }
-                }, 500);
+            showLoadingMessageDialog();
+            mHandler.postDelayed(() -> {
+                if (TextUtils.isEmpty(mPassword)) {
+                    ArrayList<OrderTask> orderTasks = new ArrayList<>();
+                    orderTasks.add(OrderTaskAssembler.getLockState());
+                    MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+                } else {
+                    XLog.i("锁定状态，获取unLock，解锁");
+                    ArrayList<OrderTask> orderTasks = new ArrayList<>();
+                    orderTasks.add(OrderTaskAssembler.getUnLock());
+                    MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+                }
+            }, 500);
 
 //            } else {
 //                MokoSupport.getInstance().disConnectBle();
@@ -262,12 +260,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
                                         mokoBleScanner.stopScanDevice();
                                     }
                                     showLoadingProgressDialog();
-                                    ivRefresh.postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            MokoSupport.getInstance().connDevice(mSelectedBeaconXMac);
-                                        }
-                                    }, 500);
+                                    ivRefresh.postDelayed(() -> MokoSupport.getInstance().connDevice(mSelectedBeaconXMac), 500);
                                 }
 
                                 @Override
@@ -286,16 +279,20 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
                         }
                     } else if ("02".equals(valueStr)) {
                         // 不需要密码验证
+                        BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_MODEL_NUMBER);
                         Intent deviceInfoIntent = new Intent(NordicMainActivity.this, DeviceInfoActivity.class);
                         deviceInfoIntent.putExtra(AppConstants.EXTRA_KEY_PASSWORD, mPassword);
+                        deviceInfoIntent.putExtra(AppConstants.IS_NEW_VERSION, null == modelNumberChar);
                         startActivityForResult(deviceInfoIntent, AppConstants.REQUEST_CODE_DEVICE_INFO);
                     } else {
                         // 解锁成功
                         XLog.i("解锁成功");
                         unLockResponse = "";
                         mSavedPassword = mPassword;
+                        BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_MODEL_NUMBER);
                         Intent deviceInfoIntent = new Intent(NordicMainActivity.this, DeviceInfoActivity.class);
                         deviceInfoIntent.putExtra(AppConstants.EXTRA_KEY_PASSWORD, mPassword);
+                        deviceInfoIntent.putExtra(AppConstants.IS_NEW_VERSION, null == modelNumberChar);
                         startActivityForResult(deviceInfoIntent, AppConstants.REQUEST_CODE_DEVICE_INFO);
                     }
                     break;

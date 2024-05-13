@@ -96,6 +96,10 @@ public class DeviceFragment extends Fragment {
         tvProductDate.setText(productDate);
     }
 
+    public void setProductDateStr(String dateStr) {
+        tvProductDate.setText(dateStr);
+    }
+
     public void setHardwareVersion(byte[] value) {
         String hardwareVersion = new String(value).trim();
         tvHardwareVersion.setText(hardwareVersion);

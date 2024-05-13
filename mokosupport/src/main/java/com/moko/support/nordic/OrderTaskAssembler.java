@@ -280,11 +280,29 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask setResponsePackageSwitch(int enable) {
+        ParamsTask task = new ParamsTask();
+        task.setResponsePackageSwitch(enable);
+        return task;
+    }
+
+    public static OrderTask getResponsePackageSwitch(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.GET_RESPONSE_PACKAGE_SWITCH);
+        return task;
+    }
+
     /**
      * @Description 获取制造商
      */
     public static OrderTask getManufacturer() {
         GetManufacturerNameTask task = new GetManufacturerNameTask();
+        return task;
+    }
+
+    public static OrderTask getNewManufacturer(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.GET_NEW_MANUFACTURER_NAME);
         return task;
     }
 
@@ -296,11 +314,23 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask getNewDeviceModel(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.GET_NEW_PRODUCT_MODE);
+        return task;
+    }
+
     /**
      * @Description 获取生产日期
      */
     public static OrderTask getProductDate() {
         GetSerialNumberTask task = new GetSerialNumberTask();
+        return task;
+    }
+
+    public static OrderTask getNewProductDate(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.GET_NEW_PRODUCT_DATE);
         return task;
     }
 
@@ -312,6 +342,12 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask getNewHardwareVersion(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.GET_NEW_HARDWARE_VERSION);
+        return task;
+    }
+
     /**
      * @Description 获取固件版本
      */
@@ -320,11 +356,23 @@ public class OrderTaskAssembler {
         return task;
     }
 
+    public static OrderTask getNewFirmwareVersion(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.GET_NEW_FIRMWARE_VERSION);
+        return task;
+    }
+
     /**
      * @Description 获取软件版本
      */
     public static OrderTask getSoftwareVersion() {
         GetSoftwareRevisionTask task = new GetSoftwareRevisionTask();
+        return task;
+    }
+
+    public static OrderTask getNewSoftwareVersion(){
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.GET_NEW_SOFTWARE_VERSION);
         return task;
     }
 

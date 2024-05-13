@@ -21,6 +21,7 @@ public class AppConstants {
     public static final String EXTRA_KEY_TRIGGER_TYPE = "EXTRA_KEY_TRIGGER_TYPE";
     public static final String EXTRA_KEY_TRIGGER_DATA = "EXTRA_KEY_TRIGGER_DATA";
     public static final String EXTRA_KEY_PASSWORD_VERIFICATION = "EXTRA_KEY_PASSWORD_VERIFICATION";
+    public static final String IS_NEW_VERSION = "IS_NEW_VERSION";
 
     // request_code
     public static final int REQUEST_CODE_DEVICE_INFO = 0x10;
