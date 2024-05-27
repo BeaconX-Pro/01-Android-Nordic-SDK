@@ -328,6 +328,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                 case GET_NEW_PRODUCT_DATE:
                                     if (length > 0) {
                                         int year = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 6));
+                                        MokoSupport.isNewVersion = year >= 2021;
                                         String month = String.valueOf(value[6] & 0xff);
                                         String day = String.valueOf(value[7] & 0xff);
                                         String monthStr = month.length() == 1 ? "0" + month : month;
