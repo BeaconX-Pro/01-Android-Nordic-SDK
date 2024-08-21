@@ -62,10 +62,10 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import no.nordicsemi.android.dfu.DfuProgressListener;
-import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
-import no.nordicsemi.android.dfu.DfuServiceInitiator;
-import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
+import com.moko.support.nordic.dfu.DfuProgressListener;
+import com.moko.support.nordic.dfu.DfuProgressListenerAdapter;
+import com.moko.support.nordic.dfu.DfuServiceInitiator;
+import com.moko.support.nordic.dfu.DfuServiceListenerHelper;
 
 public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener {
     public static final int REQUEST_CODE_SELECT_FIRMWARE = 0x10;

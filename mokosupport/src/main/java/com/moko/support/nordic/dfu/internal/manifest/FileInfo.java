@@ -19,29 +19,25 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.moko.bxp.nordic.service;
 
-import android.app.Activity;
+package com.moko.support.nordic.dfu.internal.manifest;
 
-import com.moko.support.nordic.dfu.DfuBaseService;
+import com.google.gson.annotations.SerializedName;
 
-public class DfuService extends DfuBaseService {
+public class FileInfo {
+	@SerializedName("bin_file") protected String binFile;
+	@SerializedName("dat_file") protected String datFile;
+	@SerializedName("init_packet_data") protected InitPacketData initPacketData;
 
-    @Override
-    protected Class<? extends Activity> getNotificationTarget() {
-        /*
-         * As a target activity the NotificationActivity is returned, not the MainActivity. This is because the notification must create a new task:
-		 * 
-		 * intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		 * 
-		 * when user press it. Using NotificationActivity we can check whether the new activity is a root activity (that means no other activity was open before)
-		 * or that there is other activity already open. In the later case the notificationActivity will just be closed. System will restore the previous activity from 
-		 * this application - the MainActivity. However if nRF Beacon has been closed during upload and user click the notification a NotificationActivity will
-		 * be launched as a root activity. It will create and start the MainActivity and finish itself.
-		 * 
-		 * This method may be used to restore the target activity in case the application was closed or is open. It may also be used to recreate an activity history (see NotificationActivity).
-		 */
-        return null;
-    }
+	public String getBinFileName() {
+		return binFile;
+	}
 
+	public String getDatFileName() {
+		return datFile;
+	}
+
+	public InitPacketData getInitPacketData() {
+		return initPacketData;
+	}
 }
