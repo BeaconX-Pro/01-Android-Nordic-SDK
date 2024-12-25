@@ -6,17 +6,17 @@ if (!isLibrary.toBoolean()) {
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         if (!isLibrary.toBoolean()) {
             applicationId = "com.moko.bxp.nordic"
         }
         namespace = "com.moko.bxp.nordic"
-        minSdkVersion 18
-        targetSdkVersion 33
-        versionCode 10
-        versionName "1.0.9"
+        minSdkVersion 21
+        targetSdkVersion 34
+        versionCode 110
+        versionName "1.1.0"
         def formatDate = new Date().format("yyyyMMddHHmm")
         setProperty("archivesBaseName", "BXP-NORDIC_${versionName}_${formatDate}")
     }

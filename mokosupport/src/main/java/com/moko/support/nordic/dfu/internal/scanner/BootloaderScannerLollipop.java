@@ -22,6 +22,7 @@
 
 package com.moko.support.nordic.dfu.internal.scanner;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -41,6 +42,7 @@ public class BootloaderScannerLollipop extends ScanCallback implements Bootloade
 	private String mBootloaderAddress;
 	private boolean mFound;
 
+	@SuppressLint("MissingPermission")
 	@Override
 	public String searchFor(final String deviceAddress) {
 		final String firstBytes = deviceAddress.substring(0, 15);

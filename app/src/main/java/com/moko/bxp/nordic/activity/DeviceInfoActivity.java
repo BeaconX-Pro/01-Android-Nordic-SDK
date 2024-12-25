@@ -39,7 +39,7 @@ import com.moko.bxp.nordic.entity.ValidParams;
 import com.moko.bxp.nordic.fragment.DeviceFragment;
 import com.moko.bxp.nordic.fragment.SettingFragment;
 import com.moko.bxp.nordic.fragment.SlotFragment;
-import com.moko.bxp.nordic.service.DfuService;
+import com.moko.bxp.nordic.service.DfuServiceNordic;
 import com.moko.bxp.nordic.utils.FileUtils;
 import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.support.nordic.MokoSupport;
@@ -539,7 +539,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                             .setKeepBond(false)
                             .setDisableNotification(true);
                     starter.setZip(null, firmwareFilePath);
-                    starter.start(this, DfuService.class);
+                    starter.start(this, DfuServiceNordic.class);
                     showDFUProgressDialog("Waiting...");
                 } else {
                     Toast.makeText(this, "file is not exists!", Toast.LENGTH_SHORT).show();
@@ -751,8 +751,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 ToastUtils.showToast(DeviceInfoActivity.this, "Error:DFU Failed");
                 MokoSupport.getInstance().disConnectBle();
                 final LocalBroadcastManager manager = LocalBroadcastManager.getInstance(DeviceInfoActivity.this);
-                final Intent abortAction = new Intent(DfuService.BROADCAST_ACTION);
-                abortAction.putExtra(DfuService.EXTRA_ACTION, DfuService.ACTION_ABORT);
+                final Intent abortAction = new Intent(DfuServiceNordic.BROADCAST_ACTION);
+                abortAction.putExtra(DfuServiceNordic.EXTRA_ACTION, DfuServiceNordic.ACTION_ABORT);
                 manager.sendBroadcast(abortAction);
             }
         }

@@ -25,7 +25,8 @@ import android.app.Activity;
 
 import com.moko.support.nordic.dfu.DfuBaseService;
 
-public class DfuService extends DfuBaseService {
+
+public class DfuServiceNordic extends DfuBaseService {
 
     @Override
     protected Class<? extends Activity> getNotificationTarget() {

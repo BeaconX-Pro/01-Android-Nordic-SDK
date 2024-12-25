@@ -22,6 +22,7 @@
 
 package com.moko.support.nordic.dfu.internal.scanner;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
@@ -35,6 +36,7 @@ public class BootloaderScannerJB implements BootloaderScanner, BluetoothAdapter.
 	private String mBootloaderAddress;
 	private boolean mFound;
 
+	@SuppressLint("MissingPermission")
 	@SuppressWarnings("deprecation")
 	@Override
 	public String searchFor(final String deviceAddress) {

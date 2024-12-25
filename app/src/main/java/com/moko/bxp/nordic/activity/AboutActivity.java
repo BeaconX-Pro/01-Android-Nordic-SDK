@@ -19,7 +19,6 @@ import java.util.Calendar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-
 public class AboutActivity extends BaseActivity {
     @BindView(R2.id.app_version)
     TextView appVersion;
