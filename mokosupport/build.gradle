@@ -33,7 +33,7 @@ dependencies {
     api 'org.greenrobot:eventbus:3.2.0'
     api 'com.elvishew:xlog:1.6.1'
     api 'com.google.code.gson:gson:2.8.5'
-    implementation 'no.nordicsemi.android:ble:2.5.1'
+    implementation 'no.nordicsemi.android:ble:2.7.2'
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
 }

@@ -13,8 +13,6 @@ import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.nordic.entity.OrderCHAR;
 import com.moko.support.nordic.entity.OrderServices;
 
-import java.util.UUID;
-
 import androidx.annotation.NonNull;
 
 final class MokoBleConfig extends MokoBleManager {
@@ -27,6 +25,7 @@ final class MokoBleConfig extends MokoBleManager {
     private BluetoothGattCharacteristic lightSensorNotifyCharacteristic;
     private BluetoothGattCharacteristic lightSensorCurrentCharacteristic;
     private BluetoothGattCharacteristic disconnectCharacteristic;
+    private BluetoothGatt gatt;
 
     public MokoBleConfig(@NonNull Context context, MokoResponseCallback callback) {
         super(context);
@@ -34,9 +33,10 @@ final class MokoBleConfig extends MokoBleManager {
     }
 
     @Override
-    public boolean init(BluetoothGatt gatt) {
+    public boolean checkServiceCharacteristicSupported(BluetoothGatt gatt) {
         final BluetoothGattService service = gatt.getService(OrderServices.SERVICE_CUSTOM.getUuid());
         if (service != null) {
+            this.gatt = gatt;
             thCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_TH_NOTIFY.getUuid());
             lockedCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_LOCKED_NOTIFY.getUuid());
             threeAxisCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_THREE_AXIS_NOTIFY.getUuid());
@@ -44,11 +44,19 @@ final class MokoBleConfig extends MokoBleManager {
             disconnectCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_DISCONNECT.getUuid());
             lightSensorNotifyCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_LIGHT_SENSOR_NOTIFY.getUuid());
             lightSensorCurrentCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_LIGHT_SENSOR_CURRENT.getUuid());
-            enableDisconnectNotify();
-            enableLockedNotify();
-            return true;
+            return disconnectCharacteristic != null
+                    && lockedCharacteristic != null;
         }
         return false;
+    }
+
+    @Override
+    public void init() {
+        requestMtu(247).with(((device, mtu) -> {
+        })).then((device -> {
+            enableDisconnectNotify();
+            enableLockedNotify();
+        })).enqueue();
     }
 
     @Override
@@ -59,13 +67,6 @@ final class MokoBleConfig extends MokoBleManager {
     @Override
     public void read(BluetoothGattCharacteristic characteristic, byte[] value) {
         mMokoResponseCallback.onCharacteristicRead(characteristic, value);
-    }
-
-    @Override
-    public void discovered(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-        UUID lastCharacteristicUUID = characteristic.getUuid();
-        if (lockedCharacteristic.getUuid().equals(lastCharacteristicUUID))
-            mMokoResponseCallback.onServicesDiscovered(gatt);
     }
 
     @Override
@@ -99,7 +100,7 @@ final class MokoBleConfig extends MokoBleManager {
     }
 
     public void enableTHNotify() {
-        setIndicationCallback(thCharacteristic).with((device, data) -> {
+        setNotificationCallback(thCharacteristic).with((device, data) -> {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
@@ -113,7 +114,7 @@ final class MokoBleConfig extends MokoBleManager {
     }
 
     public void enableStoreNotify() {
-        setIndicationCallback(storeCharacteristic).with((device, data) -> {
+        setNotificationCallback(storeCharacteristic).with((device, data) -> {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
@@ -127,7 +128,7 @@ final class MokoBleConfig extends MokoBleManager {
     }
 
     public void enableThreeAxisNotify() {
-        setIndicationCallback(threeAxisCharacteristic).with((device, data) -> {
+        setNotificationCallback(threeAxisCharacteristic).with((device, data) -> {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
@@ -142,13 +143,13 @@ final class MokoBleConfig extends MokoBleManager {
 
 
     public void enableLockedNotify() {
-        setIndicationCallback(lockedCharacteristic).with((device, data) -> {
+        setNotificationCallback(lockedCharacteristic).with((device, data) -> {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
             mMokoResponseCallback.onCharacteristicChanged(lockedCharacteristic, value);
         });
-        enableNotifications(lockedCharacteristic).enqueue();
+        enableNotifications(lockedCharacteristic).done(device -> mMokoResponseCallback.onServicesDiscovered(gatt)).enqueue();
     }
 
     public void disableLockedNotify() {
@@ -156,7 +157,7 @@ final class MokoBleConfig extends MokoBleManager {
     }
 
     public void enableDisconnectNotify() {
-        setIndicationCallback(disconnectCharacteristic).with((device, data) -> {
+        setNotificationCallback(disconnectCharacteristic).with((device, data) -> {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
@@ -172,7 +173,7 @@ final class MokoBleConfig extends MokoBleManager {
     public void enableLightSensorNotify() {
         if (lightSensorNotifyCharacteristic == null)
             return;
-        setIndicationCallback(lightSensorNotifyCharacteristic).with((device, data) -> {
+        setNotificationCallback(lightSensorNotifyCharacteristic).with((device, data) -> {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
@@ -190,7 +191,7 @@ final class MokoBleConfig extends MokoBleManager {
     public void enableLightSensorCurrentNotify() {
         if (lightSensorCurrentCharacteristic == null)
             return;
-        setIndicationCallback(lightSensorCurrentCharacteristic).with((device, data) -> {
+        setNotificationCallback(lightSensorCurrentCharacteristic).with((device, data) -> {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
