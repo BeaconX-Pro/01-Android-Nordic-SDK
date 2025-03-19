@@ -68,8 +68,8 @@ android {
             if (variant.buildType.name == "release") {
                 // 修改aar名称
                 variant.outputs.all { output ->
-                    def formatedDate = new Date().format("yyyyMMddHHmm")
-                    outputFileName = "BXP-NORDIC_${android.defaultConfig.versionName}_${formatedDate}.aar"
+                    def formatDate = new Date().format("yyyyMMddHHmm")
+                    outputFileName = "BXP-NORDIC_${android.defaultConfig.versionName}_${formatDate}.aar"
                 }
                 // 复制aar到指定目录
                 variant.assemble.doLast {
@@ -106,9 +106,10 @@ dependencies {
         implementation files('libs/mokoSupport.jar')
         compileOnly files('libs/mokoBleLib.jar')
         implementation 'no.nordicsemi.android.support.v18:scanner:1.6.0'
-        implementation 'org.greenrobot:eventbus:3.2.0'
+        implementation 'org.greenrobot:eventbus:3.3.1'
         implementation 'com.elvishew:xlog:1.6.1'
-        implementation 'no.nordicsemi.android:ble:2.5.1'
+        implementation 'com.google.code.gson:gson:2.10.1'
+        implementation 'no.nordicsemi.android:ble:2.7.3'
         implementation 'androidx.appcompat:appcompat:1.0.0'
     }
 }

@@ -30,10 +30,10 @@ android {
 dependencies {
     api files('libs/mokoBleLib.jar')
     api 'no.nordicsemi.android.support.v18:scanner:1.6.0'
-    api 'org.greenrobot:eventbus:3.2.0'
+    api 'org.greenrobot:eventbus:3.3.1'
     api 'com.elvishew:xlog:1.6.1'
-    api 'com.google.code.gson:gson:2.8.5'
-    implementation 'no.nordicsemi.android:ble:2.7.2'
+    api 'com.google.code.gson:gson:2.10.1'
+    implementation 'no.nordicsemi.android:ble:2.7.3'
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
 }

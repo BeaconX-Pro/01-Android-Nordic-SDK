@@ -52,9 +52,9 @@ public class AboutActivity extends BaseActivity {
     public void onFeedback(View view) {
         if (isWindowLocked())
             return;
-        File trackerLog = new File(BaseApplication.PATH_LOGCAT + File.separator + "BXP-NORDIC.txt");
-        File trackerLogBak = new File(BaseApplication.PATH_LOGCAT + File.separator + "BXP-NORDIC.txt.bak");
-        File trackerCrashLog = new File(BaseApplication.PATH_LOGCAT + File.separator + "crash_log.txt");
+        File trackerLog = new File(NordicMainActivity.PATH_LOGCAT + File.separator + "BXP-NORDIC.txt");
+        File trackerLogBak = new File(NordicMainActivity.PATH_LOGCAT + File.separator + "BXP-NORDIC.txt.bak");
+        File trackerCrashLog = new File(NordicMainActivity.PATH_LOGCAT + File.separator + "crash_log.txt");
         if (!trackerLog.exists() || !trackerLog.canRead()) {
             ToastUtils.showToast(this, "File is not exists!");
             return;
