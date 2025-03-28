@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -19,7 +17,7 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
+import com.moko.bxp.nordic.databinding.ActivityQuickSwitchBinding;
 import com.moko.bxp.nordic.dialog.AlertMessageDialog;
 import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.utils.ToastUtils;
@@ -35,57 +33,23 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.cardview.widget.CardView;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class QuickSwitchActivity extends BaseActivity {
 
-    @BindView(R2.id.iv_connectable)
-    ImageView ivConnectable;
-    @BindView(R2.id.tv_connectable_status)
-    TextView tvConnectableStatus;
-    @BindView(R2.id.iv_trigger_led_notify)
-    ImageView ivTriggerLedNotify;
-    @BindView(R2.id.tv_trigger_led_notify)
-    TextView tvTriggerLedNotify;
-    @BindView(R2.id.iv_button_power)
-    ImageView ivButtonPower;
-    @BindView(R2.id.tv_button_power)
-    TextView tvButtonPower;
-    @BindView(R2.id.iv_hw_reset)
-    ImageView ivHwReset;
-    @BindView(R2.id.tv_hw_reset)
-    TextView tvHwReset;
-    @BindView(R2.id.iv_password_verify)
-    ImageView ivPasswordVerify;
-    @BindView(R2.id.tv_password_verify)
-    TextView tvPasswordVerify;
-    @BindView(R2.id.cv_hw_reset)
-    CardView cvHwReset;
-    @BindView(R2.id.cv_trigger_led_notify)
-    CardView cvTriggerLedNotify;
-    @BindView(R2.id.cv_scan_response_indicator)
-    CardView cvResponseSwitch;
-    @BindView(R2.id.iv_scan_response_indicator)
-    ImageView ivScanResponseIndicator;
-    @BindView(R2.id.tv_scan_response_indicator)
-    TextView tvScanResponseIndicator;
+    private ActivityQuickSwitchBinding mBind;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_quick_switch);
-        ButterKnife.bind(this);
+        mBind = ActivityQuickSwitchBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
 
         EventBus.getDefault().register(this);
-        boolean isNewVersion = getIntent().getBooleanExtra(AppConstants.IS_NEW_VERSION,true);
+        boolean isNewVersion = getIntent().getBooleanExtra(AppConstants.IS_NEW_VERSION, true);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
-        if (isNewVersion) cvResponseSwitch.setVisibility(View.VISIBLE);
+        if (isNewVersion) mBind.cvScanResponseIndicator.setVisibility(View.VISIBLE);
         if (!MokoSupport.getInstance().isBluetoothOpen()) {
             // 蓝牙未打开，开启蓝牙
             MokoSupport.getInstance().enableBluetooth();
@@ -148,14 +112,14 @@ public class QuickSwitchActivity extends BaseActivity {
                                     break;
                                 case GET_HW_RESET_ENABLE:
                                     if (value.length >= 4) {
-                                        cvHwReset.setVisibility(View.VISIBLE);
+                                        mBind.cvHwReset.setVisibility(View.VISIBLE);
                                         int enable = value[4] & 0xFF;
                                         setHWResetEnable(enable);
                                     }
                                     break;
                                 case GET_TRIGGER_LED_NOTIFICATION:
                                     if (value.length >= 4) {
-                                        cvTriggerLedNotify.setVisibility(View.VISIBLE);
+                                        mBind.cvTriggerLedNotify.setVisibility(View.VISIBLE);
                                         int enable = value[4] & 0xFF;
                                         setTriggerLEDNotifyEnable(enable);
                                     }
@@ -220,45 +184,45 @@ public class QuickSwitchActivity extends BaseActivity {
 
     public void setPasswordVerify(int enable) {
         this.enablePasswordVerify = enable == 1;
-        ivPasswordVerify.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-        tvPasswordVerify.setText(enablePasswordVerify ? "Enable" : "Disable");
-        tvPasswordVerify.setEnabled(enablePasswordVerify);
+        mBind.ivPasswordVerify.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+        mBind.tvPasswordVerify.setText(enablePasswordVerify ? "Enable" : "Disable");
+        mBind.tvPasswordVerify.setEnabled(enablePasswordVerify);
     }
 
     boolean enableConnected;
 
     public void setConnectable(int enable) {
         enableConnected = enable == 1;
-        ivConnectable.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-        tvConnectableStatus.setText(enableConnected ? "Enable" : "Disable");
-        tvConnectableStatus.setEnabled(enableConnected);
+        mBind.ivConnectable.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+        mBind.tvConnectableStatus.setText(enableConnected ? "Enable" : "Disable");
+        mBind.tvConnectableStatus.setEnabled(enableConnected);
     }
 
     private boolean enableButtonPower;
 
     public void setButtonPower(int enable) {
         this.enableButtonPower = enable == 1;
-        ivButtonPower.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-        tvButtonPower.setText(enableButtonPower ? "Enable" : "Disable");
-        tvButtonPower.setEnabled(enableButtonPower);
+        mBind.ivButtonPower.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+        mBind.tvButtonPower.setText(enableButtonPower ? "Enable" : "Disable");
+        mBind.tvButtonPower.setEnabled(enableButtonPower);
     }
 
     private boolean enableHWReset;
 
     public void setHWResetEnable(int enable) {
         this.enableHWReset = enable == 1;
-        ivHwReset.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-        tvHwReset.setText(enableHWReset ? "Enable" : "Disable");
-        tvHwReset.setEnabled(enableHWReset);
+        mBind.ivHwReset.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+        mBind.tvHwReset.setText(enableHWReset ? "Enable" : "Disable");
+        mBind.tvHwReset.setEnabled(enableHWReset);
     }
 
     private boolean enableTriggerLEDNotify;
 
     public void setTriggerLEDNotifyEnable(int enable) {
         this.enableTriggerLEDNotify = enable == 1;
-        ivTriggerLedNotify.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-        tvTriggerLedNotify.setText(enableTriggerLEDNotify ? "Enable" : "Disable");
-        tvTriggerLedNotify.setEnabled(enableTriggerLEDNotify);
+        mBind.ivTriggerLedNotify.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+        mBind.tvTriggerLedNotify.setText(enableTriggerLEDNotify ? "Enable" : "Disable");
+        mBind.tvTriggerLedNotify.setEnabled(enableTriggerLEDNotify);
     }
 
     public void onChangeConnectable(View view) {
@@ -339,9 +303,9 @@ public class QuickSwitchActivity extends BaseActivity {
 
     public void setScanResponseIndicator(int enable) {
         enableScanResponse = enable == 1;
-        ivScanResponseIndicator.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-        tvScanResponseIndicator.setText(enable == 1 ? "Enable" : "Disable");
-        tvScanResponseIndicator.setEnabled(enable == 1);
+        mBind.ivScanResponseIndicator.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+        mBind.tvScanResponseIndicator.setText(enable == 1 ? "Enable" : "Disable");
+        mBind.tvScanResponseIndicator.setEnabled(enable == 1);
     }
 
     public void onChangeScanResponseIndicator(View view) {

@@ -16,9 +16,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.elvishew.xlog.XLog;
@@ -29,10 +26,10 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
-import com.moko.bxp.nordic.adapter.BeaconXListAdapter;
 import com.moko.bxp.nordic.BuildConfig;
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
+import com.moko.bxp.nordic.adapter.BeaconXListAdapter;
+import com.moko.bxp.nordic.databinding.ActivityMainBinding;
 import com.moko.bxp.nordic.dialog.AlertMessageDialog;
 import com.moko.bxp.nordic.dialog.LoadingDialog;
 import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
@@ -62,26 +59,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 
 public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCallback, BaseQuickAdapter.OnItemChildClickListener {
 
-    @BindView(R2.id.iv_refresh)
-    ImageView ivRefresh;
-    @BindView(R2.id.rv_devices)
-    RecyclerView rvDevices;
-    @BindView(R2.id.tv_device_num)
-    TextView tvDeviceNum;
-    @BindView(R2.id.rl_edit_filter)
-    RelativeLayout rl_edit_filter;
-    @BindView(R2.id.rl_filter)
-    RelativeLayout rl_filter;
-    @BindView(R2.id.tv_filter)
-    TextView tv_filter;
+    private ActivityMainBinding mBind;
     private boolean mReceiverTag = false;
     private ConcurrentHashMap<String, BeaconXInfo> beaconXInfoHashMap;
     private ArrayList<BeaconXInfo> beaconXInfos;
@@ -96,8 +78,8 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        mBind = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         // 初始化Xlog
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             // 优先保存到SD卡中
@@ -117,11 +99,11 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
         adapter.replaceData(beaconXInfos);
         adapter.setOnItemChildClickListener(this);
         adapter.openLoadAnimation();
-        rvDevices.setLayoutManager(new LinearLayoutManager(this));
+        mBind.rvDevices.setLayoutManager(new LinearLayoutManager(this));
         DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         itemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.shape_recycleview_divider));
-        rvDevices.addItemDecoration(itemDecoration);
-        rvDevices.setAdapter(adapter);
+        mBind.rvDevices.addItemDecoration(itemDecoration);
+        mBind.rvDevices.setAdapter(adapter);
 
         mHandler = new Handler(Looper.getMainLooper());
         mokoBleScanner = new MokoBleScanner(this);
@@ -260,7 +242,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
                                         mokoBleScanner.stopScanDevice();
                                     }
                                     showLoadingProgressDialog();
-                                    ivRefresh.postDelayed(() -> MokoSupport.getInstance().connDevice(mSelectedBeaconXMac), 500);
+                                    mBind.ivRefresh.postDelayed(() -> MokoSupport.getInstance().connDevice(mSelectedBeaconXMac), 500);
                                 }
 
                                 @Override
@@ -349,7 +331,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
                         @Override
                         public void run() {
                             adapter.replaceData(beaconXInfos);
-                            tvDeviceNum.setText(String.format("DEVICE(%d)", beaconXInfos.size()));
+                            mBind.tvDeviceNum.setText(String.format("DEVICE(%d)", beaconXInfos.size()));
                         }
                     });
                     try {
@@ -495,7 +477,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
             }
             mSelectedBeaconXMac = beaconXInfo.mac;
             showLoadingProgressDialog();
-            ivRefresh.postDelayed(new Runnable() {
+            mBind.ivRefresh.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     MokoSupport.getInstance().connDevice(beaconXInfo.mac);
@@ -546,8 +528,8 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
             if (!TextUtils.isEmpty(filterName)
                     || !TextUtils.isEmpty(showFilterMac)
                     || filterRssi != -100) {
-                rl_filter.setVisibility(View.VISIBLE);
-                rl_edit_filter.setVisibility(View.GONE);
+                mBind.rlFilter.setVisibility(View.VISIBLE);
+                mBind.rlEditFilter.setVisibility(View.GONE);
                 StringBuilder stringBuilder = new StringBuilder();
                 if (!TextUtils.isEmpty(filterName)) {
                     stringBuilder.append(filterName);
@@ -561,10 +543,10 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
                     stringBuilder.append(String.format("%sdBm", filterRssi + ""));
                     stringBuilder.append(";");
                 }
-                tv_filter.setText(stringBuilder.toString());
+                mBind.tvFilter.setText(stringBuilder.toString());
             } else {
-                rl_filter.setVisibility(View.GONE);
-                rl_edit_filter.setVisibility(View.VISIBLE);
+                mBind.rlFilter.setVisibility(View.GONE);
+                mBind.rlEditFilter.setVisibility(View.VISIBLE);
             }
             if (isWindowLocked())
                 return;
@@ -621,8 +603,8 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
             mHandler.removeMessages(0);
             mokoBleScanner.stopScanDevice();
         }
-        rl_filter.setVisibility(View.GONE);
-        rl_edit_filter.setVisibility(View.VISIBLE);
+        mBind.rlFilter.setVisibility(View.GONE);
+        mBind.rlEditFilter.setVisibility(View.VISIBLE);
         filterName = "";
         filterMac = "";
         filterRssi = -100;

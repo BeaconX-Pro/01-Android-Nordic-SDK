@@ -23,7 +23,7 @@ package com.moko.bxp.nordic.service;
 
 import android.app.Activity;
 
-import com.moko.support.nordic.dfu.DfuBaseService;
+import no.nordicsemi.android.dfu.DfuBaseService;
 
 
 public class DfuServiceNordic extends DfuBaseService {

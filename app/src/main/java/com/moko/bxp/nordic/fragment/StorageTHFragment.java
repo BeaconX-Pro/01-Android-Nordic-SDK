@@ -6,28 +6,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
 import com.moko.bxp.nordic.activity.THDataActivity;
+import com.moko.bxp.nordic.databinding.FragmentStorageTHBinding;
 import com.moko.bxp.nordic.dialog.BottomDialog;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class StorageTHFragment extends Fragment {
 
     private static final String TAG = "StorageTHFragment";
-    @BindView(R2.id.tv_storage_temp)
-    TextView tvStorageTemp;
-    @BindView(R2.id.tv_storage_humidity)
-    TextView tvStorageHumidity;
-    @BindView(R2.id.tv_t_h_tips)
-    TextView tvTHTips;
+    private FragmentStorageTHBinding mBind;
     private ArrayList<String> mHumidityDatas;
     private ArrayList<String> mTempDatas;
 
@@ -52,8 +43,7 @@ public class StorageTHFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.fragment_storage_t_h, container, false);
-        ButterKnife.bind(this, view);
+        mBind = FragmentStorageTHBinding.inflate(inflater, container, false);
         activity = (THDataActivity) getActivity();
         mHumidityDatas = new ArrayList<>();
         for (int i = 1; i <= 190; i++) {
@@ -63,7 +53,7 @@ public class StorageTHFragment extends Fragment {
         for (int i = 1; i <= 120; i++) {
             mTempDatas.add(MokoUtils.getDecimalFormat("0.0").format(i * 0.5));
         }
-        return view;
+        return mBind.getRoot();
     }
 
     @Override
@@ -92,7 +82,7 @@ public class StorageTHFragment extends Fragment {
             mTempSelected = 0;
         String tempStr = mTempDatas.get(mTempSelected);
         String humiStr = mHumidityDatas.get(mHumiditySelected);
-        tvTHTips.setText(getString(R.string.t_h_tips_0, tempStr, humiStr));
+        mBind.tvTHTips.setText(getString(R.string.t_h_tips_0, tempStr, humiStr));
 //        else if (mTempSelected == 0 && mHumiditySelected > 0) {
 //            tvTHTips.setText(getString(R.string.t_h_tips_1, mHumiditySelected));
 //        } else if (mTempSelected > 0 && mHumiditySelected == 0) {
@@ -101,7 +91,7 @@ public class StorageTHFragment extends Fragment {
 //        } else if (mTempSelected == 0 && mHumiditySelected == 0) {
 //            tvTHTips.setText(R.string.t_h_tips_3);
 //        }
-        tvStorageTemp.setText(tempStr);
+        mBind.tvStorageTemp.setText(tempStr);
     }
 
     private int mHumiditySelected = 1;
@@ -112,7 +102,7 @@ public class StorageTHFragment extends Fragment {
             mHumiditySelected = 0;
         String tempStr = mTempDatas.get(mTempSelected);
         String humiStr = mHumidityDatas.get(mHumiditySelected);
-        tvTHTips.setText(getString(R.string.t_h_tips_0, tempStr, humiStr));
+        mBind.tvTHTips.setText(getString(R.string.t_h_tips_0, tempStr, humiStr));
 //        else if (mTempSelected == 0 && mHumiditySelected > 0) {
 //            tvTHTips.setText(getString(R.string.t_h_tips_1, humiStr));
 //        } else if (mTempSelected > 0 && mHumiditySelected == 0) {
@@ -120,7 +110,7 @@ public class StorageTHFragment extends Fragment {
 //        } else if (mTempSelected == 0 && mHumiditySelected == 0) {
 //            tvTHTips.setText(R.string.t_h_tips_3);
 //        }
-        tvStorageHumidity.setText(humiStr);
+        mBind.tvStorageHumidity.setText(humiStr);
     }
 
     public void selectStorageTemp() {
@@ -130,8 +120,8 @@ public class StorageTHFragment extends Fragment {
             mTempSelected = value;
             String tempStr = mTempDatas.get(mTempSelected);
             String humiStr = mHumidityDatas.get(mHumiditySelected);
-            tvTHTips.setText(getString(R.string.t_h_tips_0, tempStr, humiStr));
-            tvStorageTemp.setText(tempStr);
+            mBind.tvTHTips.setText(getString(R.string.t_h_tips_0, tempStr, humiStr));
+            mBind.tvStorageTemp.setText(tempStr);
             activity.setSelectedTemp(value + 1);
         });
         tempDialog.show(activity.getSupportFragmentManager());
@@ -144,8 +134,8 @@ public class StorageTHFragment extends Fragment {
             mHumiditySelected = value;
             String tempStr = mTempDatas.get(mTempSelected);
             String humiStr = mHumidityDatas.get(mHumiditySelected);
-            tvTHTips.setText(getString(R.string.t_h_tips_0, tempStr, humiStr));
-            tvStorageHumidity.setText(humiStr);
+            mBind.tvTHTips.setText(getString(R.string.t_h_tips_0, tempStr, humiStr));
+            mBind.tvStorageHumidity.setText(humiStr);
             activity.setSelectedHumidity(value + 1);
         });
         humidityDialog.show(activity.getSupportFragmentManager());

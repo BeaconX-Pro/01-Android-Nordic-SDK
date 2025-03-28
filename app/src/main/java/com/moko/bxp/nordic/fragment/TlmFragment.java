@@ -7,17 +7,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
-import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
-import com.moko.bxp.nordic.able.ISlotDataAction;
-import com.moko.bxp.nordic.activity.SlotDataActivity;
-import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.bxp.nordic.R;
+import com.moko.bxp.nordic.able.ISlotDataAction;
+import com.moko.bxp.nordic.activity.SlotDataActivity;
+import com.moko.bxp.nordic.databinding.FragmentTlmBinding;
+import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 import com.moko.support.nordic.entity.SlotFrameTypeEnum;
@@ -25,20 +23,12 @@ import com.moko.support.nordic.entity.TxPowerEnum;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class TlmFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, ISlotDataAction {
 
     private static final String TAG = "TlmFragment";
 
 
-    @BindView(R2.id.sb_tx_power)
-    SeekBar sbTxPower;
-    @BindView(R2.id.tv_tx_power)
-    TextView tvTxPower;
-    @BindView(R2.id.et_adv_interval)
-    EditText etAdvInterval;
+    private FragmentTlmBinding mBind;
 
     private SlotDataActivity activity;
 
@@ -60,29 +50,28 @@ public class TlmFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.fragment_tlm, container, false);
-        ButterKnife.bind(this, view);
+        mBind = FragmentTlmBinding.inflate(inflater, container, false);
         activity = (SlotDataActivity) getActivity();
-        sbTxPower.setOnSeekBarChangeListener(this);
+        mBind.sbTxPower.setOnSeekBarChangeListener(this);
         setDefault();
-        return view;
+        return mBind.getRoot();
     }
 
     private void setDefault() {
         if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.NO_DATA) {
-            etAdvInterval.setText("10");
-            etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
-            sbTxPower.setProgress(6);
+            mBind.etAdvInterval.setText("10");
+            mBind.etAdvInterval.setSelection(mBind.etAdvInterval.getText().toString().length());
+            mBind.sbTxPower.setProgress(6);
         } else {
             int advIntervalProgress = activity.slotData.advInterval / 100;
-            etAdvInterval.setText(advIntervalProgress + "");
-            etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
+            mBind.etAdvInterval.setText(advIntervalProgress + "");
+            mBind.etAdvInterval.setSelection(mBind.etAdvInterval.getText().toString().length());
             advIntervalBytes = MokoUtils.toByteArray(activity.slotData.advInterval, 2);
 
             int txPowerProgress = TxPowerEnum.fromTxPower(activity.slotData.txPower).ordinal();
-            sbTxPower.setProgress(txPowerProgress);
+            mBind.sbTxPower.setProgress(txPowerProgress);
             txPowerBytes = MokoUtils.toByteArray(activity.slotData.txPower, 1);
-            tvTxPower.setText(String.format("%ddBm", activity.slotData.txPower));
+            mBind.tvTxPower.setText(String.format("%ddBm", activity.slotData.txPower));
         }
     }
 
@@ -116,7 +105,7 @@ public class TlmFragment extends Fragment implements SeekBar.OnSeekBarChangeList
         if (viewId == R.id.sb_tx_power) {
             TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
             int txPower = txPowerEnum.getTxPower();
-            tvTxPower.setText(String.format("%ddBm", txPower));
+            mBind.tvTxPower.setText(String.format("%ddBm", txPower));
             txPowerBytes = MokoUtils.toByteArray(txPower, 1);
         }
     }
@@ -133,7 +122,7 @@ public class TlmFragment extends Fragment implements SeekBar.OnSeekBarChangeList
 
     @Override
     public boolean isValid() {
-        String advInterval = etAdvInterval.getText().toString();
+        String advInterval = mBind.etAdvInterval.getText().toString();
         if (TextUtils.isEmpty(advInterval)) {
             ToastUtils.showToast(activity, "The Adv interval can not be empty.");
             return false;
@@ -163,16 +152,16 @@ public class TlmFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     public void resetParams() {
         if (activity.slotData.frameTypeEnum == activity.currentFrameTypeEnum) {
             int advIntervalProgress = activity.slotData.advInterval / 100;
-            etAdvInterval.setText(advIntervalProgress + "");
-            etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
+            mBind.etAdvInterval.setText(advIntervalProgress + "");
+            mBind.etAdvInterval.setSelection(mBind.etAdvInterval.getText().toString().length());
             advIntervalBytes = MokoUtils.toByteArray(activity.slotData.advInterval, 2);
 
             int txPowerProgress = TxPowerEnum.fromTxPower(activity.slotData.txPower).ordinal();
-            sbTxPower.setProgress(txPowerProgress);
+            mBind.sbTxPower.setProgress(txPowerProgress);
         } else {
-            etAdvInterval.setText("10");
-            etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
-            sbTxPower.setProgress(6);
+            mBind.etAdvInterval.setText("10");
+            mBind.etAdvInterval.setSelection(mBind.etAdvInterval.getText().toString().length());
+            mBind.sbTxPower.setProgress(6);
         }
     }
 }

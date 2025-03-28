@@ -11,9 +11,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -22,7 +20,7 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
+import com.moko.bxp.nordic.databinding.ActivityAxisBinding;
 import com.moko.bxp.nordic.dialog.BottomDialog;
 import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.utils.ToastUtils;
@@ -37,29 +35,9 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarChangeListener {
 
-    @BindView(R2.id.iv_sync)
-    ImageView ivSync;
-    @BindView(R2.id.tv_sync)
-    TextView tvSync;
-    @BindView(R2.id.tv_x_data)
-    TextView tvXData;
-    @BindView(R2.id.tv_y_data)
-    TextView tvYData;
-    @BindView(R2.id.tv_z_data)
-    TextView tvZData;
-    @BindView(R2.id.tv_axis_scale)
-    TextView tvAxisScale;
-    @BindView(R2.id.tv_axis_data_rate)
-    TextView tvAxisDataRate;
-    @BindView(R2.id.sb_trigger_sensitivity)
-    SeekBar sbTriggerSensitivity;
-    @BindView(R2.id.tv_trigger_sensitivity)
-    TextView tvTriggerSensitivity;
+    private ActivityAxisBinding mBind;
     private boolean mReceiverTag = false;
     private ArrayList<String> axisDataRates;
     private ArrayList<String> axisScales;
@@ -72,8 +50,8 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_axis);
-        ButterKnife.bind(this);
+        mBind = ActivityAxisBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         axisDataRates = new ArrayList<>();
         axisDataRates.add("1Hz");
         axisDataRates.add("10Hz");
@@ -85,7 +63,7 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
         axisScales.add("±4g");
         axisScales.add("±8g");
         axisScales.add("±16g");
-        sbTriggerSensitivity.setOnSeekBarChangeListener(this);
+        mBind.sbTriggerSensitivity.setOnSeekBarChangeListener(this);
 
         EventBus.getDefault().register(this);
 
@@ -149,29 +127,29 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
                                 case GET_AXIS_PARAMS:
                                     if (value.length > 6) {
                                         mSelectedRate = value[4] & 0xff;
-                                        tvAxisDataRate.setText(axisDataRates.get(mSelectedRate));
+                                        mBind.tvAxisDataRate.setText(axisDataRates.get(mSelectedRate));
                                         mSelectedScale = value[5] & 0xff;
-                                        tvAxisScale.setText(axisScales.get(mSelectedScale));
+                                        mBind.tvAxisScale.setText(axisScales.get(mSelectedScale));
                                         mSelectedSensitivity = value[6] & 0xff;
                                         if (MokoSupport.isNewVersion) {
-                                            sbTriggerSensitivity.setProgress(mSelectedSensitivity - 1);
+                                            mBind.sbTriggerSensitivity.setProgress(mSelectedSensitivity - 1);
                                             if (mSelectedScale == 0) {
-                                                sbTriggerSensitivity.setMax(19);
+                                                mBind.sbTriggerSensitivity.setMax(19);
                                             }
                                             if (mSelectedScale == 1) {
-                                                sbTriggerSensitivity.setMax(39);
+                                                mBind.sbTriggerSensitivity.setMax(39);
                                             }
                                             if (mSelectedScale == 2) {
-                                                sbTriggerSensitivity.setMax(79);
+                                                mBind.sbTriggerSensitivity.setMax(79);
                                             }
                                             if (mSelectedScale == 3) {
-                                                sbTriggerSensitivity.setMax(159);
+                                                mBind.sbTriggerSensitivity.setMax(159);
                                             }
-                                            tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("0.0g").format(mSelectedSensitivity * 0.1));
+                                            mBind.tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("0.0g").format(mSelectedSensitivity * 0.1));
                                         } else {
-                                            sbTriggerSensitivity.setProgress(mSelectedSensitivity - 7);
-                                            sbTriggerSensitivity.setMax(248);
-                                            tvTriggerSensitivity.setText(String.valueOf(mSelectedSensitivity));
+                                            mBind.sbTriggerSensitivity.setProgress(mSelectedSensitivity - 7);
+                                            mBind.sbTriggerSensitivity.setMax(248);
+                                            mBind.tvTriggerSensitivity.setText(String.valueOf(mSelectedSensitivity));
                                         }
                                     }
                                     break;
@@ -208,9 +186,9 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
                         if (value.length > 5) {
                             String axisHexStr = MokoUtils.bytesToHexString(value);
                             int length = axisHexStr.length();
-                            tvZData.setText(String.format("Z-axis:0x%s", axisHexStr.substring(length - 4).toUpperCase()));
-                            tvYData.setText(String.format("Y-axis:0x%s", axisHexStr.substring(length - 8, length - 4).toUpperCase()));
-                            tvXData.setText(String.format("X-axis:0x%s", axisHexStr.substring(length - 12, length - 8).toUpperCase()));
+                            mBind.tvZData.setText(String.format("Z-axis:0x%s", axisHexStr.substring(length - 4).toUpperCase()));
+                            mBind.tvYData.setText(String.format("Y-axis:0x%s", axisHexStr.substring(length - 8, length - 4).toUpperCase()));
+                            mBind.tvXData.setText(String.format("X-axis:0x%s", axisHexStr.substring(length - 12, length - 8).toUpperCase()));
                         }
                         break;
                 }
@@ -281,10 +259,10 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (MokoSupport.isNewVersion) {
             mSelectedSensitivity = progress + 1;
-            tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("0.0g").format(mSelectedSensitivity * 0.1));
+            mBind.tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("0.0g").format(mSelectedSensitivity * 0.1));
         } else {
             mSelectedSensitivity = progress + 7;
-            tvTriggerSensitivity.setText(mSelectedSensitivity + "");
+            mBind.tvTriggerSensitivity.setText(mSelectedSensitivity + "");
         }
     }
 
@@ -319,13 +297,13 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
             isSync = true;
             MokoSupport.getInstance().enableThreeAxisNotify();
             Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
-            ivSync.startAnimation(animation);
-            tvSync.setText("Stop");
+            mBind.ivSync.startAnimation(animation);
+            mBind.tvSync.setText("Stop");
         } else {
             MokoSupport.getInstance().disableThreeAxisNotify();
             isSync = false;
-            ivSync.clearAnimation();
-            tvSync.setText("Sync");
+            mBind.ivSync.clearAnimation();
+            mBind.tvSync.setText("Sync");
         }
     }
 
@@ -336,20 +314,20 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
         scaleDialog.setDatas(axisScales, mSelectedScale);
         scaleDialog.setListener(value -> {
             mSelectedScale = value;
-            tvAxisScale.setText(axisScales.get(value));
+            mBind.tvAxisScale.setText(axisScales.get(value));
             if (MokoSupport.isNewVersion) {
-                sbTriggerSensitivity.setProgress(0);
+                mBind.sbTriggerSensitivity.setProgress(0);
                 if (mSelectedScale == 0) {
-                    sbTriggerSensitivity.setMax(19);
+                    mBind.sbTriggerSensitivity.setMax(19);
                 }
                 if (mSelectedScale == 1) {
-                    sbTriggerSensitivity.setMax(39);
+                    mBind.sbTriggerSensitivity.setMax(39);
                 }
                 if (mSelectedScale == 2) {
-                    sbTriggerSensitivity.setMax(79);
+                    mBind.sbTriggerSensitivity.setMax(79);
                 }
                 if (mSelectedScale == 3) {
-                    sbTriggerSensitivity.setMax(159);
+                    mBind.sbTriggerSensitivity.setMax(159);
                 }
             }
         });
@@ -363,7 +341,7 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
         dataRateDialog.setDatas(axisDataRates, mSelectedRate);
         dataRateDialog.setListener(value -> {
             mSelectedRate = value;
-            tvAxisDataRate.setText(axisDataRates.get(value));
+            mBind.tvAxisDataRate.setText(axisDataRates.get(value));
         });
         dataRateDialog.show(getSupportFragmentManager());
     }

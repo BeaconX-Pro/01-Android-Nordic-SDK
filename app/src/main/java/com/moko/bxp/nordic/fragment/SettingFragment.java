@@ -7,33 +7,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.RelativeLayout;
 
 import com.moko.ble.lib.task.OrderTask;
-import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
 import com.moko.bxp.nordic.activity.DeviceInfoActivity;
+import com.moko.bxp.nordic.databinding.FragmentSettingBinding;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class SettingFragment extends Fragment {
 
     private static final String TAG = "SettingFragment";
-    @BindView(R2.id.rl_password)
-    RelativeLayout rlPassword;
-    @BindView(R2.id.rl_reset_factory)
-    RelativeLayout rlResetFactory;
-    @BindView(R2.id.rl_sensor_config)
-    RelativeLayout rlSensorConfig;
-    @BindView(R2.id.et_effective_click_interval)
-    EditText etEffectiveClickInterval;
+    private FragmentSettingBinding mBind;
 
     private DeviceInfoActivity activity;
 
@@ -55,10 +42,9 @@ public class SettingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.fragment_setting, container, false);
-        ButterKnife.bind(this, view);
+        mBind = FragmentSettingBinding.inflate(inflater, container, false);
         activity = (DeviceInfoActivity) getActivity();
-        return view;
+        return mBind.getRoot();
     }
 
     @Override
@@ -80,31 +66,31 @@ public class SettingFragment extends Fragment {
     }
 
     public void setModifyPasswordShown(boolean isSupportModifyPassword) {
-        rlPassword.setVisibility(isSupportModifyPassword ? View.VISIBLE : View.GONE);
+        mBind.rlPassword.setVisibility(isSupportModifyPassword ? View.VISIBLE : View.GONE);
     }
 
     public void setResetShown(int enable) {
-        rlResetFactory.setVisibility(enable == 1 ? View.VISIBLE : View.GONE);
+        mBind.rlResetFactory.setVisibility(enable == 1 ? View.VISIBLE : View.GONE);
     }
 
     public void setDeviceType(int deviceType) {
         switch (deviceType) {
             case 0:
-                rlSensorConfig.setVisibility(View.GONE);
+                mBind.rlSensorConfig.setVisibility(View.GONE);
                 break;
             case 1:
-                rlSensorConfig.setVisibility(View.VISIBLE);
+                mBind.rlSensorConfig.setVisibility(View.VISIBLE);
                 break;
 
         }
     }
 
     public void setEffectiveClickInterval(int interval) {
-        etEffectiveClickInterval.setText(String.valueOf(interval / 100));
+        mBind.etEffectiveClickInterval.setText(String.valueOf(interval / 100));
     }
 
     public boolean isValid() {
-        String intervalStr = etEffectiveClickInterval.getText().toString();
+        String intervalStr = mBind.etEffectiveClickInterval.getText().toString();
         if (TextUtils.isEmpty(intervalStr))
             return false;
         int interval = Integer.parseInt(intervalStr);
@@ -114,7 +100,7 @@ public class SettingFragment extends Fragment {
     }
 
     public void saveParams() {
-        String intervalStr = etEffectiveClickInterval.getText().toString();
+        String intervalStr =mBind.etEffectiveClickInterval.getText().toString();
         int interval = Integer.parseInt(intervalStr) * 100;
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setEffectiveClickInterval(interval));

@@ -12,13 +12,17 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.elvishew.xlog.XLog;
+import com.moko.ble.lib.MokoConstants;
+import com.moko.ble.lib.event.ConnectStatusEvent;
+import com.moko.ble.lib.event.OrderTaskResponseEvent;
+import com.moko.ble.lib.task.OrderTask;
+import com.moko.ble.lib.task.OrderTaskResponse;
+import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
+import com.moko.bxp.nordic.databinding.ActivityThBinding;
 import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.fragment.StorageHumidityFragment;
 import com.moko.bxp.nordic.fragment.StorageTHFragment;
@@ -26,12 +30,6 @@ import com.moko.bxp.nordic.fragment.StorageTempFragment;
 import com.moko.bxp.nordic.fragment.StorageTimeFragment;
 import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.bxp.nordic.utils.Utils;
-import com.moko.ble.lib.MokoConstants;
-import com.moko.ble.lib.event.ConnectStatusEvent;
-import com.moko.ble.lib.event.OrderTaskResponseEvent;
-import com.moko.ble.lib.task.OrderTask;
-import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 import com.moko.support.nordic.entity.OrderCHAR;
@@ -45,25 +43,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import cn.carbswang.android.numberpickerview.library.NumberPickerView;
 
 public class THDataActivity extends BaseActivity implements NumberPickerView.OnValueChangeListener {
 
-    @BindView(R2.id.tv_temp)
-    TextView tvTemp;
-    @BindView(R2.id.tv_humidity)
-    TextView tvHumidity;
-    @BindView(R2.id.npv_storage_condition)
-    NumberPickerView npvStorageCondition;
-    //    @BindView(R2.id.frame_storage_condition)
-//    FrameLayout frameStorageCondition;
-    @BindView(R2.id.tv_update_date)
-    TextView tvUpdateDate;
-    @BindView(R2.id.et_period)
-    EditText etPeriod;
-
+    private ActivityThBinding mBind;
     private FragmentManager fragmentManager;
     private StorageTempFragment tempFragment;
     private StorageHumidityFragment humidityFragment;
@@ -83,15 +67,15 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_th);
-        ButterKnife.bind(this);
+        mBind = ActivityThBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
 
         fragmentManager = getFragmentManager();
         createFragments();
-        npvStorageCondition.setOnValueChangedListener(this);
-        npvStorageCondition.setValue(0);
-        npvStorageCondition.setMinValue(0);
-        npvStorageCondition.setMaxValue(3);
+        mBind.npvStorageCondition.setOnValueChangedListener(this);
+        mBind.npvStorageCondition.setValue(0);
+        mBind.npvStorageCondition.setMinValue(0);
+        mBind.npvStorageCondition.setMaxValue(3);
         EventBus.getDefault().register(this);
 
         // 注册广播接收器
@@ -218,26 +202,26 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
                                     if (value.length > 4) {
                                         byte[] period = Arrays.copyOfRange(value, 4, 6);
                                         String periodStr = MokoUtils.toInt(period) + "";
-                                        etPeriod.setText(periodStr);
-                                        etPeriod.setSelection(periodStr.length());
+                                        mBind.etPeriod.setText(periodStr);
+                                        mBind.etPeriod.setSelection(periodStr.length());
                                     }
                                     break;
                                 case GET_STORAGE_CONDITION:
                                     if (value.length > 6 && (value[4] & 0xff) == 0) {
                                         mStorageType = 0;
-                                        npvStorageCondition.setValue(0);
+                                        mBind.npvStorageCondition.setValue(0);
                                         byte[] temp = Arrays.copyOfRange(value, 5, 7);
                                         mSelectedTemp = MokoUtils.toInt(temp) / 5;
                                         tempFragment.setTempData(mSelectedTemp);
                                     } else if (value.length > 6 && (value[4] & 0xff) == 1) {
                                         mStorageType = 1;
-                                        npvStorageCondition.setValue(1);
+                                        mBind.npvStorageCondition.setValue(1);
                                         byte[] humidity = Arrays.copyOfRange(value, 5, 7);
                                         mSelectedHumidity = MokoUtils.toInt(humidity) / 5;
                                         humidityFragment.setHumidityData(mSelectedHumidity);
                                     } else if (value.length > 8 && (value[4] & 0xff) == 2) {
                                         mStorageType = 2;
-                                        npvStorageCondition.setValue(2);
+                                        mBind.npvStorageCondition.setValue(2);
                                         byte[] temp = Arrays.copyOfRange(value, 5, 7);
                                         byte[] humidity = Arrays.copyOfRange(value, 7, 9);
                                         mSelectedTemp = MokoUtils.toInt(temp) / 5;
@@ -246,7 +230,7 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
                                         thFragment.setHumidityData(mSelectedHumidity);
                                     } else if (value.length > 5 && (value[4] & 0xff) == 3) {
                                         mStorageType = 3;
-                                        npvStorageCondition.setValue(3);
+                                        mBind.npvStorageCondition.setValue(3);
                                         mSelectedTime = value[5] & 0xff;
                                         timeFragment.setTimeData(mSelectedTime);
                                     }
@@ -267,7 +251,7 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
                                         calendar.set(Calendar.HOUR_OF_DAY, hour);
                                         calendar.set(Calendar.MINUTE, minute);
                                         calendar.set(Calendar.SECOND, second);
-                                        tvUpdateDate.setText(Utils.calendar2strDate(calendar, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS));
+                                        mBind.tvUpdateDate.setText(Utils.calendar2strDate(calendar, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS));
                                     }
                                     break;
                                 case SET_TH_PERIOD:
@@ -318,10 +302,10 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
                         if (value.length > 3) {
                             byte[] tempBytes = Arrays.copyOfRange(value, 0, 2);
                             float temp = MokoUtils.byte2short(tempBytes) * 0.1f;
-                            tvTemp.setText(MokoUtils.getDecimalFormat("0.0").format(temp));
+                            mBind.tvTemp.setText(MokoUtils.getDecimalFormat("0.0").format(temp));
                             byte[] humidityBytes = Arrays.copyOfRange(value, 2, 4);
                             float humidity = MokoUtils.toInt(humidityBytes) * 0.1f;
-                            tvHumidity.setText(MokoUtils.getDecimalFormat("0.0").format(humidity));
+                            mBind.tvHumidity.setText(MokoUtils.getDecimalFormat("0.0").format(humidity));
                         }
                         break;
                 }
@@ -430,7 +414,7 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
         if (isWindowLocked())
             return;
         // 保存
-        String periodStr = etPeriod.getText().toString();
+        String periodStr = mBind.etPeriod.getText().toString();
         if (TextUtils.isEmpty(periodStr)) {
             ToastUtils.showToast(this, "The Sampling Period can not be empty");
             return;

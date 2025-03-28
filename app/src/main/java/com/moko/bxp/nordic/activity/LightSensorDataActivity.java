@@ -9,9 +9,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.elvishew.xlog.XLog;
 import com.moko.ble.lib.MokoConstants;
@@ -23,8 +20,8 @@ import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.BuildConfig;
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
 import com.moko.bxp.nordic.adapter.LightSensorDataListAdapter;
+import com.moko.bxp.nordic.databinding.ActivityLightSensorBinding;
 import com.moko.bxp.nordic.dialog.AlertMessageDialog;
 import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.utils.ToastUtils;
@@ -46,31 +43,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class LightSensorDataActivity extends BaseActivity {
 
     private static final String TRACKED_FILE = "light_sensor.txt";
 
     private static String PATH_LOGCAT;
-    @BindView(R2.id.tv_light_sensor_status)
-    TextView tvLightSensorStatus;
-    @BindView(R2.id.tv_update_date)
-    TextView tvUpdateDate;
-    @BindView(R2.id.iv_sync)
-    ImageView ivSync;
-    @BindView(R2.id.tv_sync)
-    TextView tvSync;
-    @BindView(R2.id.tv_export)
-    TextView tvExport;
-    @BindView(R2.id.ll_data)
-    LinearLayout llData;
-    @BindView(R2.id.rv_light_data)
-    RecyclerView rvLightData;
 
-
+    private ActivityLightSensorBinding mBind;
     private boolean mIsShown;
     private boolean isSync;
     private Handler mHandler;
@@ -82,8 +62,8 @@ public class LightSensorDataActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_light_sensor);
-        ButterKnife.bind(this);
+        mBind = ActivityLightSensorBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             // 优先保存到SD卡中
             PATH_LOGCAT = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "mokoBeaconXPro" : "BXP-NORDIC") + File.separator + TRACKED_FILE;
@@ -96,20 +76,20 @@ public class LightSensorDataActivity extends BaseActivity {
         lightSensorStoreData = MokoSupport.getInstance().lightSensorStoreData;
         lightSensorStoreString = MokoSupport.getInstance().lightSensorStoreString;
         if (lightSensorStoreData != null && lightSensorStoreData.size() > 0 && lightSensorStoreString != null) {
-            tvExport.setEnabled(true);
+            mBind.tvExport.setEnabled(true);
             if (!mIsShown) {
                 mIsShown = true;
                 Drawable top = getResources().getDrawable(R.drawable.ic_download_checked);
-                tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+                mBind.tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
             }
-            llData.setVisibility(View.VISIBLE);
+            mBind.llData.setVisibility(View.VISIBLE);
         } else {
             lightSensorStoreData = new ArrayList<>();
             lightSensorStoreString = new StringBuilder();
         }
         mAdapter.replaceData(lightSensorStoreData);
-        rvLightData.setLayoutManager(new LinearLayoutManager(this));
-        rvLightData.setAdapter(mAdapter);
+        mBind.rvLightData.setLayoutManager(new LinearLayoutManager(this));
+        mBind.rvLightData.setAdapter(mAdapter);
 
         mHandler = new Handler();
         EventBus.getDefault().register(this);
@@ -154,7 +134,7 @@ public class LightSensorDataActivity extends BaseActivity {
                     case CHAR_LIGHT_SENSOR_CURRENT:
                         if (value.length == 1) {
                             int status = MokoUtils.toInt(value);
-                            tvLightSensorStatus.setText(status == 1 ? "Ambient light detected" : "Ambient light NOT detected");
+                            mBind.tvLightSensorStatus.setText(status == 1 ? "Ambient light detected" : "Ambient light NOT detected");
                         }
                         break;
                     case CHAR_PARAMS:
@@ -180,7 +160,7 @@ public class LightSensorDataActivity extends BaseActivity {
                                         calendar.set(Calendar.HOUR_OF_DAY, hour);
                                         calendar.set(Calendar.MINUTE, minute);
                                         calendar.set(Calendar.SECOND, second);
-                                        tvUpdateDate.setText(Utils.calendar2strDate(calendar, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS));
+                                        mBind.tvUpdateDate.setText(Utils.calendar2strDate(calendar, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS));
                                     }
                                     break;
                                 case SET_DEVICE_TIME:
@@ -197,9 +177,9 @@ public class LightSensorDataActivity extends BaseActivity {
                                         mIsShown = false;
                                         lightSensorStoreData.clear();
                                         mAdapter.replaceData(lightSensorStoreData);
-                                        llData.setVisibility(View.GONE);
+                                        mBind.llData.setVisibility(View.GONE);
                                         Drawable top = getResources().getDrawable(R.drawable.ic_download);
-                                        tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+                                        mBind.tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
                                         ToastUtils.showToast(this, "Erase success!");
                                     } else {
                                         ToastUtils.showToast(this, "Failed");
@@ -230,15 +210,15 @@ public class LightSensorDataActivity extends BaseActivity {
                     case CHAR_LIGHT_SENSOR_CURRENT:
                         if (value.length == 1) {
                             int status = MokoUtils.toInt(value);
-                            tvLightSensorStatus.setText(status == 1 ? "Ambient light detected" : "Ambient light NOT detected");
+                            mBind.tvLightSensorStatus.setText(status == 1 ? "Ambient light detected" : "Ambient light NOT detected");
                         }
                         break;
                     case CHAR_LIGHT_SENSOR_NOTIFY:
                         if (!mIsShown) {
                             mIsShown = true;
-                            llData.setVisibility(View.VISIBLE);
+                            mBind.llData.setVisibility(View.VISIBLE);
                             Drawable top = getResources().getDrawable(R.drawable.ic_download_checked);
-                            tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+                            mBind.tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
                         }
                         if (value.length > 6) {
                             int year = value[0] & 0xff;
@@ -257,7 +237,7 @@ public class LightSensorDataActivity extends BaseActivity {
                             calendar.set(Calendar.SECOND, second);
                             String time = Utils.calendar2strDate(calendar, AppConstants.PATTERN_YYYY_MM_DD_HH_MM_SS);
                             String statusStr = status == 1 ? "Ambient light detected" : "Ambient light NOT detected";
-                            tvLightSensorStatus.setText(statusStr);
+                            mBind.tvLightSensorStatus.setText(statusStr);
                             LightSensorStoreData data = new LightSensorStoreData();
                             data.time = time;
                             data.status = statusStr;
@@ -272,8 +252,8 @@ public class LightSensorDataActivity extends BaseActivity {
                             XLog.i("Timeout");
                             MokoSupport.getInstance().disableLightSensorNotify();
                             isSync = false;
-                            ivSync.clearAnimation();
-                            tvSync.setText("Sync");
+                            mBind.ivSync.clearAnimation();
+                            mBind.tvSync.setText("Sync");
                         }, 10 * 1000);
                         break;
                 }
@@ -344,15 +324,15 @@ public class LightSensorDataActivity extends BaseActivity {
             isSync = true;
             MokoSupport.getInstance().enableLightSensorNotify();
             Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
-            ivSync.startAnimation(animation);
-            tvSync.setText("Stop");
+            mBind.ivSync.startAnimation(animation);
+            mBind.tvSync.setText("Stop");
         } else {
             if (mHandler.hasMessages(0))
                 mHandler.removeMessages(0);
             MokoSupport.getInstance().disableLightSensorNotify();
             isSync = false;
-            ivSync.clearAnimation();
-            tvSync.setText("Sync");
+            mBind.ivSync.clearAnimation();
+            mBind.tvSync.setText("Sync");
         }
     }
 
@@ -378,7 +358,7 @@ public class LightSensorDataActivity extends BaseActivity {
         if (mIsShown) {
             showSyncingProgressDialog();
             writeLightSensorFile("");
-            tvExport.postDelayed(() -> {
+            mBind.tvExport.postDelayed(() -> {
                 dismissSyncProgressDialog();
                 String log = lightSensorStoreString.toString();
                 if (!TextUtils.isEmpty(log)) {

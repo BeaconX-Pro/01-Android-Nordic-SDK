@@ -9,18 +9,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
-import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
-import com.moko.bxp.nordic.able.ISlotDataAction;
-import com.moko.bxp.nordic.activity.SlotDataActivity;
-import com.moko.bxp.nordic.dialog.UrlSchemeDialog;
-import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.bxp.nordic.R;
+import com.moko.bxp.nordic.able.ISlotDataAction;
+import com.moko.bxp.nordic.activity.SlotDataActivity;
+import com.moko.bxp.nordic.databinding.FragmentUrlBinding;
+import com.moko.bxp.nordic.dialog.UrlSchemeDialog;
+import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 import com.moko.support.nordic.entity.SlotFrameTypeEnum;
@@ -30,27 +28,11 @@ import com.moko.support.nordic.entity.UrlSchemeEnum;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class UrlFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, ISlotDataAction {
 
     private static final String TAG = "UrlFragment";
     private final String FILTER_ASCII = "[!-~]*";
-    @BindView(R2.id.et_url)
-    EditText etUrl;
-    @BindView(R2.id.sb_adv_tx_power)
-    SeekBar sbRssi;
-    @BindView(R2.id.sb_tx_power)
-    SeekBar sbTxPower;
-    @BindView(R2.id.tv_url_scheme)
-    TextView tvUrlScheme;
-    @BindView(R2.id.tv_adv_tx_power)
-    TextView tvRssi;
-    @BindView(R2.id.tv_tx_power)
-    TextView tvTxPower;
-    @BindView(R2.id.et_adv_interval)
-    EditText etAdvInterval;
+    private FragmentUrlBinding mBind;
 
 
     private SlotDataActivity activity;
@@ -73,11 +55,10 @@ public class UrlFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.fragment_url, container, false);
-        ButterKnife.bind(this, view);
+        mBind = FragmentUrlBinding.inflate(inflater, container, false);
         activity = (SlotDataActivity) getActivity();
-        sbRssi.setOnSeekBarChangeListener(this);
-        sbTxPower.setOnSeekBarChangeListener(this);
+        mBind.sbAdvTxPower.setOnSeekBarChangeListener(this);
+        mBind.sbTxPower.setOnSeekBarChangeListener(this);
         InputFilter filter = new InputFilter() {
             @Override
             public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
@@ -88,54 +69,54 @@ public class UrlFragment extends Fragment implements SeekBar.OnSeekBarChangeList
                 return null;
             }
         };
-        etUrl.setFilters(new InputFilter[]{new InputFilter.LengthFilter(32), filter});
+        mBind.etUrl.setFilters(new InputFilter[]{new InputFilter.LengthFilter(32), filter});
         setDefault();
-        return view;
+        return mBind.getRoot();
     }
 
     private void setDefault() {
         if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.NO_DATA) {
-            etAdvInterval.setText("10");
-            etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
-            sbRssi.setProgress(100);
-            sbTxPower.setProgress(6);
+            mBind.etAdvInterval.setText("10");
+            mBind.etAdvInterval.setSelection(mBind.etAdvInterval.getText().toString().length());
+            mBind.sbAdvTxPower.setProgress(100);
+            mBind.sbTxPower.setProgress(6);
         } else {
             int advIntervalProgress = activity.slotData.advInterval / 100;
-            etAdvInterval.setText(advIntervalProgress + "");
-            etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
+            mBind.etAdvInterval.setText(advIntervalProgress + "");
+            mBind.etAdvInterval.setSelection(mBind.etAdvInterval.getText().toString().length());
             advIntervalBytes = MokoUtils.toByteArray(activity.slotData.advInterval, 2);
 
             if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.TLM) {
-                sbRssi.setProgress(100);
+                mBind.sbAdvTxPower.setProgress(100);
                 advTxPowerBytes = MokoUtils.toByteArray(0, 1);
-                tvRssi.setText(String.format("%ddBm", 0));
+                mBind.tvAdvTxPower.setText(String.format("%ddBm", 0));
             } else {
                 int advTxPowerProgress = activity.slotData.rssi_0m + 100;
-                sbRssi.setProgress(advTxPowerProgress);
+                mBind.sbAdvTxPower.setProgress(advTxPowerProgress);
                 advTxPowerBytes = MokoUtils.toByteArray(activity.slotData.rssi_0m, 1);
-                tvRssi.setText(String.format("%ddBm", activity.slotData.rssi_0m));
+                mBind.tvAdvTxPower.setText(String.format("%ddBm", activity.slotData.rssi_0m));
             }
 
             int txPowerProgress = TxPowerEnum.fromTxPower(activity.slotData.txPower).ordinal();
-            sbTxPower.setProgress(txPowerProgress);
+            mBind.sbTxPower.setProgress(txPowerProgress);
             txPowerBytes = MokoUtils.toByteArray(activity.slotData.txPower, 1);
-            tvTxPower.setText(String.format("%ddBm", activity.slotData.txPower));
+            mBind.tvTxPower.setText(String.format("%ddBm", activity.slotData.txPower));
         }
         mUrlSchemeHex = MokoUtils.int2HexString(UrlSchemeEnum.HTTP_WWW.getUrlType());
-        tvUrlScheme.setText(UrlSchemeEnum.HTTP_WWW.getUrlDesc());
+        mBind.tvUrlScheme.setText(UrlSchemeEnum.HTTP_WWW.getUrlDesc());
         if (activity.slotData.frameTypeEnum == SlotFrameTypeEnum.URL) {
             mUrlSchemeHex = MokoUtils.int2HexString(activity.slotData.urlSchemeEnum.getUrlType());
-            tvUrlScheme.setText(activity.slotData.urlSchemeEnum.getUrlDesc());
+            mBind.tvUrlScheme.setText(activity.slotData.urlSchemeEnum.getUrlDesc());
             String url = activity.slotData.urlContent;
             String urlExpansionStr = url.substring(url.length() - 2);
             int urlExpansionType = Integer.parseInt(urlExpansionStr, 16);
             UrlExpansionEnum urlEnum = UrlExpansionEnum.fromUrlExpanType(urlExpansionType);
             if (urlEnum == null) {
-                etUrl.setText(MokoUtils.hex2String(url));
+                mBind.etUrl.setText(MokoUtils.hex2String(url));
             } else {
-                etUrl.setText(MokoUtils.hex2String(url.substring(0, url.length() - 2)) + urlEnum.getUrlExpanDesc());
+                mBind.etUrl.setText(MokoUtils.hex2String(url.substring(0, url.length() - 2)) + urlEnum.getUrlExpanDesc());
             }
-            etUrl.setSelection(etUrl.getText().toString().length());
+            mBind.etUrl.setSelection(mBind.etUrl.getText().toString().length());
         }
 
     }
@@ -170,15 +151,15 @@ public class UrlFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     public void upgdateData(int viewId, int progress) {
         if (viewId == R.id.sb_adv_tx_power) {
             int advTxPower = progress - 100;
-            tvRssi.setText(String.format("%ddBm", advTxPower));
+            mBind.tvAdvTxPower.setText(String.format("%ddBm", advTxPower));
             advTxPowerBytes = MokoUtils.toByteArray(advTxPower, 1);
-            sbRssi.setProgress(progress);
+            mBind.sbAdvTxPower.setProgress(progress);
         } else if (viewId == R.id.sb_tx_power) {
             TxPowerEnum txPowerEnum = TxPowerEnum.fromOrdinal(progress);
             int txPower = txPowerEnum.getTxPower();
-            tvTxPower.setText(String.format("%ddBm", txPower));
+            mBind.tvTxPower.setText(String.format("%ddBm", txPower));
             txPowerBytes = MokoUtils.toByteArray(txPower, 1);
-            sbTxPower.setProgress(progress);
+            mBind.sbTxPower.setProgress(progress);
         }
     }
 
@@ -198,8 +179,8 @@ public class UrlFragment extends Fragment implements SeekBar.OnSeekBarChangeList
 
     @Override
     public boolean isValid() {
-        String urlContent = etUrl.getText().toString();
-        String advInterval = etAdvInterval.getText().toString();
+        String urlContent = mBind.etUrl.getText().toString();
+        String advInterval = mBind.etAdvInterval.getText().toString();
         if (TextUtils.isEmpty(urlContent) || TextUtils.isEmpty(mUrlSchemeHex)) {
             ToastUtils.showToast(activity, "Data format incorrect!");
             return false;
@@ -262,46 +243,46 @@ public class UrlFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     public void resetParams() {
         if (activity.slotData.frameTypeEnum == activity.currentFrameTypeEnum) {
             int advIntervalProgress = activity.slotData.advInterval / 100;
-            etAdvInterval.setText(advIntervalProgress + "");
-            etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
+            mBind.etAdvInterval.setText(advIntervalProgress + "");
+            mBind.etAdvInterval.setSelection(mBind.etAdvInterval.getText().toString().length());
             advIntervalBytes = MokoUtils.toByteArray(activity.slotData.advInterval, 2);
 
             int rssiProgress = activity.slotData.rssi_0m + 100;
-            sbRssi.setProgress(rssiProgress);
+            mBind.sbAdvTxPower.setProgress(rssiProgress);
 
             int txPowerProgress = TxPowerEnum.fromTxPower(activity.slotData.txPower).ordinal();
-            sbTxPower.setProgress(txPowerProgress);
+            mBind.sbTxPower.setProgress(txPowerProgress);
 
             mUrlSchemeHex = MokoUtils.int2HexString(activity.slotData.urlSchemeEnum.getUrlType());
-            tvUrlScheme.setText(activity.slotData.urlSchemeEnum.getUrlDesc());
+            mBind.tvUrlScheme.setText(activity.slotData.urlSchemeEnum.getUrlDesc());
             String url = activity.slotData.urlContent;
             String urlExpansionStr = url.substring(url.length() - 2);
             int urlExpansionType = Integer.parseInt(urlExpansionStr, 16);
             UrlExpansionEnum urlEnum = UrlExpansionEnum.fromUrlExpanType(urlExpansionType);
             if (urlEnum == null) {
-                etUrl.setText(MokoUtils.hex2String(url));
+                mBind.etUrl.setText(MokoUtils.hex2String(url));
             } else {
-                etUrl.setText(MokoUtils.hex2String(url.substring(0, url.length() - 2)) + urlEnum.getUrlExpanDesc());
+                mBind.etUrl.setText(MokoUtils.hex2String(url.substring(0, url.length() - 2)) + urlEnum.getUrlExpanDesc());
             }
-            etUrl.setSelection(etUrl.getText().toString().length());
+            mBind.etUrl.setSelection(mBind.etUrl.getText().toString().length());
         } else {
-            etAdvInterval.setText("10");
-            etAdvInterval.setSelection(etAdvInterval.getText().toString().length());
-            sbRssi.setProgress(100);
-            sbTxPower.setProgress(6);
+            mBind.etAdvInterval.setText("10");
+            mBind.etAdvInterval.setSelection(mBind.etAdvInterval.getText().toString().length());
+            mBind.sbAdvTxPower.setProgress(100);
+            mBind.sbTxPower.setProgress(6);
 
-            etUrl.setText("");
+            mBind.etUrl.setText("");
         }
     }
 
     public void selectUrlScheme() {
         UrlSchemeDialog dialog = new UrlSchemeDialog(getActivity());
-        dialog.setData(tvUrlScheme.getText().toString());
+        dialog.setUrlScheme(mBind.tvUrlScheme.getText().toString());
         dialog.setUrlSchemeClickListener(new UrlSchemeDialog.UrlSchemeClickListener() {
             @Override
             public void onEnsureClicked(String urlType) {
                 UrlSchemeEnum urlSchemeEnum = UrlSchemeEnum.fromUrlType(Integer.valueOf(urlType));
-                tvUrlScheme.setText(urlSchemeEnum.getUrlDesc());
+                mBind.tvUrlScheme.setText(urlSchemeEnum.getUrlDesc());
                 mUrlSchemeHex = MokoUtils.int2HexString(Integer.valueOf(urlType));
             }
         });

@@ -9,38 +9,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
 import com.moko.bxp.nordic.activity.SlotDataActivity;
+import com.moko.bxp.nordic.databinding.FragmentTriggerTappedBinding;
 import com.moko.bxp.nordic.utils.ToastUtils;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class TriggerTappedFragment extends Fragment implements RadioGroup.OnCheckedChangeListener {
 
     private static final String TAG = "TappedFragment";
 
 
-    @BindView(R2.id.tv_trigger_tips)
-    TextView tvTriggerTips;
-    @BindView(R2.id.rb_always_start)
-    RadioButton rbAlwaysStart;
-    @BindView(R2.id.rb_start_advertising)
-    RadioButton rbStartAdvertising;
-    @BindView(R2.id.rb_stop_advertising)
-    RadioButton rbStopAdvertising;
-    @BindView(R2.id.rg_tapped)
-    RadioGroup rgTapped;
-    @BindView(R2.id.et_start)
-    EditText etStart;
-    @BindView(R2.id.et_stop)
-    EditText etStop;
+   private FragmentTriggerTappedBinding mBind;
 
 
     private SlotDataActivity activity;
@@ -64,27 +45,26 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.fragment_trigger_tapped, container, false);
-        ButterKnife.bind(this, view);
+        mBind = FragmentTriggerTappedBinding.inflate(inflater, container, false);
         activity = (SlotDataActivity) getActivity();
         if (mDuration == 0) {
             if (mIsStart) {
-                rbAlwaysStart.setChecked(true);
+                mBind.rbAlwaysStart.setChecked(true);
             }
         } else {
             if (mIsStart) {
-                rbStartAdvertising.setChecked(true);
-                etStart.setText(mDuration + "");
-                etStart.setSelection((mDuration + "").length());
+                mBind.rbStartAdvertising.setChecked(true);
+                mBind.etStart.setText(mDuration + "");
+                mBind.etStart.setSelection((mDuration + "").length());
             } else {
-                rbStopAdvertising.setChecked(true);
-                etStop.setText(mDuration + "");
-                etStop.setSelection((mDuration + "").length());
+                mBind.rbStopAdvertising.setChecked(true);
+                mBind.etStop.setText(mDuration + "");
+                mBind.etStop.setSelection((mDuration + "").length());
             }
         }
-        rgTapped.setOnCheckedChangeListener(this);
+        mBind.rgTapped.setOnCheckedChangeListener(this);
         updateTips();
-        etStart.addTextChangedListener(new TextWatcher() {
+        mBind.etStart.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -98,7 +78,7 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
             @Override
             public void afterTextChanged(Editable s) {
                 String duration = s.toString();
-                if (rbStartAdvertising.isChecked() && !TextUtils.isEmpty(duration)) {
+                if (mBind.rbStartAdvertising.isChecked() && !TextUtils.isEmpty(duration)) {
                     mDuration = Integer.parseInt(duration);
                     String tips = "";
                     if (mTrapType == 0)
@@ -107,11 +87,11 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                         tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button twice");
                     if (mTrapType == 2)
                         tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button three times");
-                    tvTriggerTips.setText(tips);
+                    mBind.tvTriggerTips.setText(tips);
                 }
             }
         });
-        etStop.addTextChangedListener(new TextWatcher() {
+        mBind.etStop.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -125,7 +105,7 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
             @Override
             public void afterTextChanged(Editable s) {
                 String duration = s.toString();
-                if (rbStopAdvertising.isChecked() && !TextUtils.isEmpty(duration)) {
+                if (mBind.rbStopAdvertising.isChecked() && !TextUtils.isEmpty(duration)) {
                     mDuration = Integer.parseInt(duration);
                     String tips = "";
                     if (mTrapType == 0)
@@ -134,15 +114,15 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                         tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button twice");
                     if (mTrapType == 2)
                         tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button three times");
-                    tvTriggerTips.setText(tips);
+                    mBind.tvTriggerTips.setText(tips);
                 }
             }
         });
-        return view;
+        return mBind.getRoot();
     }
 
     public void updateTips() {
-        if (rbAlwaysStart.isChecked()) {
+        if (mBind.rbAlwaysStart.isChecked()) {
             String tips = "";
             if (mTrapType == 0)
                 tips = getString(R.string.trigger_tapped_tips_1, "single click button");
@@ -150,9 +130,9 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                 tips = getString(R.string.trigger_tapped_tips_1, "press the button twice");
             if (mTrapType == 2)
                 tips = getString(R.string.trigger_tapped_tips_1, "press the button three times");
-            tvTriggerTips.setText(tips);
-        } else if (rbStartAdvertising.isChecked()) {
-            mDuration = Integer.parseInt(etStart.getText().toString());
+            mBind.tvTriggerTips.setText(tips);
+        } else if (mBind.rbStartAdvertising.isChecked()) {
+            mDuration = Integer.parseInt(mBind.etStart.getText().toString());
             String tips = "";
             if (mTrapType == 0)
                 tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "single click button");
@@ -160,9 +140,9 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                 tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button twice");
             if (mTrapType == 2)
                 tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button three times");
-            tvTriggerTips.setText(tips);
+            mBind.tvTriggerTips.setText(tips);
         } else {
-            mDuration = Integer.parseInt(etStop.getText().toString());
+            mDuration = Integer.parseInt(mBind.etStop.getText().toString());
             String tips = "";
             if (mTrapType == 0)
                 tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "single click button");
@@ -170,7 +150,7 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                 tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button twice");
             if (mTrapType == 2)
                 tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button three times");
-            tvTriggerTips.setText(tips);
+            mBind.tvTriggerTips.setText(tips);
         }
     }
 
@@ -207,10 +187,10 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                 tips = getString(R.string.trigger_tapped_tips_1,  "press the button twice");
             if (mTrapType == 2)
                 tips = getString(R.string.trigger_tapped_tips_1, "press the button three times");
-            tvTriggerTips.setText(tips);
+            mBind.tvTriggerTips.setText(tips);
         } else if (checkedId == R.id.rb_start_advertising) {
             mIsStart = true;
-            String startDuration = etStart.getText().toString();
+            String startDuration = mBind.etStart.getText().toString();
             if (TextUtils.isEmpty(startDuration)) {
                 mDuration = 0;
             } else {
@@ -223,10 +203,10 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                 tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button twice");
             if (mTrapType == 2)
                 tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button three times");
-            tvTriggerTips.setText(tips);
+            mBind.tvTriggerTips.setText(tips);
         } else if (checkedId == R.id.rb_stop_advertising) {
             mIsStart = false;
-            String stopDuration = etStop.getText().toString();
+            String stopDuration = mBind.etStop.getText().toString();
             if (TextUtils.isEmpty(stopDuration)) {
                 mDuration = 0;
             } else {
@@ -239,7 +219,7 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                 tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button twice");
             if (mTrapType == 2)
                 tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button three times");
-            tvTriggerTips.setText(tips);
+            mBind.tvTriggerTips.setText(tips);
         }
     }
 
@@ -258,10 +238,10 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
 
     public int getData() {
         String duration = "";
-        if (rbStartAdvertising.isChecked()) {
-            duration = etStart.getText().toString();
-        } else if (rbStopAdvertising.isChecked()) {
-            duration = etStop.getText().toString();
+        if (mBind.rbStartAdvertising.isChecked()) {
+            duration = mBind.etStart.getText().toString();
+        } else if (mBind.rbStopAdvertising.isChecked()) {
+            duration = mBind.etStop.getText().toString();
         } else {
             duration = "0";
         }
@@ -270,7 +250,7 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
             return -1;
         }
         mDuration = Integer.parseInt(duration);
-        if ((rbStartAdvertising.isChecked() || rbStopAdvertising.isChecked()) && (mDuration < 1 || mDuration > 65535)) {
+        if ((mBind.rbStartAdvertising.isChecked() || mBind.rbStopAdvertising.isChecked()) && (mDuration < 1 || mDuration > 65535)) {
             ToastUtils.showToast(activity, "The advertising range is 1~65535");
             return -1;
         }

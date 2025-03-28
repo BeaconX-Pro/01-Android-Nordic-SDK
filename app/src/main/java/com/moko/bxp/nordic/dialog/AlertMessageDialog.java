@@ -3,65 +3,45 @@ package com.moko.bxp.nordic.dialog;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.view.ViewGroup;
+
 
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
+import com.moko.bxp.nordic.databinding.DialogAlertBinding;
 
 import androidx.annotation.StringRes;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+import androidx.core.content.ContextCompat;
 
-public class AlertMessageDialog extends MokoBaseDialog {
+public class AlertMessageDialog extends MokoBaseDialog<DialogAlertBinding> {
     public static final String TAG = AlertMessageDialog.class.getSimpleName();
-    @BindView(R2.id.tv_alert_title)
-    TextView tvAlertTitle;
-    @BindView(R2.id.ll_alert_title)
-    LinearLayout llAlertTitle;
-    @BindView(R2.id.tv_alert_message)
-    TextView tvAlertMessage;
-    @BindView(R2.id.tv_alert_cancel)
-    TextView tvAlertCancel;
-    @BindView(R2.id.tv_alert_confirm)
-    TextView tvAlertConfirm;
-    @BindView(R2.id.view_divider)
-    View viewDivider;
-
     private String cancel;
-
     private String confirm;
-
     private String title;
-
     private String message;
-
     private int cancelId = -1;
-
     private int confirmId = -1;
-
     private int titleId = -1;
-
     private int messageId = -1;
-
     private boolean cancelGone;
-
+    private int messageTextColorId = -1;
 
     @Override
-    public int getLayoutRes() {
-        return R.layout.dialog_alert;
+    protected DialogAlertBinding getViewBind(LayoutInflater inflater, ViewGroup container) {
+        return DialogAlertBinding.inflate(inflater, container, false);
     }
 
     @Override
-    public void bindView(View v) {
-        ButterKnife.bind(this, v);
+    protected void onCreateView() {
         if (titleId > 0) {
             title = getString(titleId);
         }
         if (messageId > 0) {
             message = getString(messageId);
+        }
+        if (messageTextColorId > 0) {
+            mBind.tvAlertMessage.setTextColor(ContextCompat.getColor(getContext(), messageTextColorId));
         }
         if (confirmId > 0) {
             confirm = getString(confirmId);
@@ -69,24 +49,34 @@ public class AlertMessageDialog extends MokoBaseDialog {
         if (cancelId > 0) {
             cancel = getString(cancelId);
         }
-        TextPaint tp = tvAlertTitle.getPaint();
+        TextPaint tp = mBind.tvAlertTitle.getPaint();
         tp.setFakeBoldText(true);
         if (TextUtils.isEmpty(title)) {
-            llAlertTitle.setVisibility(View.GONE);
+            mBind.llAlertTitle.setVisibility(View.GONE);
         } else {
-            tvAlertTitle.setText(title);
+            mBind.tvAlertTitle.setText(title);
         }
-        tvAlertMessage.setText(message);
+        mBind.tvAlertMessage.setText(message);
         if (!TextUtils.isEmpty(cancel)) {
-            tvAlertCancel.setText(cancel);
+            mBind.tvAlertCancel.setText(cancel);
         }
         if (!TextUtils.isEmpty(confirm)) {
-            tvAlertConfirm.setText(confirm);
+            mBind.tvAlertConfirm.setText(confirm);
         }
         if (cancelGone) {
-            tvAlertCancel.setVisibility(View.GONE);
-            viewDivider.setVisibility(View.GONE);
+            mBind.tvAlertCancel.setVisibility(View.GONE);
+            mBind.viewDivider.setVisibility(View.GONE);
         }
+        mBind.tvAlertCancel.setOnClickListener(v -> {
+            dismiss();
+            if (onAlertCancelListener != null)
+                onAlertCancelListener.onClick();
+        });
+        mBind.tvAlertConfirm.setOnClickListener(v -> {
+            dismiss();
+            if (onAlertConfirmListener != null)
+                onAlertConfirmListener.onClick();
+        });
     }
 
     @Override
@@ -175,17 +165,7 @@ public class AlertMessageDialog extends MokoBaseDialog {
         cancelGone = true;
     }
 
-    @OnClick(R2.id.tv_alert_cancel)
-    public void onCancel(View view) {
-        dismiss();
-        if (onAlertCancelListener != null)
-            onAlertCancelListener.onClick();
-    }
-
-    @OnClick(R2.id.tv_alert_confirm)
-    public void onConfirm(View view) {
-        dismiss();
-        if (onAlertConfirmListener != null)
-            onAlertConfirmListener.onClick();
+    public void setMessageTextColorId(int messageTextColorId) {
+        this.messageTextColorId = messageTextColorId;
     }
 }

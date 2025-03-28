@@ -10,10 +10,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.elvishew.xlog.XLog;
 import com.moko.ble.lib.MokoConstants;
@@ -24,8 +20,8 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
 import com.moko.bxp.nordic.able.ISlotDataAction;
+import com.moko.bxp.nordic.databinding.ActivitySlotDataBinding;
 import com.moko.bxp.nordic.dialog.BottomDialog;
 import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.fragment.AxisFragment;
@@ -54,8 +50,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import cn.carbswang.android.numberpickerview.library.NumberPickerView;
 
 public class SlotDataActivity extends BaseActivity implements NumberPickerView.OnValueChangeListener {
@@ -77,24 +71,8 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
     private static final int DEVICE_TYPE_SENSOR_TH_LIGHT = 6;
     private static final int DEVICE_TYPE_SENSOR_AXIS_TH_LIGHT = 7;
 
-    @BindView(R2.id.tv_slot_title)
-    TextView tvSlotTitle;
-    @BindView(R2.id.iv_save)
-    ImageView ivSave;
-    @BindView(R2.id.frame_slot_container)
-    FrameLayout frameSlotContainer;
-    @BindView(R2.id.npv_slot_type)
-    NumberPickerView npvSlotType;
-    @BindView(R2.id.iv_trigger)
-    ImageView ivTrigger;
-    @BindView(R2.id.tv_trigger_type)
-    TextView tvTriggerType;
-    @BindView(R2.id.frame_trigger_container)
-    FrameLayout frameTriggerContainer;
-    @BindView(R2.id.rl_trigger)
-    RelativeLayout rlTrigger;
-    @BindView(R2.id.rl_trigger_switch)
-    RelativeLayout rlTriggerSwitch;
+    private ActivitySlotDataBinding mBind;
+
     private FragmentManager fragmentManager;
     private UidFragment uidFragment;
     private UrlFragment urlFragment;
@@ -123,8 +101,8 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_slot_data);
-        ButterKnife.bind(this);
+        mBind = ActivitySlotDataBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         if (getIntent() != null && getIntent().getExtras() != null) {
             slotData = (SlotData) getIntent().getSerializableExtra(AppConstants.EXTRA_KEY_SLOT_DATA);
             currentFrameTypeEnum = slotData.frameTypeEnum;
@@ -141,20 +119,20 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         triggerTypes = new ArrayList<>();
         if (deviceType == DEVICE_TYPE_SENSOR_NULL) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_no_sensor);
-            npvSlotType.setDisplayedValues(slotTypeArray);
+            mBind.npvSlotType.setDisplayedValues(slotTypeArray);
             triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
         } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_axis);
-            npvSlotType.setDisplayedValues(slotTypeArray);
+            mBind.npvSlotType.setDisplayedValues(slotTypeArray);
             triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Device moves");
         } else if (deviceType == DEVICE_TYPE_SENSOR_TH) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_th);
-            npvSlotType.setDisplayedValues(slotTypeArray);
+            mBind.npvSlotType.setDisplayedValues(slotTypeArray);
             triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
@@ -164,7 +142,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             triggerTypes.add("Humidity below");
         } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_all);
-            npvSlotType.setDisplayedValues(slotTypeArray);
+            mBind.npvSlotType.setDisplayedValues(slotTypeArray);
             triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
@@ -175,14 +153,14 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             triggerTypes.add("Device moves");
         } else if (deviceType == DEVICE_TYPE_SENSOR_LIGHT) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_no_sensor);
-            npvSlotType.setDisplayedValues(slotTypeArray);
+            mBind.npvSlotType.setDisplayedValues(slotTypeArray);
             triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
             triggerTypes.add("Ambient light detected");
         } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS_LIGHT) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_axis);
-            npvSlotType.setDisplayedValues(slotTypeArray);
+            mBind.npvSlotType.setDisplayedValues(slotTypeArray);
             triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
@@ -190,7 +168,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             triggerTypes.add("Ambient light detected");
         } else if (deviceType == DEVICE_TYPE_SENSOR_TH_LIGHT) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_th);
-            npvSlotType.setDisplayedValues(slotTypeArray);
+            mBind.npvSlotType.setDisplayedValues(slotTypeArray);
             triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
@@ -201,7 +179,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             triggerTypes.add("Ambient light detected");
         } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH_LIGHT) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_all);
-            npvSlotType.setDisplayedValues(slotTypeArray);
+            mBind.npvSlotType.setDisplayedValues(slotTypeArray);
             triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
@@ -213,28 +191,28 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             triggerTypes.add("Ambient light detected");
         }
         final int length = slotTypeArray.length;
-        npvSlotType.setMinValue(0);
-        npvSlotType.setMaxValue(length - 1);
-        npvSlotType.setOnValueChangedListener(this);
+        mBind.npvSlotType.setMinValue(0);
+        mBind.npvSlotType.setMaxValue(length - 1);
+        mBind.npvSlotType.setOnValueChangedListener(this);
         for (int i = 0; i < length; i++) {
             if (slotData.frameTypeEnum.getShowName().equals(slotTypeArray[i])) {
-                npvSlotType.setValue(i);
+                mBind.npvSlotType.setValue(i);
                 showFragment(i);
                 break;
             }
         }
-        tvSlotTitle.setText(slotData.slotEnum.getTitle());
+        mBind.tvSlotTitle.setText(slotData.slotEnum.getTitle());
         if (slotData.frameTypeEnum != SlotFrameTypeEnum.NO_DATA) {
-            rlTriggerSwitch.setVisibility(View.VISIBLE);
+            mBind.rlTriggerSwitch.setVisibility(View.VISIBLE);
         } else {
-            rlTriggerSwitch.setVisibility(View.GONE);
+            mBind.rlTriggerSwitch.setVisibility(View.GONE);
         }
         if (triggerType > 0) {
-            ivTrigger.setImageResource(R.drawable.ic_checked);
-            rlTrigger.setVisibility(View.VISIBLE);
+            mBind.ivTrigger.setImageResource(R.drawable.ic_checked);
+            mBind.rlTrigger.setVisibility(View.VISIBLE);
         } else {
-            ivTrigger.setImageResource(R.drawable.ic_unchecked);
-            rlTrigger.setVisibility(View.GONE);
+            mBind.ivTrigger.setImageResource(R.drawable.ic_unchecked);
+            mBind.rlTrigger.setVisibility(View.GONE);
         }
         createTriggerFragments();
         showTriggerFragment();
@@ -327,7 +305,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                 lightDetectedFragment.setStart((triggerData[3] & 0xff) == 1);
                 break;
         }
-        tvTriggerType.setText(triggerTypes.get(triggerTypeSelected));
+        mBind.tvTriggerType.setText(triggerTypes.get(triggerTypeSelected));
     }
 
     private void showTriggerFragment() {
@@ -546,9 +524,9 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         }
         SlotFrameTypeEnum slotFrameTypeEnum = SlotFrameTypeEnum.fromShowName(slotTypeArray[newVal]);
         if (slotFrameTypeEnum != SlotFrameTypeEnum.NO_DATA) {
-            rlTriggerSwitch.setVisibility(View.VISIBLE);
+            mBind.rlTriggerSwitch.setVisibility(View.VISIBLE);
         } else {
-            rlTriggerSwitch.setVisibility(View.GONE);
+            mBind.rlTriggerSwitch.setVisibility(View.GONE);
         }
     }
 
@@ -674,11 +652,11 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             return;
         if (triggerType > 0) {
             triggerType = TRIGGER_TYPE_NULL;
-            ivTrigger.setImageResource(R.drawable.ic_unchecked);
-            rlTrigger.setVisibility(View.GONE);
+            mBind.ivTrigger.setImageResource(R.drawable.ic_unchecked);
+            mBind.rlTrigger.setVisibility(View.GONE);
         } else {
-            ivTrigger.setImageResource(R.drawable.ic_checked);
-            rlTrigger.setVisibility(View.VISIBLE);
+            mBind.ivTrigger.setImageResource(R.drawable.ic_checked);
+            mBind.rlTrigger.setVisibility(View.VISIBLE);
             triggerType = TRIGGER_TYPE_TRAP_DOUBLE;
             showTriggerFragment();
         }
@@ -823,7 +801,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                     humidityFragment.setHumidityTypeAndRefresh(false);
                     break;
             }
-            tvTriggerType.setText(triggerTypes.get(value));
+            mBind.tvTriggerType.setText(triggerTypes.get(value));
         });
         dialog.show(getSupportFragmentManager());
     }

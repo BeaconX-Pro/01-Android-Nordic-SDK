@@ -61,7 +61,7 @@ The response is notified by `EventBus`, we can get result when we send task to d
 
 * Android Studio 3.6.+
 
-* minSdkVersion 18
+* minSdkVersion 26
 
 **Import to Project**
 

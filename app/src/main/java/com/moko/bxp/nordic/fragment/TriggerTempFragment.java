@@ -6,35 +6,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
 import com.moko.bxp.nordic.activity.SlotDataActivity;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import com.moko.bxp.nordic.databinding.FragmentTriggerTempBinding;
 
 public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, RadioGroup.OnCheckedChangeListener {
 
     private static final String TAG = "TempFragment";
-    @BindView(R2.id.sb_trigger_temp)
-    SeekBar sbTriggerTemp;
-    @BindView(R2.id.tv_trigger_temp)
-    TextView tvTriggerTemp;
-    @BindView(R2.id.rb_start)
-    RadioButton rbStart;
-    @BindView(R2.id.rb_stop)
-    RadioButton rbStop;
-    @BindView(R2.id.rg_advertising)
-    RadioGroup rgAdvertising;
-    @BindView(R2.id.tv_trigger_tips)
-    TextView tvTriggerTips;
-//    @BindView(R.id.trigger_temp)
-//    TextView triggerTemp;
+    private FragmentTriggerTempBinding mBind;
 
 
     private SlotDataActivity activity;
@@ -58,22 +40,21 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.fragment_trigger_temp, container, false);
-        ButterKnife.bind(this, view);
+        mBind = FragmentTriggerTempBinding.inflate(inflater, container, false);
         activity = (SlotDataActivity) getActivity();
-        rgAdvertising.setOnCheckedChangeListener(this);
-        sbTriggerTemp.setOnSeekBarChangeListener(this);
+        mBind.rgAdvertising.setOnCheckedChangeListener(this);
+        mBind.sbTriggerTemp.setOnSeekBarChangeListener(this);
         if (mIsStart) {
-            rbStart.setChecked(true);
+            mBind.rbStart.setChecked(true);
         } else {
-            rbStop.setChecked(true);
+            mBind.rbStop.setChecked(true);
         }
-        sbTriggerTemp.setProgress(mProgress);
+        mBind.sbTriggerTemp.setProgress(mProgress);
         String tempStr = String.format("%d℃", mProgress - 20);
-        tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
+        mBind.tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
                 mIsStart ? "start advertising" : "stop advertising", "temperature", mIsAbove ? "above" : "below", tempStr));
 //        triggerTemp.setText(mIsAbove ? "Temperature Above" : "Temperature Below");
-        return view;
+        return mBind.getRoot();
     }
 
     @Override
@@ -99,8 +80,8 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         mProgress = progress;
         String tempStr = String.format("%d℃", progress - 20);
-        tvTriggerTemp.setText(tempStr);
-        tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
+        mBind.tvTriggerTemp.setText(tempStr);
+        mBind.tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
                 mIsStart ? "start advertising" : "stop advertising", "temperature", mIsAbove ? "above" : "below", tempStr));
     }
 
@@ -126,7 +107,7 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
             mIsStart = false;
         }
         String tempStr = String.format("%d℃", mProgress - 20);
-        tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
+        mBind.tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
                 mIsStart ? "start advertising" : "stop advertising", "temperature", mIsAbove ? "above" : "below", tempStr));
     }
 
@@ -153,7 +134,7 @@ public class TriggerTempFragment extends Fragment implements SeekBar.OnSeekBarCh
     public void setTempTypeAndRefresh(boolean isAbove) {
         mIsAbove = isAbove;
         String tempStr = String.format("%d℃", mProgress - 20);
-        tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
+        mBind.tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
                 mIsStart ? "start advertising" : "stop advertising", "temperature", mIsAbove ? "above" : "below", tempStr));
     }
 

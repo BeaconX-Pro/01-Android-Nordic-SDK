@@ -8,16 +8,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.CheckBox;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.elvishew.xlog.XLog;
 import com.moko.ble.lib.MokoConstants;
@@ -27,15 +22,13 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
-import com.moko.bxp.nordic.BuildConfig;
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
 import com.moko.bxp.nordic.adapter.THDataListAdapter;
+import com.moko.bxp.nordic.databinding.ActivityExportDataBinding;
 import com.moko.bxp.nordic.dialog.AlertMessageDialog;
 import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.bxp.nordic.utils.Utils;
-import com.moko.bxp.nordic.view.THChartView;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 import com.moko.support.nordic.entity.OrderCHAR;
@@ -55,37 +48,13 @@ import java.util.Calendar;
 import java.util.List;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ExportDataActivity extends BaseActivity {
 
     private static final String TRACKED_FILE = "T&HDatas.txt";
 
     private static String PATH_LOGCAT;
-    @BindView(R2.id.iv_sync)
-    ImageView ivSync;
-    @BindView(R2.id.tv_export)
-    TextView tvExport;
-    @BindView(R2.id.tv_sync)
-    TextView tvSync;
-    @BindView(R2.id.cb_data_show)
-    CheckBox cbDataShow;
-    @BindView(R2.id.ll_th_chart_view)
-    LinearLayout llTHChartView;
-    @BindView(R2.id.temp_chart_view)
-    THChartView tempChartView;
-    @BindView(R2.id.humi_chart_view)
-    THChartView humiChartView;
-    @BindView(R2.id.th_chart_total)
-    TextView thChartTotal;
-    @BindView(R2.id.th_chart_display)
-    TextView thChartDisplay;
-    @BindView(R2.id.rv_th_data)
-    RecyclerView rvThData;
-    @BindView(R2.id.ll_th_data)
-    LinearLayout llThData;
+    private ActivityExportDataBinding mBind;
 
     private boolean mReceiverTag = false;
     private boolean mIsShown;
@@ -100,39 +69,39 @@ public class ExportDataActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_export_data);
-        ButterKnife.bind(this);
+        mBind = ActivityExportDataBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
 
         PATH_LOGCAT = NordicMainActivity.PATH_LOGCAT + File.separator + TRACKED_FILE;
 
         mHumiList = new ArrayList<>();
         mTempList = new ArrayList<>();
-        cbDataShow.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        mBind.cbDataShow.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 // 绘制折线图并展示
-                llThData.setVisibility(View.GONE);
-                llTHChartView.setVisibility(View.VISIBLE);
-                tempChartView.setxValue(mTempList);
-                humiChartView.setxValue(mHumiList);
+                mBind.llThData.setVisibility(View.GONE);
+                mBind.llThChartView.setVisibility(View.VISIBLE);
+                mBind.tempChartView.setxValue(mTempList);
+                mBind.humiChartView.setxValue(mHumiList);
                 int length = mTempList.size();
-                thChartTotal.setText(getString(R.string.th_chart_total, length));
-                thChartDisplay.setText(getString(R.string.th_chart_display, length > 1000 ? 1000 : length));
+                mBind.thChartTotal.setText(getString(R.string.th_chart_total, length));
+                mBind.thChartDisplay.setText(getString(R.string.th_chart_display, length > 1000 ? 1000 : length));
             } else {
                 // 隐藏折线图
-                llThData.setVisibility(View.VISIBLE);
-                llTHChartView.setVisibility(View.GONE);
+                mBind.llThData.setVisibility(View.VISIBLE);
+                mBind.llThChartView.setVisibility(View.GONE);
             }
         });
         mAdapter = new THDataListAdapter();
         thStoreData = MokoSupport.getInstance().thStoreData;
         thStoreString = MokoSupport.getInstance().thStoreString;
         if (thStoreData != null && thStoreData.size() > 0 && thStoreString != null) {
-            tvExport.setEnabled(true);
+            mBind.tvExport.setEnabled(true);
             if (!mIsShown) {
                 mIsShown = true;
-                llThData.setVisibility(View.VISIBLE);
+                mBind.llThData.setVisibility(View.VISIBLE);
                 Drawable top = getResources().getDrawable(R.drawable.ic_download_checked);
-                tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+                mBind.tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
             }
             for (THStoreData item : thStoreData) {
                 float temp = Float.parseFloat(item.temp);
@@ -146,8 +115,8 @@ public class ExportDataActivity extends BaseActivity {
             thStoreString = new StringBuilder();
         }
         mAdapter.replaceData(thStoreData);
-        rvThData.setLayoutManager(new LinearLayoutManager(this));
-        rvThData.setAdapter(mAdapter);
+        mBind.rvThData.setLayoutManager(new LinearLayoutManager(this));
+        mBind.rvThData.setAdapter(mAdapter);
 
         mHandler = new Handler();
         EventBus.getDefault().register(this);
@@ -162,10 +131,10 @@ public class ExportDataActivity extends BaseActivity {
         } else {
             MokoSupport.getInstance().enableStoreNotify();
             Animation animation = AnimationUtils.loadAnimation(ExportDataActivity.this, R.anim.rotate_refresh);
-            ivSync.startAnimation(animation);
-            tvSync.setText("Stop");
+            mBind.ivSync.startAnimation(animation);
+            mBind.tvSync.setText("Stop");
             isSync = true;
-            cbDataShow.setEnabled(false);
+            mBind.cbDataShow.setEnabled(false);
         }
     }
 
@@ -217,9 +186,9 @@ public class ExportDataActivity extends BaseActivity {
                                         mIsShown = false;
                                         thStoreData.clear();
                                         mAdapter.replaceData(thStoreData);
-                                        llThData.setVisibility(View.GONE);
+                                        mBind.llThData.setVisibility(View.GONE);
                                         Drawable top = getResources().getDrawable(R.drawable.ic_download);
-                                        tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+                                        mBind.tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
                                         ToastUtils.showToast(ExportDataActivity.this, "Erase success!");
                                     } else {
                                         ToastUtils.showToast(ExportDataActivity.this, "Failed");
@@ -250,9 +219,9 @@ public class ExportDataActivity extends BaseActivity {
                     case CHAR_STORE_NOTIFY:
                         if (!mIsShown) {
                             mIsShown = true;
-                            llThData.setVisibility(View.VISIBLE);
+                            mBind.llThData.setVisibility(View.VISIBLE);
                             Drawable top = getResources().getDrawable(R.drawable.ic_download_checked);
-                            tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+                            mBind.tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
                         }
 
                         if (value.length > 19) {
@@ -356,9 +325,9 @@ public class ExportDataActivity extends BaseActivity {
                             XLog.i("Timeout");
                             MokoSupport.getInstance().disableStoreNotify();
                             isSync = false;
-                            ivSync.clearAnimation();
-                            tvSync.setText("Sync");
-                            cbDataShow.setEnabled(true);
+                            mBind.ivSync.clearAnimation();
+                            mBind.tvSync.setText("Sync");
+                            mBind.cbDataShow.setEnabled(true);
                         }, 10 * 1000);
                         break;
                 }
@@ -467,18 +436,18 @@ public class ExportDataActivity extends BaseActivity {
             isSync = true;
             MokoSupport.getInstance().enableStoreNotify();
             Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
-            ivSync.startAnimation(animation);
-            tvSync.setText("Stop");
-            cbDataShow.setChecked(false);
-            cbDataShow.setEnabled(false);
+            mBind.ivSync.startAnimation(animation);
+            mBind.tvSync.setText("Stop");
+            mBind.cbDataShow.setChecked(false);
+            mBind.cbDataShow.setEnabled(false);
         } else {
             if (mHandler.hasMessages(0))
                 mHandler.removeMessages(0);
             MokoSupport.getInstance().disableStoreNotify();
             isSync = false;
-            ivSync.clearAnimation();
-            tvSync.setText("Sync");
-            cbDataShow.setEnabled(true);
+            mBind.ivSync.clearAnimation();
+            mBind.tvSync.setText("Sync");
+            mBind.cbDataShow.setEnabled(true);
         }
     }
 
@@ -488,7 +457,7 @@ public class ExportDataActivity extends BaseActivity {
         if (mIsShown) {
             showSyncingProgressDialog();
             writeTHFile("");
-            tvExport.postDelayed(new Runnable() {
+            mBind.tvExport.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     dismissSyncProgressDialog();

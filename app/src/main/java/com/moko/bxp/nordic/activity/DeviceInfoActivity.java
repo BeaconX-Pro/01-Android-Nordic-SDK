@@ -15,11 +15,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.elvishew.xlog.XLog;
@@ -31,7 +27,7 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
+import com.moko.bxp.nordic.databinding.ActivityDeviceInfoBinding;
 import com.moko.bxp.nordic.dialog.AlertMessageDialog;
 import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.dialog.ModifyPasswordDialog;
@@ -59,31 +55,15 @@ import java.util.Arrays;
 
 import androidx.annotation.IdRes;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import com.moko.support.nordic.dfu.DfuProgressListener;
-import com.moko.support.nordic.dfu.DfuProgressListenerAdapter;
-import com.moko.support.nordic.dfu.DfuServiceInitiator;
-import com.moko.support.nordic.dfu.DfuServiceListenerHelper;
+import no.nordicsemi.android.dfu.DfuProgressListener;
+import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
+import no.nordicsemi.android.dfu.DfuServiceInitiator;
+import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
 
 public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener {
     public static final int REQUEST_CODE_SELECT_FIRMWARE = 0x10;
 
-    @BindView(R2.id.frame_container)
-    FrameLayout frameContainer;
-    @BindView(R2.id.radioBtn_slot)
-    RadioButton radioBtnSlot;
-    @BindView(R2.id.radioBtn_setting)
-    RadioButton radioBtnSetting;
-    @BindView(R2.id.radioBtn_device)
-    RadioButton radioBtnDevice;
-    @BindView(R2.id.rg_options)
-    RadioGroup rgOptions;
-    @BindView(R2.id.tv_title)
-    TextView tvTitle;
-    @BindView(R2.id.iv_save)
-    ImageView ivSave;
+    private ActivityDeviceInfoBinding mBind;
     private FragmentManager fragmentManager;
     private SlotFragment slotFragment;
     private SettingFragment settingFragment;
@@ -103,13 +83,13 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_device_info);
-        ButterKnife.bind(this);
+        mBind = ActivityDeviceInfoBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         validParams = new ValidParams();
         mPassword = getIntent().getStringExtra(AppConstants.EXTRA_KEY_PASSWORD);
         fragmentManager = getFragmentManager();
         initFragment();
-        rgOptions.setOnCheckedChangeListener(this);
+        mBind.rgOptions.setOnCheckedChangeListener(this);
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -169,7 +149,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                     return;
                 if (MokoSupport.getInstance().isBluetoothOpen()) {
                     if (isUpgrading) {
-                        tvTitle.postDelayed(() -> {
+                        mBind.tvTitle.postDelayed(() -> {
                             dismissDFUProgressDialog();
                         }, 2000);
                     } else {
@@ -189,7 +169,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
                 // 设备连接成功，通知页面更新
                 showSyncingProgressDialog();
-                tvTitle.postDelayed(() -> MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getLockState()), 1500);
+                mBind.tvTitle.postDelayed(() -> MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getLockState()), 1500);
             }
         });
 
@@ -407,7 +387,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                     case CHAR_ADV_INTERVAL:
                         if (value.length >= 2) {
                             slotFragment.setAdvInterval(value);
-                            tvTitle.postDelayed(() -> {
+                            mBind.tvTitle.postDelayed(() -> {
                                 slotFragment.gotoSlotDataDetail();
                             }, 300);
                         }
@@ -442,7 +422,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     public void getSlotType() {
         showSyncingProgressDialog();
-        tvTitle.postDelayed(() -> MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getSlotType()), 1500);
+        mBind.tvTitle.postDelayed(() -> MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getSlotType()), 1500);
     }
 
     private void getDeviceInfo() {
@@ -611,38 +591,38 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     private void showSlotFragment() {
         if (slotFragment != null) {
-            ivSave.setVisibility(View.GONE);
+            mBind.ivSave.setVisibility(View.GONE);
             fragmentManager.beginTransaction()
                     .hide(settingFragment)
                     .hide(deviceFragment)
                     .show(slotFragment)
                     .commit();
         }
-        tvTitle.setText(getString(R.string.slot_title));
+        mBind.tvTitle.setText(getString(R.string.slot_title));
     }
 
     private void showSettingFragment() {
         if (settingFragment != null) {
-            ivSave.setVisibility(View.VISIBLE);
+            mBind.ivSave.setVisibility(View.VISIBLE);
             fragmentManager.beginTransaction()
                     .hide(slotFragment)
                     .hide(deviceFragment)
                     .show(settingFragment)
                     .commit();
         }
-        tvTitle.setText(getString(R.string.setting_title));
+        mBind.tvTitle.setText(getString(R.string.setting_title));
     }
 
     private void showDeviceFragment() {
         if (deviceFragment != null) {
-            ivSave.setVisibility(View.GONE);
+            mBind.ivSave.setVisibility(View.GONE);
             fragmentManager.beginTransaction()
                     .hide(slotFragment)
                     .hide(settingFragment)
                     .show(deviceFragment)
                     .commit();
         }
-        tvTitle.setText(getString(R.string.device_title));
+        mBind.tvTitle.setText(getString(R.string.device_title));
     }
 
     @Override
@@ -870,7 +850,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     public void onSave(View view) {
         if (isWindowLocked())
             return;
-        if (radioBtnSetting.isChecked()) {
+        if (mBind.radioBtnSetting.isChecked()) {
             if (settingFragment.isValid()) {
                 showSyncingProgressDialog();
                 settingFragment.saveParams();

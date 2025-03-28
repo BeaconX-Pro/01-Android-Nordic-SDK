@@ -4,35 +4,27 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 
-import com.moko.bxp.nordic.BaseApplication;
 import com.moko.bxp.nordic.BuildConfig;
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
+import com.moko.bxp.nordic.databinding.ActivityAboutBinding;
 import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.bxp.nordic.utils.Utils;
 
 import java.io.File;
 import java.util.Calendar;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class AboutActivity extends BaseActivity {
-    @BindView(R2.id.app_version)
-    TextView appVersion;
-    @BindView(R2.id.tv_feedback_log)
-    TextView tvFeedbackLog;
+    private ActivityAboutBinding mBind;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about);
-        ButterKnife.bind(this);
+        mBind = ActivityAboutBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         if (!BuildConfig.IS_LIBRARY) {
-            appVersion.setText(String.format("APP Version:V%s", Utils.getVersionInfo(this)));
-            tvFeedbackLog.setVisibility(View.VISIBLE);
+            mBind.appVersion.setText(String.format("APP Version:V%s", Utils.getVersionInfo(this)));
+            mBind.tvFeedbackLog.setVisibility(View.VISIBLE);
         }
     }
 

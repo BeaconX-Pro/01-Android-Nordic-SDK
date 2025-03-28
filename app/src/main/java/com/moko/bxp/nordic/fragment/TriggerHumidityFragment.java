@@ -6,36 +6,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.R2;
 import com.moko.bxp.nordic.activity.SlotDataActivity;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import com.moko.bxp.nordic.databinding.FragmentTriggerHumidityBinding;
 
 public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, RadioGroup.OnCheckedChangeListener {
 
     private static final String TAG = "HumidityFragment";
 
-    @BindView(R2.id.sb_trigger_humidity)
-    SeekBar sbTriggerHumidity;
-    @BindView(R2.id.tv_trigger_humidiy)
-    TextView tvTriggerHumidiy;
-    @BindView(R2.id.rb_start)
-    RadioButton rbStart;
-    @BindView(R2.id.rb_stop)
-    RadioButton rbStop;
-    @BindView(R2.id.rg_advertising)
-    RadioGroup rgAdvertising;
-    @BindView(R2.id.tv_trigger_tips)
-    TextView tvTriggerTips;
-//    @BindView(R.id.trigger_humidiy)
-//    TextView triggerHumidiy;
+    private FragmentTriggerHumidityBinding mBind;
 
 
     private SlotDataActivity activity;
@@ -59,22 +41,21 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.fragment_trigger_humidity, container, false);
-        ButterKnife.bind(this, view);
+        mBind = FragmentTriggerHumidityBinding.inflate(inflater, container, false);
         activity = (SlotDataActivity) getActivity();
-        rgAdvertising.setOnCheckedChangeListener(this);
-        sbTriggerHumidity.setOnSeekBarChangeListener(this);
+        mBind.rgAdvertising.setOnCheckedChangeListener(this);
+        mBind.sbTriggerHumidity.setOnSeekBarChangeListener(this);
         if (mIsStart) {
-            rbStart.setChecked(true);
+            mBind.rbStart.setChecked(true);
         } else {
-            rbStop.setChecked(true);
+            mBind.rbStop.setChecked(true);
         }
-        sbTriggerHumidity.setProgress(mProgress);
+        mBind.sbTriggerHumidity.setProgress(mProgress);
         String humidityStr = String.format("%d%%", mProgress);
-        tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
+        mBind.tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
                 mIsStart ? "start advertising" : "stop advertising", "humidity", mIsAbove ? "above" : "below", humidityStr));
 //        triggerHumidiy.setText(mIsAbove ? "Humidity Above" : "Humidity Below");
-        return view;
+        return mBind.getRoot();
     }
 
     @Override
@@ -100,8 +81,8 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         mProgress = progress;
         String humidityStr = String.format("%d%%", progress);
-        tvTriggerHumidiy.setText(humidityStr);
-        tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
+        mBind.tvTriggerHumidiy.setText(humidityStr);
+        mBind.tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
                 mIsStart ? "start advertising" : "stop advertising", "humidity", mIsAbove ? "above" : "below", humidityStr));
     }
 
@@ -127,7 +108,7 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
             mIsStart = false;
         }
         String humidityStr = String.format("%d%%", mProgress);
-        tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
+        mBind.tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
                 mIsStart ? "start advertising" : "stop advertising", "humidity", mIsAbove ? "above" : "below", humidityStr));
     }
 
@@ -154,7 +135,7 @@ public class TriggerHumidityFragment extends Fragment implements SeekBar.OnSeekB
     public void setHumidityTypeAndRefresh(boolean isAbove) {
         mIsAbove = isAbove;
         String humidityStr = String.format("%d%%", mProgress);
-        tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
+        mBind.tvTriggerTips.setText(getString(R.string.trigger_t_h_tips,
                 mIsStart ? "start advertising" : "stop advertising", "humidity", mIsAbove ? "above" : "below", humidityStr));
     }
 

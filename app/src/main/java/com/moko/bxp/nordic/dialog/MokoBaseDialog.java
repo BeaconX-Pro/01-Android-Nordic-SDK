@@ -1,7 +1,6 @@
 package com.moko.bxp.nordic.dialog;
 
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -13,15 +12,15 @@ import android.view.WindowManager;
 
 import com.moko.bxp.nordic.R;
 
-import androidx.annotation.LayoutRes;
 import androidx.annotation.StyleRes;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.viewbinding.ViewBinding;
 
 
-public abstract class MokoBaseDialog extends DialogFragment {
-
+public abstract class MokoBaseDialog<VM extends ViewBinding> extends DialogFragment {
+    protected VM mBind;
     private static final String TAG = "base_dialog";
 
     private static final float DEFAULT_DIM = 0.2f;
@@ -39,24 +38,19 @@ public abstract class MokoBaseDialog extends DialogFragment {
                              Bundle savedInstanceState) {
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getDialog().setCanceledOnTouchOutside(getCancelOutside());
-        getDialog().setOnKeyListener(new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    return getCancellable();
-                }
-                return false;
+        getDialog().setOnKeyListener((dialog, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                return getCancellable();
             }
+            return false;
         });
-        View v = inflater.inflate(getLayoutRes(), container, false);
-        bindView(v);
-        return v;
+        mBind = getViewBind(inflater,container);
+        onCreateView();
+        return mBind.getRoot();
     }
+    protected abstract VM getViewBind(LayoutInflater inflater, ViewGroup container);
 
-    @LayoutRes
-    public abstract int getLayoutRes();
-
-    public abstract void bindView(View v);
+    protected void onCreateView(){};
 
     @Override
     public void onStart() {
