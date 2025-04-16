@@ -145,7 +145,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 // 设备断开，通知页面更新
                 if (mIsClose)
                     return;
-                if (mDisconnectType > 0)
+                if (mDisconnectType == 1 || mDisconnectType == 2)
                     return;
                 if (MokoSupport.getInstance().isBluetoothOpen()) {
                     if (isUpgrading) {
