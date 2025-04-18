@@ -15,7 +15,7 @@
             android:id="@+id/tv_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:drawableLeft="@drawable/back"
+            android:drawableLeft="@drawable/ic_back"
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
             android:paddingLeft="16dp"
@@ -43,7 +43,7 @@
             android:onClick="onSave"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:src="@drawable/save" />
+            android:src="@drawable/ic_save" />
     </RelativeLayout>
 
     <ScrollView
@@ -60,7 +60,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/slot_item_bg"
+                android:background="@drawable/ic_slot_item_bg"
                 android:paddingLeft="25dp"
                 android:paddingTop="10dp"
                 android:paddingRight="25dp"
@@ -70,7 +70,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:drawableLeft="@drawable/frame_type"
+                    android:drawableLeft="@drawable/ic_slot_frame_type"
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
                     android:text="Frame type"
@@ -116,7 +116,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/trigger"
+                    android:drawableLeft="@drawable/ic_sensor_trigger"
                     android:drawablePadding="10dp"
                     android:gravity="center"
                     android:text="Trigger"

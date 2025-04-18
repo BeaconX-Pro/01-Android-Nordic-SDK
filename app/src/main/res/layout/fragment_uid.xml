@@ -7,7 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/slot_item_bg"
+        android:background="@drawable/ic_slot_item_bg"
         android:orientation="vertical"
         android:paddingLeft="25dp"
         android:paddingTop="10dp"
@@ -17,7 +17,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/adv_content"
+            android:drawableLeft="@drawable/ic_slot_adv"
             android:drawablePadding="10dp"
             android:gravity="center"
             android:text="Adv content"
@@ -101,7 +101,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:background="@drawable/slot_item_bg"
+        android:background="@drawable/ic_slot_item_bg"
         android:orientation="vertical"
         android:paddingLeft="25dp"
         android:paddingTop="10dp"
@@ -111,7 +111,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/base_params"
+            android:drawableLeft="@drawable/ic_slot_params"
             android:drawablePadding="10dp"
             android:gravity="center"
             android:text="Parameters"

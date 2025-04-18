@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.activity.THDataActivity;
 import com.moko.bxp.nordic.databinding.FragmentStorageTimeBinding;
-import com.moko.bxp.nordic.dialog.BottomDialog;
+import com.moko.lib.bxpui.dialog.BottomDialog;
 
 import java.util.ArrayList;
 

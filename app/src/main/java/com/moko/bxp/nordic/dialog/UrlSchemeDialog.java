@@ -3,6 +3,7 @@ package com.moko.bxp.nordic.dialog;
 import android.content.Context;
 
 import com.moko.bxp.nordic.databinding.DialogUrlSchemeBinding;
+import com.moko.lib.bxpui.dialog.BaseDialog;
 import com.moko.support.nordic.entity.UrlSchemeEnum;
 
 public class UrlSchemeDialog extends BaseDialog<DialogUrlSchemeBinding> {

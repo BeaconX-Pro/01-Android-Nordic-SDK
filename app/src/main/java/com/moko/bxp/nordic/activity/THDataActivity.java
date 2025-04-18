@@ -23,7 +23,7 @@ import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.databinding.ActivityThBinding;
-import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
+import com.moko.lib.bxpui.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.fragment.StorageHumidityFragment;
 import com.moko.bxp.nordic.fragment.StorageTHFragment;
 import com.moko.bxp.nordic.fragment.StorageTempFragment;

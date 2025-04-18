@@ -14,7 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:src="@drawable/blue_arrows" />
+            android:src="@drawable/ic_slot_point" />
 
         <TextView
             android:layout_width="wrap_content"

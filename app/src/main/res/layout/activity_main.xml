@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
-            android:drawableLeft="@drawable/back"
+            android:drawableLeft="@drawable/ic_back"
             android:drawablePadding="6dp"
             android:gravity="center_vertical"
             android:onClick="onBack"
@@ -42,7 +42,7 @@
             android:onClick="onAbout"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:src="@drawable/about" />
+            android:src="@drawable/ic_about" />
     </RelativeLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -69,7 +69,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:drawableLeft="@drawable/filter_search"
+                android:drawableLeft="@drawable/ic_filter_search"
                 android:drawablePadding="10dp"
                 android:gravity="center_vertical"
                 android:text="Edit Filter"
@@ -80,7 +80,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/filter_arrow" />
+                android:src="@drawable/ic_filter_arrow" />
 
         </RelativeLayout>
 
@@ -119,7 +119,7 @@
                 android:onClick="onFilterDelete"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:src="@drawable/filter_delete" />
+                android:src="@drawable/ic_filter_delete" />
 
         </RelativeLayout>
 
@@ -131,7 +131,7 @@
             android:onClick="onRefresh"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:src="@drawable/refresh"
+            android:src="@drawable/ic_refresh"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

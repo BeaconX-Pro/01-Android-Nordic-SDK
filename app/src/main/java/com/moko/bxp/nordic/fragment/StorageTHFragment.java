@@ -11,7 +11,7 @@ import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.activity.THDataActivity;
 import com.moko.bxp.nordic.databinding.FragmentStorageTHBinding;
-import com.moko.bxp.nordic.dialog.BottomDialog;
+import com.moko.lib.bxpui.dialog.BottomDialog;
 
 import java.util.ArrayList;
 

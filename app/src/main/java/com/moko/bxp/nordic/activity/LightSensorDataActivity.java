@@ -22,8 +22,8 @@ import com.moko.bxp.nordic.BuildConfig;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.adapter.LightSensorDataListAdapter;
 import com.moko.bxp.nordic.databinding.ActivityLightSensorBinding;
-import com.moko.bxp.nordic.dialog.AlertMessageDialog;
-import com.moko.bxp.nordic.dialog.LoadingMessageDialog;
+import com.moko.lib.bxpui.dialog.AlertMessageDialog;
+import com.moko.lib.bxpui.dialog.LoadingMessageDialog;
 import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.bxp.nordic.utils.Utils;
 import com.moko.support.nordic.MokoSupport;
@@ -79,7 +79,7 @@ public class LightSensorDataActivity extends BaseActivity {
             mBind.tvExport.setEnabled(true);
             if (!mIsShown) {
                 mIsShown = true;
-                Drawable top = getResources().getDrawable(R.drawable.ic_download_checked);
+                Drawable top = getResources().getDrawable(R.drawable.ic_export_enable);
                 mBind.tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
             }
             mBind.llData.setVisibility(View.VISIBLE);
@@ -178,7 +178,7 @@ public class LightSensorDataActivity extends BaseActivity {
                                         lightSensorStoreData.clear();
                                         mAdapter.replaceData(lightSensorStoreData);
                                         mBind.llData.setVisibility(View.GONE);
-                                        Drawable top = getResources().getDrawable(R.drawable.ic_download);
+                                        Drawable top = getResources().getDrawable(R.drawable.ic_export_unenable);
                                         mBind.tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
                                         ToastUtils.showToast(this, "Erase success!");
                                     } else {
@@ -217,7 +217,7 @@ public class LightSensorDataActivity extends BaseActivity {
                         if (!mIsShown) {
                             mIsShown = true;
                             mBind.llData.setVisibility(View.VISIBLE);
-                            Drawable top = getResources().getDrawable(R.drawable.ic_download_checked);
+                            Drawable top = getResources().getDrawable(R.drawable.ic_export_enable);
                             mBind.tvExport.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
                         }
                         if (value.length > 6) {
