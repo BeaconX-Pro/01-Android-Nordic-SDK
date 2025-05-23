@@ -92,6 +92,7 @@ public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHo
                 helper.setVisible(R.id.tv_tx_power, true);
                 helper.setVisible(R.id.tv_ranging_data, true);
                 helper.setText(R.id.tv_tx_power, String.format("Tx power:%ddBm", item.txPower));
+                helper.setText(R.id.tv_tamper_state, item.tamperState > 0 ? "Tamper alert" : "Tamper normal");
                 if (item.ambientLightState < 0) {
                     int rangingData = item.rangingData;
                     helper.setText(R.id.tv_ranging_data, String.format("Ranging data:%sdBm", String.valueOf((byte) rangingData)));

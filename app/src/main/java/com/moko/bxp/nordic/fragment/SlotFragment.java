@@ -34,6 +34,8 @@ public class SlotFragment extends Fragment {
     private DeviceInfoActivity activity;
     private SlotData slotData;
     private int deviceType;
+    private boolean mSupportTamperDetect;
+    private boolean mNoSingleTrigger;
     private int triggerType;
     private String triggerData;
 
@@ -87,6 +89,8 @@ public class SlotFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), SlotDataActivity.class);
                 intent.putExtra(AppConstants.EXTRA_KEY_SLOT_DATA, slotData);
                 intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, deviceType);
+                intent.putExtra(AppConstants.EXTRA_KEY_TAMPER_DETECT, mSupportTamperDetect);
+                intent.putExtra(AppConstants.EXTRA_KEY_NO_SINGLE_TRIGGER, mNoSingleTrigger);
                 startActivityForResult(intent, AppConstants.REQUEST_CODE_SLOT_DATA);
                 break;
             case IBEACON:
@@ -199,6 +203,8 @@ public class SlotFragment extends Fragment {
         intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, deviceType);
         intent.putExtra(AppConstants.EXTRA_KEY_TRIGGER_TYPE, triggerType);
         intent.putExtra(AppConstants.EXTRA_KEY_TRIGGER_DATA, triggerData);
+        intent.putExtra(AppConstants.EXTRA_KEY_TAMPER_DETECT, mSupportTamperDetect);
+        intent.putExtra(AppConstants.EXTRA_KEY_NO_SINGLE_TRIGGER, mNoSingleTrigger);
         startActivityForResult(intent, AppConstants.REQUEST_CODE_SLOT_DATA);
     }
 
@@ -254,6 +260,14 @@ public class SlotFragment extends Fragment {
 
     public void setDeviceType(int deviceType) {
         this.deviceType = deviceType;
+    }
+
+    public void setSupportTamperDetect(boolean supportTamperDetect) {
+        this.mSupportTamperDetect = supportTamperDetect;
+    }
+
+    public void setNoSingleTrigger(boolean noSingleTrigger) {
+        this.mNoSingleTrigger = noSingleTrigger;
     }
 
 

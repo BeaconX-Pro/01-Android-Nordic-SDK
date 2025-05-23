@@ -20,6 +20,8 @@ public class AppConstants {
     public static final String EXTRA_KEY_DEVICE_TYPE = "EXTRA_KEY_DEVICE_TYPE";
     public static final String EXTRA_KEY_TRIGGER_TYPE = "EXTRA_KEY_TRIGGER_TYPE";
     public static final String EXTRA_KEY_TRIGGER_DATA = "EXTRA_KEY_TRIGGER_DATA";
+    public static final String EXTRA_KEY_TAMPER_DETECT = "EXTRA_KEY_TAMPER_DETECT";
+    public static final String EXTRA_KEY_NO_SINGLE_TRIGGER = "EXTRA_KEY_NO_SINGLE_TRIGGER";
     public static final String EXTRA_KEY_PASSWORD_VERIFICATION = "EXTRA_KEY_PASSWORD_VERIFICATION";
     public static final String IS_NEW_VERSION = "IS_NEW_VERSION";
 

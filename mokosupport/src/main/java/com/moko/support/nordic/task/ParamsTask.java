@@ -152,6 +152,10 @@ public class ParamsTask extends OrderTask {
                 value = "EA" + MokoUtils.int2HexString(ParamsKeyEnum.SET_TRIGGER_DATA.getParamsKey()) + "0004"
                         + "07" + String.format("%04X", params) + (isStart ? "01" : "02");
                 break;
+            case 8:
+                value = "EA" + MokoUtils.int2HexString(ParamsKeyEnum.SET_TRIGGER_DATA.getParamsKey()) + "0004"
+                        + "08" + String.format("%04X", params) + (isStart ? "01" : "02");
+                break;
         }
         data = MokoUtils.hex2bytes(value);
     }

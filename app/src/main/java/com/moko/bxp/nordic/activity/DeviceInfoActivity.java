@@ -327,14 +327,23 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
                                 case GET_NEW_FIRMWARE_VERSION:
                                     if (length > 0) {
-                                        deviceFragment.setFirmwareVersion(Arrays.copyOfRange(value, 4, value.length));
+                                        byte[] versionBytes = Arrays.copyOfRange(value, 4, value.length);
+                                        String version = new String(versionBytes);
+                                        deviceFragment.setFirmwareVersion(versionBytes);
                                         validParams.firmwareVersion = "1";
+                                        if (version.contains("BXP-DH01") || version.contains("BXP-DH_W7") || version.contains("BXP-D04"))
+                                            slotFragment.setSupportTamperDetect(true);
+                                        if (version.contains("BXP-C"))
+                                            // no single trigger
+                                            slotFragment.setNoSingleTrigger(true);
                                     }
                                     break;
 
                                 case GET_NEW_SOFTWARE_VERSION:
                                     if (length > 0) {
-                                        deviceFragment.setSoftwareVersion(Arrays.copyOfRange(value, 4, value.length));
+                                        byte[] versionBytes = Arrays.copyOfRange(value, 4, value.length);
+                                        String version = new String(versionBytes);
+                                        deviceFragment.setSoftwareVersion(versionBytes);
                                         validParams.softwareVersion = "1";
                                     }
                                     break;
@@ -363,8 +372,14 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                         validParams.hardwareVersion = "1";
                         break;
                     case CHAR_FIRMWARE_REVISION:
+                        String version = new String(value);
                         deviceFragment.setFirmwareVersion(value);
                         validParams.firmwareVersion = "1";
+                        if (version.contains("BXP-DH01") || version.contains("BXP-DH_W7") || version.contains("BXP-D04"))
+                            slotFragment.setSupportTamperDetect(true);
+                        if (version.contains("BXP-C"))
+                            // no single trigger
+                            slotFragment.setNoSingleTrigger(true);
                         break;
                     case CHAR_SOFTWARE_REVISION:
                         deviceFragment.setSoftwareVersion(value);

@@ -38,6 +38,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
         int lockState = -1;
 //        int ambientLightSupport = -1;
         int ambientLightState = -1;
+        int tamperState = -1;
         ScanResult result = deviceInfo.scanResult;
         ScanRecord record = result.getScanRecord();
         Map<ParcelUuid, byte[]> map = record.getServiceData();
@@ -100,6 +101,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                                 if (ambientLightSupport == 4) {
                                     ambientLightState = bytes[6] & 2;
                                 }
+                                tamperState = bytes[6] & 8;
 //                                connectState = bytes[6] & 0xff;
                                 // 40000a0d0d0001ff02030405063001
                                 break;
@@ -196,6 +198,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
             if (ambientLightState >= 0) {
                 beaconXInfo.ambientLightState = ambientLightState;
             }
+            beaconXInfo.tamperState = tamperState;
             if (result.isConnectable())
                 beaconXInfo.connectState = 1;
             beaconXInfo.scanRecord = deviceInfo.scanRecord;
@@ -223,6 +226,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
             } else {
                 beaconXInfo.ambientLightState = ambientLightState;
             }
+            beaconXInfo.tamperState = tamperState;
             if (result.isConnectable()) {
                 beaconXInfo.connectState = 1;
             } else {

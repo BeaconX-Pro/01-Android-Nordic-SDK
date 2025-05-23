@@ -28,6 +28,7 @@ public class BeaconXInfo implements Serializable {
     public int battery;
     public int lockState;
     public int ambientLightState;
+    public int tamperState;
 //    public int ambientLightSupport;
     public int connectState;
     public long intervalTime;
