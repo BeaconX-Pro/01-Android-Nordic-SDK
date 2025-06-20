@@ -50,7 +50,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
         int type = -1;
         int needParseData = -1;
         byte[] manufacturerBytes = record.getManufacturerSpecificData(0x004C);
-        if (null != manufacturerBytes && manufacturerBytes.length ==23) {
+        if (null != manufacturerBytes && manufacturerBytes.length == 23) {
             isBeacon = true;
             type = BeaconXInfo.VALID_DATA_TYPE_IBEACON_APPLE;
             values = manufacturerBytes;
@@ -198,7 +198,9 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
             if (ambientLightState >= 0) {
                 beaconXInfo.ambientLightState = ambientLightState;
             }
-            beaconXInfo.tamperState = tamperState;
+            if (tamperState >= 0) {
+                beaconXInfo.tamperState = tamperState;
+            }
             if (result.isConnectable())
                 beaconXInfo.connectState = 1;
             beaconXInfo.scanRecord = deviceInfo.scanRecord;
@@ -226,7 +228,9 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
             } else {
                 beaconXInfo.ambientLightState = ambientLightState;
             }
-            beaconXInfo.tamperState = tamperState;
+            if (tamperState >= 0) {
+                beaconXInfo.tamperState = tamperState;
+            }
             if (result.isConnectable()) {
                 beaconXInfo.connectState = 1;
             } else {
