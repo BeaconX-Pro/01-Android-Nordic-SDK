@@ -14,7 +14,6 @@ import android.widget.RadioGroup;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.activity.SlotDataActivity;
 import com.moko.bxp.nordic.databinding.FragmentTriggerTamperDetectBinding;
-import com.moko.bxp.nordic.databinding.FragmentTriggerTappedBinding;
 import com.moko.bxp.nordic.utils.ToastUtils;
 
 public class TriggerTamperDetectFragment extends Fragment implements RadioGroup.OnCheckedChangeListener {

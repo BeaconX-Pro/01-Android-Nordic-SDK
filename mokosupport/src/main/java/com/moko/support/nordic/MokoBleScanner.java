@@ -3,8 +3,6 @@ package com.moko.support.nordic;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 
-import androidx.annotation.NonNull;
-
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.nordic.callback.MokoScanDeviceCallback;
 import com.moko.support.nordic.entity.DeviceInfo;
@@ -12,6 +10,7 @@ import com.moko.support.nordic.entity.DeviceInfo;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat;
 import no.nordicsemi.android.support.v18.scanner.ScanCallback;
 import no.nordicsemi.android.support.v18.scanner.ScanFilter;
@@ -36,9 +35,21 @@ public final class MokoBleScanner {
                 .setLegacy(false)
                 .build();
 //        List<ScanFilter> scanFilterList = new ArrayList<>();
-//        ScanFilter.Builder builder = new ScanFilter.Builder();
-//        builder.setServiceData(new ParcelUuid(OrderServices.SERVICE_ADV.getUuid()), null);
-//        scanFilterList.add(builder.build());
+//        ScanFilter.Builder builderEddystone = new ScanFilter.Builder();
+//        builderEddystone.setServiceData(new ParcelUuid(OrderServices.SERVICE_ADV_EDDYSTONE.getUuid()), null);
+//        scanFilterList.add(builderEddystone.build());
+//        ScanFilter.Builder builderCustom = new ScanFilter.Builder();
+//        builderCustom.setServiceData(new ParcelUuid(OrderServices.SERVICE_ADV_CUSTOM.getUuid()), null);
+//        scanFilterList.add(builderCustom.build());
+//        ScanFilter.Builder builderCustom2 = new ScanFilter.Builder();
+//        builderCustom2.setServiceData(new ParcelUuid(OrderServices.SERVICE_ADV_CUSTOM_2.getUuid()), null);
+//        scanFilterList.add(builderCustom2.build());
+//        ScanFilter.Builder builderCustomIBeacon = new ScanFilter.Builder();
+//        builderCustomIBeacon.setServiceData(new ParcelUuid(OrderServices.SERVICE_ADV_CUSTOM_IBEACON.getUuid()), null);
+//        scanFilterList.add(builderCustomIBeacon.build());
+//        ScanFilter.Builder builderIBeacon = new ScanFilter.Builder();
+//        builderIBeacon.setManufacturerData(0x004C, null);
+//        scanFilterList.add(builderIBeacon.build());
         List<ScanFilter> scanFilterList = Collections.singletonList(new ScanFilter.Builder().build());
         mMokoLeScanHandler = new MokoLeScanHandler(callback);
         scanner.startScan(scanFilterList, settings, mMokoLeScanHandler);

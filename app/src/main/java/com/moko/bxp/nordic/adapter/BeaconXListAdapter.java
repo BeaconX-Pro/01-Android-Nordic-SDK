@@ -23,7 +23,6 @@ import com.moko.bxp.nordic.utils.BeaconXParser;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 public class BeaconXListAdapter extends BaseQuickAdapter<BeaconXInfo, BaseViewHolder> {
     public BeaconXListAdapter() {
