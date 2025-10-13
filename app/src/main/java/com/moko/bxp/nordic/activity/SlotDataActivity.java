@@ -35,7 +35,7 @@ import com.moko.bxp.nordic.fragment.TriggerTappedFragment;
 import com.moko.bxp.nordic.fragment.TriggerTempFragment;
 import com.moko.bxp.nordic.fragment.UidFragment;
 import com.moko.bxp.nordic.fragment.UrlFragment;
-import com.moko.bxp.nordic.utils.ToastUtils;
+import com.moko.lib.bxpui.utils.ToastUtils;
 import com.moko.lib.bxpui.dialog.BottomDialog;
 import com.moko.lib.bxpui.dialog.LoadingMessageDialog;
 import com.moko.support.nordic.MokoSupport;
@@ -102,6 +102,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
     private boolean mNoSingleTrigger;
     public SlotFrameTypeEnum currentFrameTypeEnum;
     public boolean isConfigError;
+    private int slotEnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +111,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
         setContentView(mBind.getRoot());
         if (getIntent() != null && getIntent().getExtras() != null) {
             slotData = (SlotData) getIntent().getSerializableExtra(AppConstants.EXTRA_KEY_SLOT_DATA);
+            slotEnable = getIntent().getIntExtra(AppConstants.EXTRA_KEY_SLOT_ENABLE, 0);
             currentFrameTypeEnum = slotData.frameTypeEnum;
             deviceType = getIntent().getIntExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, 0);
             triggerType = getIntent().getIntExtra(AppConstants.EXTRA_KEY_TRIGGER_TYPE, 0);
@@ -131,9 +133,6 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                 triggerTypes.add("Single click button");
             triggerTypes.add("Press button twice");
             triggerTypes.add("Press button three times");
-            if (mSupportTamperDetect)
-                // 兼容BXP-DH01/27
-                triggerTypes.add("Tamper detect");
         } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS) {
             slotTypeArray = getResources().getStringArray(R.array.slot_type_axis);
             mBind.npvSlotType.setDisplayedValues(slotTypeArray);
@@ -207,6 +206,9 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             triggerTypes.add("Device moves");
             triggerTypes.add("Ambient light detected");
         }
+        if (mSupportTamperDetect)
+            // 兼容BXP-DH01/W7
+            triggerTypes.add("Tamper detect");
         final int length = slotTypeArray.length;
         mBind.npvSlotType.setMinValue(0);
         mBind.npvSlotType.setMaxValue(length - 1);
@@ -326,7 +328,18 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                 lightDetectedFragment.setStart((triggerData[3] & 0xff) == 1);
                 break;
             case TRIGGER_TYPE_TAMPER_DETECT:
-                triggerTypeSelected = 3;
+                if (deviceType == DEVICE_TYPE_SENSOR_NULL) {
+                    triggerTypeSelected = 3;
+                }
+                if (deviceType == DEVICE_TYPE_SENSOR_AXIS) {
+                    triggerTypeSelected = 4;
+                }
+                if (deviceType == DEVICE_TYPE_SENSOR_TH) {
+                    triggerTypeSelected = 7;
+                }
+                if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH) {
+                    triggerTypeSelected = 8;
+                }
 
                 byte[] tamperDetectBytes = Arrays.copyOfRange(triggerData, 0, 2);
                 tamperDetectFragment.setData(MokoUtils.toInt(tamperDetectBytes));
@@ -403,7 +416,18 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                 lightDetectedFragment.setStart((triggerData[3] & 0xff) == 1);
                 break;
             case TRIGGER_TYPE_TAMPER_DETECT:
-                triggerTypeSelected = 2;
+                if (deviceType == DEVICE_TYPE_SENSOR_NULL) {
+                    triggerTypeSelected = 2;
+                }
+                if (deviceType == DEVICE_TYPE_SENSOR_AXIS) {
+                    triggerTypeSelected = 3;
+                }
+                if (deviceType == DEVICE_TYPE_SENSOR_TH) {
+                    triggerTypeSelected = 6;
+                }
+                if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH) {
+                    triggerTypeSelected = 7;
+                }
 
                 byte[] tamperDetectBytes = Arrays.copyOfRange(triggerData, 0, 2);
                 tamperDetectFragment.setData(MokoUtils.toInt(tamperDetectBytes));
@@ -524,6 +548,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                 if (MokoConstants.ACTION_DISCONNECTED.equals(action)) {
                     // 设备断开，通知页面更新
                     SlotDataActivity.this.finish();
+                    EventBus.getDefault().unregister(this);
                 }
             }
         });
@@ -542,6 +567,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                 dismissSyncProgressDialog();
                 SlotDataActivity.this.setResult(SlotDataActivity.this.RESULT_OK);
                 SlotDataActivity.this.finish();
+                EventBus.getDefault().unregister(this);
             }
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
@@ -572,6 +598,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                             // 设备上锁
                             ToastUtils.showToast(SlotDataActivity.this, "Locked");
                             SlotDataActivity.this.finish();
+                            EventBus.getDefault().unregister(this);
                         }
                         break;
                 }
@@ -592,6 +619,7 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
                         case BluetoothAdapter.STATE_TURNING_OFF:
                             // 蓝牙断开
                             finish();
+                            EventBus.getDefault().unregister(this);
                             break;
 
                     }
@@ -601,6 +629,12 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
     };
 
     @Override
+    public void onBackPressed() {
+        finish();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (mReceiverTag) {
@@ -608,7 +642,8 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             // 注销广播
             unregisterReceiver(mReceiver);
         }
-        EventBus.getDefault().unregister(this);
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
     }
 
     private LoadingMessageDialog mLoadingMessageDialog;
@@ -774,11 +809,17 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
 
     public void onBack(View view) {
         finish();
+        EventBus.getDefault().unregister(this);
     }
 
     public void onSave(View view) {
         if (isWindowLocked())
             return;
+        int slot = slotData.slotEnum.getSlot();
+        if ((slotEnable >> slot & 1) == 1 && slotDataActionImpl == null && (slotEnable - (1 << slot) == 0)) {
+            ToastUtils.showToast(this, "Please ensure that at lease 1 SLOT is enabled");
+            return;
+        }
         if (slotDataActionImpl == null) {
             byte[] noData = new byte[]{(byte) 0xFF};
             ArrayList<OrderTask> orderTasks = new ArrayList<>();

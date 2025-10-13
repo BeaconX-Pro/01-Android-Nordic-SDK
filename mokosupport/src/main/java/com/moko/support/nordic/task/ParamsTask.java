@@ -21,35 +21,7 @@ public class ParamsTask extends OrderTask {
     }
 
     public void setData(ParamsKeyEnum key) {
-        switch (key) {
-//            case GET_SLOT_TYPE:
-            case GET_DEVICE_MAC:
-//            case GET_DEVICE_NAME:
-            case GET_CONNECTABLE:
-            case GET_BUTTON_POWER:
-            case GET_IBEACON_UUID:
-            case GET_IBEACON_INFO:
-            case SET_CLOSE:
-            case GET_AXIS_PARAMS:
-            case GET_TH_PERIOD:
-            case GET_STORAGE_CONDITION:
-            case GET_DEVICE_TIME:
-            case SET_TH_EMPTY:
-            case GET_TRIGGER_DATA:
-            case GET_HW_RESET_ENABLE:
-            case GET_TRIGGER_LED_NOTIFICATION:
-            case GET_EFFECTIVE_CLICK_INTERVAL:
-            case SET_LIGHT_SENSOR_EMPTY:
-            case GET_NEW_MANUFACTURER_NAME:
-            case GET_NEW_FIRMWARE_VERSION:
-            case GET_NEW_SOFTWARE_VERSION:
-            case GET_NEW_HARDWARE_VERSION:
-            case GET_NEW_PRODUCT_MODE:
-            case GET_NEW_PRODUCT_DATE:
-            case GET_RESPONSE_PACKAGE_SWITCH:
-                createGetConfigData(key.getParamsKey());
-                break;
-        }
+        createGetConfigData(key.getParamsKey());
     }
 
     public void setResponsePackageSwitch(int enable) {
@@ -204,6 +176,40 @@ public class ParamsTask extends OrderTask {
                 (byte) ParamsKeyEnum.SET_EFFECTIVE_CLICK_INTERVAL.getParamsKey(),
                 (byte) 0x00,
                 (byte) 0x02,
+                paramsBytes[0],
+                paramsBytes[1],
+        };
+        response.responseValue = data;
+    }
+
+    public void setRemoteLEDAlarmParams(@IntRange(from = 3, to = 5) int color, @IntRange(from = 1, to = 600) int duration, @IntRange(from = 1, to = 100) int interval) {
+        byte[] paramsBytes = MokoUtils.toByteArray(duration, 2);
+        byte[] intervalBytes = MokoUtils.toByteArray(interval, 2);
+        data = new byte[]{
+                (byte) 0xEA,
+                (byte) ParamsKeyEnum.SET_REMOTE_LED_ALARM_PARAMS.getParamsKey(),
+                (byte) 0x00,
+                (byte) 0x05,
+                (byte) color,
+                intervalBytes[0],
+                intervalBytes[1],
+                paramsBytes[0],
+                paramsBytes[1],
+        };
+        response.responseValue = data;
+    }
+
+    public void setRemoteBuzzerAlarmParams(@IntRange(from = 1, to = 600) int duration, @IntRange(from = 1, to = 100) int interval) {
+        byte[] paramsBytes = MokoUtils.toByteArray(duration, 2);
+        byte[] intervalBytes = MokoUtils.toByteArray(interval, 2);
+        data = new byte[]{
+                (byte) 0xEA,
+                (byte) ParamsKeyEnum.SET_REMOTE_BUZZER_ALARM_PARAMS.getParamsKey(),
+                (byte) 0x00,
+                (byte) 0x05,
+                (byte) 0x03,
+                intervalBytes[0],
+                intervalBytes[1],
                 paramsBytes[0],
                 paramsBytes[1],
         };

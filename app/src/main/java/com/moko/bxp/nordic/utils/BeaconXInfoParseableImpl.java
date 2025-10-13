@@ -101,7 +101,10 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                                 if (ambientLightSupport == 4) {
                                     ambientLightState = bytes[6] & 2;
                                 }
-                                tamperState = bytes[6] & 8;
+                                int tamperSupport = bytes[5] & 16;//0 or 16
+                                if (tamperSupport == 16) {
+                                    tamperState = bytes[6] & 8;
+                                }
 //                                connectState = bytes[6] & 0xff;
                                 // 40000a0d0d0001ff02030405063001
                                 break;
@@ -198,9 +201,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
             if (ambientLightState >= 0) {
                 beaconXInfo.ambientLightState = ambientLightState;
             }
-            if (tamperState >= 0) {
-                beaconXInfo.tamperState = tamperState;
-            }
+            beaconXInfo.tamperState = tamperState;
             if (result.isConnectable())
                 beaconXInfo.connectState = 1;
             beaconXInfo.scanRecord = deviceInfo.scanRecord;
@@ -228,9 +229,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
             } else {
                 beaconXInfo.ambientLightState = ambientLightState;
             }
-            if (tamperState >= 0) {
-                beaconXInfo.tamperState = tamperState;
-            }
+            beaconXInfo.tamperState = tamperState;
             if (result.isConnectable()) {
                 beaconXInfo.connectState = 1;
             } else {

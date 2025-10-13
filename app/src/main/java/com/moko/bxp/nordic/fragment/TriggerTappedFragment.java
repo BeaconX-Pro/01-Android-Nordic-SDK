@@ -14,7 +14,7 @@ import android.widget.RadioGroup;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.activity.SlotDataActivity;
 import com.moko.bxp.nordic.databinding.FragmentTriggerTappedBinding;
-import com.moko.bxp.nordic.utils.ToastUtils;
+import com.moko.lib.bxpui.utils.ToastUtils;
 
 public class TriggerTappedFragment extends Fragment implements RadioGroup.OnCheckedChangeListener {
 

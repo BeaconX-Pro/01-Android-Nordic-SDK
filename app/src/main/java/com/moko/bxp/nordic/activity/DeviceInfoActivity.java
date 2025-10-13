@@ -34,7 +34,7 @@ import com.moko.bxp.nordic.fragment.SettingFragment;
 import com.moko.bxp.nordic.fragment.SlotFragment;
 import com.moko.bxp.nordic.service.DfuServiceNordic;
 import com.moko.bxp.nordic.utils.FileUtils;
-import com.moko.bxp.nordic.utils.ToastUtils;
+import com.moko.lib.bxpui.utils.ToastUtils;
 import com.moko.lib.bxpui.dialog.AlertMessageDialog;
 import com.moko.lib.bxpui.dialog.LoadingMessageDialog;
 import com.moko.lib.bxpui.dialog.ModifyPasswordDialog;
@@ -79,6 +79,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     private int mDisconnectType;
     private int mDeviceType;
     private boolean isNewVersion;
+
+    private boolean isUpgradeDisconnected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,7 +145,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                     MokoSupport.getInstance().lightSensorStoreString = null;
                 }
                 // 设备断开，通知页面更新
-                if (mIsClose)
+                if ((isUpgradeDisconnected && isUpgrading) || mIsClose)
                     return;
                 if (mDisconnectType == 1 || mDisconnectType == 2)
                     return;
@@ -331,8 +333,11 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                         String version = new String(versionBytes);
                                         deviceFragment.setFirmwareVersion(versionBytes);
                                         validParams.firmwareVersion = "1";
-                                        if (version.contains("BXP-DH01") || version.contains("BXP-DH_W7") || version.contains("BXP-D04"))
+                                        if (version.contains("BXP-DH01") || version.contains("BXP-DH_W7") || version.contains("BXP-D04")) {
+                                            isUpgradeDisconnected = true;
                                             slotFragment.setSupportTamperDetect(true);
+                                            settingFragment.setRemoteReminderShown();
+                                        }
                                         if (version.contains("BXP-C"))
                                             // no single trigger
                                             slotFragment.setNoSingleTrigger(true);
@@ -516,6 +521,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         }
     };
 
+    private String mFirmwareFilePath;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -523,17 +530,17 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             if (resultCode == RESULT_OK) {
                 //得到uri，后面就是将uri转化成file的过程。
                 Uri uri = data.getData();
-                String firmwareFilePath = FileUtils.getPath(this, uri);
-                if (TextUtils.isEmpty(firmwareFilePath)) {
+                mFirmwareFilePath = FileUtils.getPath(this, uri);
+                if (TextUtils.isEmpty(mFirmwareFilePath)) {
                     return;
                 }
-                final File firmwareFile = new File(firmwareFilePath);
+                final File firmwareFile = new File(mFirmwareFilePath);
                 if (firmwareFile.exists()) {
                     final DfuServiceInitiator starter = new DfuServiceInitiator(mDeviceMac)
                             .setDeviceName(mDeviceName)
                             .setKeepBond(false)
                             .setDisableNotification(true);
-                    starter.setZip(null, firmwareFilePath);
+                    starter.setZip(null, mFirmwareFilePath);
                     starter.start(this, DfuServiceNordic.class);
                     showDFUProgressDialog("Waiting...");
                 } else {
@@ -778,6 +785,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         public void onDfuCompleted(String deviceAddress) {
             XLog.w("onDfuCompleted...");
             isUpgradeCompleted = true;
+            dismissDFUProgressDialog();
         }
 
         @Override
@@ -795,6 +803,16 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         @Override
         public void onError(String deviceAddress, int error, int errorType, String message) {
             XLog.i("DFU Error:" + message);
+            if (!isUpgradeDisconnected) return;
+            XLog.i("DFU Error Code:" + error);
+            XLog.i("DFU Error Type:" + errorType);
+            mBind.tvTitle.postDelayed(() -> {
+                final DfuServiceInitiator starter = new DfuServiceInitiator(mDeviceMac)
+                        .setKeepBond(false)
+                        .setDisableNotification(true);
+                starter.setZip(null, mFirmwareFilePath);
+                starter.start(DeviceInfoActivity.this, DfuServiceNordic.class);
+            }, 3000);
         }
     };
 
@@ -856,6 +874,11 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             }
         });
         modifyPasswordDialog.show(getSupportFragmentManager());
+    }
+
+    public void onRemoteReminder(View view) {
+        if (isWindowLocked()) return;
+        startActivity(new Intent(this, RemoteReminderActivity.class));
     }
 
     public void onBack(View view) {

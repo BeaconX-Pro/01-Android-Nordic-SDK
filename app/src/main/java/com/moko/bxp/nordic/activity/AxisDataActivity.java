@@ -21,7 +21,7 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.databinding.ActivityAxisBinding;
-import com.moko.bxp.nordic.utils.ToastUtils;
+import com.moko.lib.bxpui.utils.ToastUtils;
 import com.moko.lib.bxpui.dialog.BottomDialog;
 import com.moko.lib.bxpui.dialog.LoadingMessageDialog;
 import com.moko.support.nordic.MokoSupport;

@@ -128,7 +128,8 @@
             android:includeFontPadding="false"
             android:text="Tamper normal"
             android:textColor="@color/grey_666666"
-            android:textSize="10sp" />
+            android:textSize="10sp"
+            android:visibility="gone" />
 
         <!--<TextView
             android:id="@+id/tv_conn_state"

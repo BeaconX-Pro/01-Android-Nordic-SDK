@@ -27,7 +27,7 @@ import com.moko.bxp.nordic.fragment.StorageHumidityFragment;
 import com.moko.bxp.nordic.fragment.StorageTHFragment;
 import com.moko.bxp.nordic.fragment.StorageTempFragment;
 import com.moko.bxp.nordic.fragment.StorageTimeFragment;
-import com.moko.bxp.nordic.utils.ToastUtils;
+import com.moko.lib.bxpui.utils.ToastUtils;
 import com.moko.bxp.nordic.utils.Utils;
 import com.moko.lib.bxpui.dialog.LoadingMessageDialog;
 import com.moko.support.nordic.MokoSupport;

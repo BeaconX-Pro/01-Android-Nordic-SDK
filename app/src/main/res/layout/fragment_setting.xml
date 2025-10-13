@@ -265,8 +265,8 @@
             android:id="@+id/effective_unit"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
             android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
             android:text="x 100ms"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
@@ -275,15 +275,29 @@
             android:id="@+id/et_effective_click_interval"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:hint="5 ~ 15"
             android:layout_centerVertical="true"
-            android:gravity="center"
             android:layout_toLeftOf="@id/effective_unit"
+            android:gravity="center"
+            android:hint="5 ~ 15"
             android:textColor="@color/black_333333"
             android:textSize="15sp" />
 
     </RelativeLayout>
 
+    <View style="@style/divider_line" />
+
+    <TextView
+        android:id="@+id/tvRemoteReminder"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:clickable="true"
+        android:drawableRight="@drawable/ic_arrow_right"
+        android:gravity="center_vertical"
+        android:onClick="onRemoteReminder"
+        android:text="Remote reminder"
+        android:textColor="@color/black_333333"
+        android:textSize="15sp"
+        android:visibility="gone" />
 
     <View style="@style/divider_line" />
 </LinearLayout>

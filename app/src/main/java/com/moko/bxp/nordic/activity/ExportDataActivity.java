@@ -25,7 +25,7 @@ import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.adapter.THDataListAdapter;
 import com.moko.bxp.nordic.databinding.ActivityExportDataBinding;
-import com.moko.bxp.nordic.utils.ToastUtils;
+import com.moko.lib.bxpui.utils.ToastUtils;
 import com.moko.bxp.nordic.utils.Utils;
 import com.moko.lib.bxpui.dialog.AlertMessageDialog;
 import com.moko.lib.bxpui.dialog.LoadingMessageDialog;

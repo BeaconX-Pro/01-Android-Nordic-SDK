@@ -286,7 +286,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getResponsePackageSwitch(){
+    public static OrderTask getResponsePackageSwitch() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.GET_RESPONSE_PACKAGE_SWITCH);
         return task;
@@ -300,7 +300,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getNewManufacturer(){
+    public static OrderTask getNewManufacturer() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.GET_NEW_MANUFACTURER_NAME);
         return task;
@@ -314,7 +314,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getNewDeviceModel(){
+    public static OrderTask getNewDeviceModel() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.GET_NEW_PRODUCT_MODE);
         return task;
@@ -328,7 +328,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getNewProductDate(){
+    public static OrderTask getNewProductDate() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.GET_NEW_PRODUCT_DATE);
         return task;
@@ -342,7 +342,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getNewHardwareVersion(){
+    public static OrderTask getNewHardwareVersion() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.GET_NEW_HARDWARE_VERSION);
         return task;
@@ -356,7 +356,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getNewFirmwareVersion(){
+    public static OrderTask getNewFirmwareVersion() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.GET_NEW_FIRMWARE_VERSION);
         return task;
@@ -370,7 +370,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask getNewSoftwareVersion(){
+    public static OrderTask getNewSoftwareVersion() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.GET_NEW_SOFTWARE_VERSION);
         return task;
@@ -532,7 +532,6 @@ public class OrderTaskAssembler {
     }
 
 
-
     public static OrderTask setLightSensorEmpty() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.SET_LIGHT_SENSOR_EMPTY);
@@ -554,6 +553,30 @@ public class OrderTaskAssembler {
     public static OrderTask setEffectiveClickInterval(@IntRange(from = 500, to = 1500) int interval) {
         ParamsTask task = new ParamsTask();
         task.setEffectiveClickInterval(interval);
+        return task;
+    }
+
+    public static OrderTask getRemoteLEDAlarmParams() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.GET_REMOTE_LED_ALARM_PARAMS);
+        return task;
+    }
+
+    public static OrderTask setRemoteLEDAlarmParams(@IntRange(from = 3, to = 5) int color, @IntRange(from = 1, to = 600) int duration, @IntRange(from = 1, to = 100) int interval) {
+        ParamsTask task = new ParamsTask();
+        task.setRemoteLEDAlarmParams(color, duration, interval);
+        return task;
+    }
+
+    public static OrderTask getRemoteBuzzerAlarmParams() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.GET_REMOTE_BUZZER_ALARM_PARAMS);
+        return task;
+    }
+
+    public static OrderTask setRemoteBuzzerAlarmParams(@IntRange(from = 1, to = 600) int duration, @IntRange(from = 1, to = 100) int interval) {
+        ParamsTask task = new ParamsTask();
+        task.setRemoteBuzzerAlarmParams(duration, interval);
         return task;
     }
 }

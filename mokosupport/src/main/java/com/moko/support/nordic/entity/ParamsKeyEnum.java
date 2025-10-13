@@ -4,7 +4,7 @@ package com.moko.support.nordic.entity;
 import java.io.Serializable;
 
 public enum ParamsKeyEnum implements Serializable {
-    GET_SLOT_TYPE(0x61),
+//    GET_SLOT_TYPE(0x61),
     GET_DEVICE_MAC(0x20),
     GET_AXIS_PARAMS(0x21),
     SET_AXIS_PARAMS(0x31),
@@ -47,6 +47,10 @@ public enum ParamsKeyEnum implements Serializable {
     SET_TRIGGER_LED_NOTIFICATION(0x57),
     GET_EFFECTIVE_CLICK_INTERVAL(0x4D),
     SET_EFFECTIVE_CLICK_INTERVAL(0x5D),
+    GET_REMOTE_LED_ALARM_PARAMS(0x61),
+    SET_REMOTE_LED_ALARM_PARAMS(0x71),
+    GET_REMOTE_BUZZER_ALARM_PARAMS(0x62),
+    SET_REMOTE_BUZZER_ALARM_PARAMS(0x72),
     SET_ERROR(0x0D),
     ;
 

@@ -32,7 +32,7 @@ import com.moko.bxp.nordic.adapter.BeaconXListAdapter;
 import com.moko.bxp.nordic.databinding.ActivityMainBinding;
 import com.moko.bxp.nordic.entity.BeaconXInfo;
 import com.moko.bxp.nordic.utils.BeaconXInfoParseableImpl;
-import com.moko.bxp.nordic.utils.ToastUtils;
+import com.moko.lib.bxpui.utils.ToastUtils;
 import com.moko.lib.bxpui.dialog.AlertMessageDialog;
 import com.moko.lib.bxpui.dialog.LoadingDialog;
 import com.moko.lib.bxpui.dialog.LoadingMessageDialog;
