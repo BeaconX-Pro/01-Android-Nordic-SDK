@@ -14,6 +14,7 @@ import com.moko.support.nordic.entity.OrderCHAR;
 import com.moko.support.nordic.entity.OrderServices;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.TransitionRes;
 
 final class MokoBleConfig extends MokoBleManager {
 
@@ -35,6 +36,7 @@ final class MokoBleConfig extends MokoBleManager {
     @Override
     public boolean checkServiceCharacteristicSupported(BluetoothGatt gatt) {
         final BluetoothGattService service = gatt.getService(OrderServices.SERVICE_CUSTOM.getUuid());
+        final BluetoothGattService otaService = gatt.getService(OrderServices.SERVICE_OTA.getUuid());
         if (service != null) {
             this.gatt = gatt;
             thCharacteristic = service.getCharacteristic(OrderCHAR.CHAR_TH_NOTIFY.getUuid());
@@ -47,11 +49,20 @@ final class MokoBleConfig extends MokoBleManager {
             return disconnectCharacteristic != null
                     && lockedCharacteristic != null;
         }
+        if (otaService != null) {
+            disconnectCharacteristic = null;
+            this.gatt = gatt;
+            return true;
+        }
         return false;
     }
 
     @Override
     public void init() {
+        if (disconnectCharacteristic == null) {
+            requestMtu(247).done(bluetoothDevice -> mMokoResponseCallback.onServicesDiscovered(gatt)).enqueue();
+            return;
+        }
         requestMtu(247).with(((device, mtu) -> {
         })).then((device -> {
             enableDisconnectNotify();

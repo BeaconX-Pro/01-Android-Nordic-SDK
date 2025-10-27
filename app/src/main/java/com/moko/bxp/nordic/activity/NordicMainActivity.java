@@ -177,19 +177,27 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
 //            BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_MODEL_NUMBER);
 //            BluetoothGattCharacteristic deviceTypeChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_DEVICE_TYPE);
 //            if (modelNumberChar != null && deviceTypeChar != null) {
-            showLoadingMessageDialog();
-            mHandler.postDelayed(() -> {
-                if (TextUtils.isEmpty(mPassword)) {
-                    ArrayList<OrderTask> orderTasks = new ArrayList<>();
-                    orderTasks.add(OrderTaskAssembler.getLockState());
-                    MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                } else {
-                    XLog.i("锁定状态，获取unLock，解锁");
-                    ArrayList<OrderTask> orderTasks = new ArrayList<>();
-                    orderTasks.add(OrderTaskAssembler.getUnLock());
-                    MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                }
-            }, 500);
+            if (isOTA) {
+                //连接成功不需要密码
+                dismissLoadingProgressDialog();
+                Intent intent = new Intent(this, DfuActivity.class);
+                intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_MAC, mSelectedBeaconXMac);
+                startActivityForResult(intent, AppConstants.REQUEST_CODE_DEVICE_INFO);
+            } else {
+                showLoadingMessageDialog();
+                mHandler.postDelayed(() -> {
+                    if (TextUtils.isEmpty(mPassword)) {
+                        ArrayList<OrderTask> orderTasks = new ArrayList<>();
+                        orderTasks.add(OrderTaskAssembler.getLockState());
+                        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+                    } else {
+                        XLog.i("锁定状态，获取unLock，解锁");
+                        ArrayList<OrderTask> orderTasks = new ArrayList<>();
+                        orderTasks.add(OrderTaskAssembler.getUnLock());
+                        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+                    }
+                }, 500);
+            }
 
 //            } else {
 //                MokoSupport.getInstance().disConnectBle();
@@ -461,6 +469,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
     private String mPassword;
     private String mSavedPassword;
     private String mSelectedBeaconXMac;
+    private boolean isOTA;
 
     @Override
     public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
@@ -469,13 +478,15 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
             MokoSupport.getInstance().enableBluetooth();
             return;
         }
-        final BeaconXInfo beaconXInfo = (BeaconXInfo) adapter.getItem(position);
+        if (isWindowLocked()) return;
+         final BeaconXInfo beaconXInfo = (BeaconXInfo) adapter.getItem(position);
         if (beaconXInfo != null && !isFinishing()) {
             if (animation != null) {
                 mHandler.removeMessages(0);
                 mokoBleScanner.stopScanDevice();
             }
             mSelectedBeaconXMac = beaconXInfo.mac;
+            isOTA = beaconXInfo.isOTA;
             showLoadingProgressDialog();
             mBind.ivRefresh.postDelayed(new Runnable() {
                 @Override

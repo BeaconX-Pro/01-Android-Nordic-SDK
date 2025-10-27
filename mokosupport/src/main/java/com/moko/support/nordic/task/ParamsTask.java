@@ -182,7 +182,7 @@ public class ParamsTask extends OrderTask {
         response.responseValue = data;
     }
 
-    public void setRemoteLEDAlarmParams(@IntRange(from = 3, to = 5) int color, @IntRange(from = 1, to = 600) int duration, @IntRange(from = 1, to = 100) int interval) {
+    public void setRemoteLEDAlarmParams(@IntRange(from = 3, to = 5) int color, @IntRange(from = 10, to = 6000) int duration, @IntRange(from = 1, to = 100) int interval) {
         byte[] paramsBytes = MokoUtils.toByteArray(duration, 2);
         byte[] intervalBytes = MokoUtils.toByteArray(interval, 2);
         data = new byte[]{
@@ -199,15 +199,16 @@ public class ParamsTask extends OrderTask {
         response.responseValue = data;
     }
 
-    public void setRemoteBuzzerAlarmParams(@IntRange(from = 1, to = 600) int duration, @IntRange(from = 1, to = 100) int interval) {
+    public void setRemoteBuzzerAlarmParams(@IntRange(from = 10, to = 6000) int duration, @IntRange(from = 1, to = 100) int interval) {
         byte[] paramsBytes = MokoUtils.toByteArray(duration, 2);
         byte[] intervalBytes = MokoUtils.toByteArray(interval, 2);
         data = new byte[]{
                 (byte) 0xEA,
                 (byte) ParamsKeyEnum.SET_REMOTE_BUZZER_ALARM_PARAMS.getParamsKey(),
                 (byte) 0x00,
-                (byte) 0x05,
-                (byte) 0x03,
+                (byte) 0x06,
+                (byte) 0x0F,
+                (byte) 0xA0,
                 intervalBytes[0],
                 intervalBytes[1],
                 paramsBytes[0],

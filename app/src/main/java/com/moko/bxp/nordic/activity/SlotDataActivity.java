@@ -35,6 +35,7 @@ import com.moko.bxp.nordic.fragment.TriggerTappedFragment;
 import com.moko.bxp.nordic.fragment.TriggerTempFragment;
 import com.moko.bxp.nordic.fragment.UidFragment;
 import com.moko.bxp.nordic.fragment.UrlFragment;
+import com.moko.lib.bxpui.dialog.AlertMessageDialog;
 import com.moko.lib.bxpui.utils.ToastUtils;
 import com.moko.lib.bxpui.dialog.BottomDialog;
 import com.moko.lib.bxpui.dialog.LoadingMessageDialog;
@@ -817,7 +818,11 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             return;
         int slot = slotData.slotEnum.getSlot();
         if ((slotEnable >> slot & 1) == 1 && slotDataActionImpl == null && (slotEnable - (1 << slot) == 0)) {
-            ToastUtils.showToast(this, "Please ensure that at lease 1 SLOT is enabled");
+            AlertMessageDialog dialog = new AlertMessageDialog();
+            dialog.setMessage("Please ensure that at lease 1 SLOT is enabled");
+            dialog.setConfirm(R.string.ok);
+            dialog.setCancelGone();
+            dialog.show(getSupportFragmentManager());
             return;
         }
         if (slotDataActionImpl == null) {
@@ -920,6 +925,9 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             case 4:
                 if (deviceType == DEVICE_TYPE_SENSOR_AXIS_LIGHT) {
                     triggerType = TRIGGER_TYPE_LIGHT;
+                } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS) {
+                    // 兼容BXP-DH01/27
+                    triggerType = TRIGGER_TYPE_TAMPER_DETECT;
                 } else {
                     triggerType = TRIGGER_TYPE_TEMPERATURE;
                 }
@@ -931,12 +939,20 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             case 7:
                 if (deviceType == DEVICE_TYPE_SENSOR_TH_LIGHT) {
                     triggerType = TRIGGER_TYPE_LIGHT;
+                } else if (deviceType == DEVICE_TYPE_SENSOR_TH) {
+                    // 兼容BXP-DH01/27
+                    triggerType = TRIGGER_TYPE_TAMPER_DETECT;
                 } else {
                     triggerType = TRIGGER_TYPE_MOVE;
                 }
                 break;
             case 8:
-                triggerType = TRIGGER_TYPE_LIGHT;
+                if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH) {
+                    // 兼容BXP-DH01/27
+                    triggerType = TRIGGER_TYPE_TAMPER_DETECT;
+                } else {
+                    triggerType = TRIGGER_TYPE_LIGHT;
+                }
                 break;
         }
         showTriggerFragment();
@@ -998,6 +1014,9 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             case 3:
                 if (deviceType == DEVICE_TYPE_SENSOR_AXIS_LIGHT) {
                     triggerType = TRIGGER_TYPE_LIGHT;
+                } else if (deviceType == DEVICE_TYPE_SENSOR_AXIS) {
+                    // 兼容BXP-DH01/27
+                    triggerType = TRIGGER_TYPE_TAMPER_DETECT;
                 } else {
                     triggerType = TRIGGER_TYPE_TEMPERATURE;
                 }
@@ -1009,12 +1028,20 @@ public class SlotDataActivity extends BaseActivity implements NumberPickerView.O
             case 6:
                 if (deviceType == DEVICE_TYPE_SENSOR_TH_LIGHT) {
                     triggerType = TRIGGER_TYPE_LIGHT;
+                } else if (deviceType == DEVICE_TYPE_SENSOR_TH) {
+                    // 兼容BXP-DH01/27
+                    triggerType = TRIGGER_TYPE_TAMPER_DETECT;
                 } else {
                     triggerType = TRIGGER_TYPE_MOVE;
                 }
                 break;
             case 7:
-                triggerType = TRIGGER_TYPE_LIGHT;
+                if (deviceType == DEVICE_TYPE_SENSOR_AXIS_TH) {
+                    // 兼容BXP-DH01/27
+                    triggerType = TRIGGER_TYPE_TAMPER_DETECT;
+                } else {
+                    triggerType = TRIGGER_TYPE_LIGHT;
+                }
                 break;
         }
         showTriggerFragment();

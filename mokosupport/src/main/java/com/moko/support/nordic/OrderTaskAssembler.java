@@ -562,7 +562,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setRemoteLEDAlarmParams(@IntRange(from = 3, to = 5) int color, @IntRange(from = 1, to = 600) int duration, @IntRange(from = 1, to = 100) int interval) {
+    public static OrderTask setRemoteLEDAlarmParams(@IntRange(from = 3, to = 5) int color, @IntRange(from = 10, to = 6000) int duration, @IntRange(from = 1, to = 100) int interval) {
         ParamsTask task = new ParamsTask();
         task.setRemoteLEDAlarmParams(color, duration, interval);
         return task;
@@ -574,7 +574,7 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static OrderTask setRemoteBuzzerAlarmParams(@IntRange(from = 1, to = 600) int duration, @IntRange(from = 1, to = 100) int interval) {
+    public static OrderTask setRemoteBuzzerAlarmParams(@IntRange(from = 10, to = 6000) int duration, @IntRange(from = 1, to = 100) int interval) {
         ParamsTask task = new ParamsTask();
         task.setRemoteBuzzerAlarmParams(duration, interval);
         return task;

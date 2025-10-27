@@ -24,6 +24,8 @@ public class AppConstants {
     public static final String EXTRA_KEY_NO_SINGLE_TRIGGER = "EXTRA_KEY_NO_SINGLE_TRIGGER";
     public static final String EXTRA_KEY_PASSWORD_VERIFICATION = "EXTRA_KEY_PASSWORD_VERIFICATION";
     public static final String EXTRA_KEY_SLOT_ENABLE = "EXTRA_KEY_SLOT_ENABLE";
+    public static final String EXTRA_KEY_DEVICE_MAC = "EXTRA_KEY_DEVICE_MAC";
+    public static final String EXTRA_KEY_DEVICE_NAME = "EXTRA_KEY_DEVICE_NAME";
     public static final String IS_NEW_VERSION = "IS_NEW_VERSION";
 
     // request_code

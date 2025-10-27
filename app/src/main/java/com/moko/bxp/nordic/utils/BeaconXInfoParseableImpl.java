@@ -46,6 +46,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
         boolean isEddystone = false;
         boolean isBeaconXPro = false;
         boolean isBeacon = false;
+        boolean isOta = false;
         byte[] values = null;
         int type = -1;
         int needParseData = -1;
@@ -95,6 +96,11 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                                 if (bytes.length != 15)
                                     return null;
                                 type = BeaconXInfo.VALID_DATA_FRAME_TYPE_INFO;
+                                if ("MOKO_DFU".equals(deviceInfo.name)) {
+                                    isOta = true;
+                                    type = BeaconXInfo.VALID_DATA_FRAME_TYPE_OTA;
+                                    break;
+                                }
                                 battery = MokoUtils.toInt(Arrays.copyOfRange(bytes, 3, 5));
                                 lockState = bytes[5] & 2;// 0 or 2
                                 int ambientLightSupport = bytes[5] & 4;// 0 or 4
@@ -178,7 +184,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                 }
             }
         }
-        if ((!isEddystone && !isBeaconXPro && !isBeacon) || values == null || type == -1) {
+        if ((!isEddystone && !isBeaconXPro && !isBeacon && !isOta) ||values == null || type == -1){
             return null;
         }
         // avoid repeat
@@ -202,6 +208,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                 beaconXInfo.ambientLightState = ambientLightState;
             }
             beaconXInfo.tamperState = tamperState;
+            beaconXInfo.isOTA = isOta;
             if (result.isConnectable())
                 beaconXInfo.connectState = 1;
             beaconXInfo.scanRecord = deviceInfo.scanRecord;
@@ -230,6 +237,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                 beaconXInfo.ambientLightState = ambientLightState;
             }
             beaconXInfo.tamperState = tamperState;
+            beaconXInfo.isOTA = isOta;
             if (result.isConnectable()) {
                 beaconXInfo.connectState = 1;
             } else {

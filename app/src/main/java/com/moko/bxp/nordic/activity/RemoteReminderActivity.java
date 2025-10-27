@@ -98,18 +98,18 @@ public class RemoteReminderActivity extends BaseActivity {
                                         int color = value[4];
                                         mBind.tvLedNotifyColor.setTag(color - 3);
                                         mBind.tvLedNotifyColor.setText(mColors[color - 3]);
-                                        int time = MokoUtils.toInt(Arrays.copyOfRange(value, 5, 7));
-                                        int interval = MokoUtils.toInt(Arrays.copyOfRange(value, 7, 9));
-                                        mBind.etBlinkingTime.setText(String.valueOf(time));
+                                        int interval = MokoUtils.toInt(Arrays.copyOfRange(value, 5, 7));
+                                        int time = MokoUtils.toInt(Arrays.copyOfRange(value, 7, 9)) / 10;
                                         mBind.etBlinkingInterval.setText(String.valueOf(interval));
+                                        mBind.etBlinkingTime.setText(String.valueOf(time));
                                     }
                                     break;
                                 case GET_REMOTE_BUZZER_ALARM_PARAMS:
                                     if (length == 6) {
-                                        int time = MokoUtils.toInt(Arrays.copyOfRange(value, 6, 8));
-                                        int interval = MokoUtils.toInt(Arrays.copyOfRange(value, 8, 10));
-                                        mBind.etRingingTime.setText(String.valueOf(time));
+                                        int interval = MokoUtils.toInt(Arrays.copyOfRange(value, 6, 8));
+                                        int time = MokoUtils.toInt(Arrays.copyOfRange(value, 8, 10)) / 10;
                                         mBind.etRingingInterval.setText(String.valueOf(interval));
+                                        mBind.etRingingTime.setText(String.valueOf(time));
                                     }
                                     break;
                             }
@@ -160,7 +160,7 @@ public class RemoteReminderActivity extends BaseActivity {
             int ledTime = Integer.parseInt(ledTimeStr);
             int ledInterval = Integer.parseInt(ledIntervalStr);
             ArrayList<OrderTask> orderTasks = new ArrayList<>();
-            orderTasks.add(OrderTaskAssembler.setRemoteLEDAlarmParams(color + 3, ledTime, ledInterval));
+            orderTasks.add(OrderTaskAssembler.setRemoteLEDAlarmParams(color + 3, ledTime * 10, ledInterval));
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         } else {
             ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
@@ -176,7 +176,7 @@ public class RemoteReminderActivity extends BaseActivity {
             int buzzerTime = Integer.parseInt(buzzerTimeStr);
             int buzzerInterval = Integer.parseInt(buzzerIntervalStr);
             ArrayList<OrderTask> orderTasks = new ArrayList<>();
-            orderTasks.add(OrderTaskAssembler.setRemoteBuzzerAlarmParams(buzzerTime, buzzerInterval));
+            orderTasks.add(OrderTaskAssembler.setRemoteBuzzerAlarmParams(buzzerTime * 10, buzzerInterval));
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         } else {
             ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
