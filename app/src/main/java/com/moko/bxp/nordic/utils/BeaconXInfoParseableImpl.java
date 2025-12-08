@@ -13,6 +13,7 @@ import com.moko.support.nordic.service.DeviceInfoParseable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import no.nordicsemi.android.support.v18.scanner.ScanRecord;
@@ -42,6 +43,7 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
         ScanResult result = deviceInfo.scanResult;
         ScanRecord record = result.getScanRecord();
         Map<ParcelUuid, byte[]> map = record.getServiceData();
+        List<ParcelUuid> list = record.getServiceUuids();
         // filter
         boolean isEddystone = false;
         boolean isBeaconXPro = false;
@@ -96,11 +98,6 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                                 if (bytes.length != 15)
                                     return null;
                                 type = BeaconXInfo.VALID_DATA_FRAME_TYPE_INFO;
-                                if ("MOKO_DFU".equals(deviceInfo.name)) {
-                                    isOta = true;
-                                    type = BeaconXInfo.VALID_DATA_FRAME_TYPE_OTA;
-                                    break;
-                                }
                                 battery = MokoUtils.toInt(Arrays.copyOfRange(bytes, 3, 5));
                                 lockState = bytes[5] & 2;// 0 or 2
                                 int ambientLightSupport = bytes[5] & 4;// 0 or 4
@@ -184,7 +181,18 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                 }
             }
         }
-        if ((!isEddystone && !isBeaconXPro && !isBeacon && !isOta) ||values == null || type == -1){
+        if (list != null && !list.isEmpty()) {
+            Iterator iterator = list.iterator();
+            if (iterator.hasNext()) {
+                ParcelUuid parcelUuid = (ParcelUuid) iterator.next();
+                if (parcelUuid.toString().startsWith("0000eaff") && "MK_OTA".equals(deviceInfo.name)) {
+                    isOta = true;
+                    type = BeaconXInfo.VALID_DATA_FRAME_TYPE_OTA;
+                    values = MokoUtils.hex2bytes(parcelUuid.toString());
+                }
+            }
+        }
+        if ((!isEddystone && !isBeaconXPro && !isBeacon && !isOta) || values == null || type == -1) {
             return null;
         }
         // avoid repeat

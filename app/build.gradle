@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdk 28
         targetSdk 35
-        versionCode 114
-        versionName "1.1.4"
+        versionCode 115
+        versionName "1.1.5"
         def formatDate = new Date().format("yyyyMMddHHmm")
         setProperty("archivesBaseName", "BXP-NORDIC_${versionName}_${formatDate}")
     }
