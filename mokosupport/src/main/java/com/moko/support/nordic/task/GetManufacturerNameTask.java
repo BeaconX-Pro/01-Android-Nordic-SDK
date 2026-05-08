@@ -7,8 +7,8 @@ public class GetManufacturerNameTask extends OrderTask {
 
     public byte[] data;
 
-    public GetManufacturerNameTask() {
-        super(OrderCHAR.CHAR_MANUFACTURER_NAME, OrderTask.RESPONSE_TYPE_READ);
+    public GetManufacturerNameTask(String address) {
+        super(OrderCHAR.CHAR_MANUFACTURER_NAME, OrderTask.RESPONSE_TYPE_READ, address);
     }
 
     @Override

@@ -73,8 +73,8 @@ public class LightSensorDataActivity extends BaseActivity {
         }
 
         mAdapter = new LightSensorDataListAdapter();
-        lightSensorStoreData = MokoSupport.getInstance().lightSensorStoreData;
-        lightSensorStoreString = MokoSupport.getInstance().lightSensorStoreString;
+        lightSensorStoreData = MokoSupport.getInstance().lightSensorStoreData.get(OrderTaskAssembler.dataAddress);
+        lightSensorStoreString = MokoSupport.getInstance().lightSensorStoreString.get(OrderTaskAssembler.dataAddress);
         if (lightSensorStoreData != null && lightSensorStoreData.size() > 0 && lightSensorStoreString != null) {
             mBind.tvExport.setEnabled(true);
             if (!mIsShown) {
@@ -103,7 +103,7 @@ public class LightSensorDataActivity extends BaseActivity {
     }
 
 
-    @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
     public void onConnectStatusEvent(ConnectStatusEvent event) {
         final String action = event.getAction();
         runOnUiThread(() -> {
@@ -115,7 +115,7 @@ public class LightSensorDataActivity extends BaseActivity {
 
     }
 
-    @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
     public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
         EventBus.getDefault().cancelEventDelivery(event);
         final String action = event.getAction();
@@ -287,8 +287,8 @@ public class LightSensorDataActivity extends BaseActivity {
         // 关闭通知
         MokoSupport.getInstance().disableLightSensorCurrentNotify();
         MokoSupport.getInstance().disableLightSensorNotify();
-        MokoSupport.getInstance().lightSensorStoreData = lightSensorStoreData;
-        MokoSupport.getInstance().lightSensorStoreString = lightSensorStoreString;
+        MokoSupport.getInstance().lightSensorStoreData.put(OrderTaskAssembler.dataAddress, lightSensorStoreData);
+        MokoSupport.getInstance().lightSensorStoreString.put(OrderTaskAssembler.dataAddress, lightSensorStoreString);
         finish();
 
     }

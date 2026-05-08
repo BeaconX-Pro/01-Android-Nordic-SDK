@@ -8,8 +8,8 @@ public class ResetDeviceTask extends OrderTask {
 
     public byte[] data = new byte[]{0x0b};
 
-    public ResetDeviceTask() {
-        super(OrderCHAR.CHAR_RESET_DEVICE, OrderTask.RESPONSE_TYPE_WRITE);
+    public ResetDeviceTask(String address) {
+        super(OrderCHAR.CHAR_RESET_DEVICE, OrderTask.RESPONSE_TYPE_WRITE, address);
     }
 
     @Override

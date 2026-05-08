@@ -8,8 +8,8 @@ public class GetLightSensorCurrentTask extends OrderTask {
 
     public byte[] data;
 
-    public GetLightSensorCurrentTask() {
-        super(OrderCHAR.CHAR_LIGHT_SENSOR_CURRENT, OrderTask.RESPONSE_TYPE_READ);
+    public GetLightSensorCurrentTask(String address) {
+        super(OrderCHAR.CHAR_LIGHT_SENSOR_CURRENT, OrderTask.RESPONSE_TYPE_READ, address);
     }
 
     @Override

@@ -93,8 +93,8 @@ public class ExportDataActivity extends BaseActivity {
             }
         });
         mAdapter = new THDataListAdapter();
-        thStoreData = MokoSupport.getInstance().thStoreData;
-        thStoreString = MokoSupport.getInstance().thStoreString;
+        thStoreData = MokoSupport.getInstance().thStoreData.get(OrderTaskAssembler.dataAddress);
+        thStoreString = MokoSupport.getInstance().thStoreString.get(OrderTaskAssembler.dataAddress);
         if (thStoreData != null && thStoreData.size() > 0 && thStoreString != null) {
             mBind.tvExport.setEnabled(true);
             if (!mIsShown) {
@@ -138,7 +138,7 @@ public class ExportDataActivity extends BaseActivity {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 400)
     public void onConnectStatusEvent(ConnectStatusEvent event) {
         final String action = event.getAction();
         runOnUiThread(new Runnable() {
@@ -155,7 +155,7 @@ public class ExportDataActivity extends BaseActivity {
         });
     }
 
-    @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 400)
     public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
         EventBus.getDefault().cancelEventDelivery(event);
         final String action = event.getAction();
@@ -388,8 +388,8 @@ public class ExportDataActivity extends BaseActivity {
     private void back() {
         // 关闭通知
         MokoSupport.getInstance().disableStoreNotify();
-        MokoSupport.getInstance().thStoreData = thStoreData;
-        MokoSupport.getInstance().thStoreString = thStoreString;
+        MokoSupport.getInstance().thStoreData.put(OrderTaskAssembler.dataAddress, thStoreData);
+        MokoSupport.getInstance().thStoreString.put(OrderTaskAssembler.dataAddress, thStoreString);
         finish();
     }
 

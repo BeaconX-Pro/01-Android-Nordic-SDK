@@ -8,8 +8,8 @@ public class GetSerialNumberTask extends OrderTask {
 
     public byte[] data;
 
-    public GetSerialNumberTask() {
-        super(OrderCHAR.CHAR_SERIAL_NUMBER, OrderTask.RESPONSE_TYPE_READ);
+    public GetSerialNumberTask(String address) {
+        super(OrderCHAR.CHAR_SERIAL_NUMBER, OrderTask.RESPONSE_TYPE_READ, address);
     }
 
     @Override

@@ -7,8 +7,8 @@ public class SetAdvSlotDataTask extends OrderTask {
 
     public byte[] data;
 
-    public SetAdvSlotDataTask() {
-        super(OrderCHAR.CHAR_ADV_SLOT_DATA, OrderTask.RESPONSE_TYPE_WRITE);
+    public SetAdvSlotDataTask(String address) {
+        super(OrderCHAR.CHAR_ADV_SLOT_DATA, OrderTask.RESPONSE_TYPE_WRITE, address);
     }
 
     @Override

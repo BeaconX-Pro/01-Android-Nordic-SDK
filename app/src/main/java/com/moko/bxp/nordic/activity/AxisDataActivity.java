@@ -83,7 +83,7 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
     public void onConnectStatusEvent(ConnectStatusEvent event) {
         final String action = event.getAction();
         runOnUiThread(new Runnable() {
@@ -100,7 +100,7 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
         });
     }
 
-    @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
     public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
         EventBus.getDefault().cancelEventDelivery(event);
         final String action = event.getAction();
@@ -131,7 +131,7 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
                                         mSelectedScale = value[5] & 0xff;
                                         mBind.tvAxisScale.setText(axisScales.get(mSelectedScale));
                                         mSelectedSensitivity = value[6] & 0xff;
-                                        if (MokoSupport.isNewVersion) {
+                                        if (MokoSupport.getInstance().isNewVersion.get(OrderTaskAssembler.dataAddress)) {
                                             mBind.sbTriggerSensitivity.setProgress(mSelectedSensitivity - 1);
                                             if (mSelectedScale == 0) {
                                                 mBind.sbTriggerSensitivity.setMax(19);
@@ -257,7 +257,7 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (MokoSupport.isNewVersion) {
+        if (MokoSupport.getInstance().isNewVersion.get(OrderTaskAssembler.dataAddress)) {
             mSelectedSensitivity = progress + 1;
             mBind.tvTriggerSensitivity.setText(MokoUtils.getDecimalFormat("0.0g").format(mSelectedSensitivity * 0.1));
         } else {
@@ -315,7 +315,7 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
         scaleDialog.setListener(value -> {
             mSelectedScale = value;
             mBind.tvAxisScale.setText(axisScales.get(value));
-            if (MokoSupport.isNewVersion) {
+            if (MokoSupport.getInstance().isNewVersion.get(OrderTaskAssembler.dataAddress)) {
                 mBind.sbTriggerSensitivity.setProgress(0);
                 if (mSelectedScale == 0) {
                     mBind.sbTriggerSensitivity.setMax(19);

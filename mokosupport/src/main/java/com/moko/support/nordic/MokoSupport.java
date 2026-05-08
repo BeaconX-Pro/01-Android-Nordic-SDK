@@ -22,10 +22,12 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class MokoSupport extends MokoBleLib {
-    private HashMap<OrderCHAR, BluetoothGattCharacteristic> mCharacteristicMap;
+    private Map<String, Map<OrderCHAR, BluetoothGattCharacteristic>> mCharacteristicMap = new LinkedHashMap<>();
 
     private static volatile MokoSupport INSTANCE;
 
@@ -66,22 +68,31 @@ public class MokoSupport extends MokoBleLib {
 
     @Override
     public void onDeviceConnected(BluetoothGatt gatt) {
-        mCharacteristicMap = new MokoCharacteristicHandler().getCharacteristics(gatt);
+        if (mCharacteristicMap.get(gatt.getDevice().getAddress()) == null) {
+            mCharacteristicMap.put(gatt.getDevice().getAddress(), new MokoCharacteristicHandler().getCharacteristics(gatt));
+        }
         ConnectStatusEvent connectStatusEvent = new ConnectStatusEvent();
         connectStatusEvent.setAction(MokoConstants.ACTION_DISCOVER_SUCCESS);
+        connectStatusEvent.setBluetoothDevice(gatt.getDevice());
         EventBus.getDefault().post(connectStatusEvent);
     }
 
     @Override
     public void onDeviceDisconnected(BluetoothDevice device) {
+        mCharacteristicMap.remove(device.getAddress());
         ConnectStatusEvent connectStatusEvent = new ConnectStatusEvent();
         connectStatusEvent.setAction(MokoConstants.ACTION_DISCONNECTED);
+        connectStatusEvent.setBluetoothDevice(device);
         EventBus.getDefault().post(connectStatusEvent);
     }
 
     @Override
-    public BluetoothGattCharacteristic getCharacteristic(Enum orderCHAR) {
-        return mCharacteristicMap.get(orderCHAR);
+    public BluetoothGattCharacteristic getCharacteristic(String address, Enum orderCHAR) {
+        return mCharacteristicMap.get(address).get(orderCHAR);
+    }
+
+    public ArrayList<String> getConnectedDeviceList() {
+        return new ArrayList<>(mCharacteristicMap.keySet());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -89,9 +100,9 @@ public class MokoSupport extends MokoBleLib {
     ///////////////////////////////////////////////////////////////////////////
 
     @Override
-    public boolean isCHARNull() {
+    public boolean isCHARNull(String address) {
         if (mCharacteristicMap == null || mCharacteristicMap.isEmpty()) {
-            disConnectBle();
+            disConnectBle(address);
             return true;
         }
         return false;
@@ -222,10 +233,10 @@ public class MokoSupport extends MokoBleLib {
             mBleConfig.disableLightSensorCurrentNotify();
     }
 
-    public static boolean isNewVersion = false;
-    public ArrayList<THStoreData> thStoreData;
-    public StringBuilder thStoreString;
-    public ArrayList<LightSensorStoreData> lightSensorStoreData;
-    public StringBuilder lightSensorStoreString;
+    public HashMap<String, Boolean> isNewVersion = new HashMap<>();
+    public HashMap<String, ArrayList<THStoreData>> thStoreData = new HashMap<>();
+    public HashMap<String, StringBuilder> thStoreString = new HashMap<>();
+    public HashMap<String, ArrayList<LightSensorStoreData>> lightSensorStoreData = new HashMap<>();
+    public HashMap<String, StringBuilder> lightSensorStoreString = new HashMap<>();
 
 }

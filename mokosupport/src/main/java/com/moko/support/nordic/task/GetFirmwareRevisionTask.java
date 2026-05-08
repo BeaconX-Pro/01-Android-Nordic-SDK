@@ -7,8 +7,8 @@ public class GetFirmwareRevisionTask extends OrderTask {
 
     public byte[] data;
 
-    public GetFirmwareRevisionTask() {
-        super(OrderCHAR.CHAR_FIRMWARE_REVISION, OrderTask.RESPONSE_TYPE_READ);
+    public GetFirmwareRevisionTask(String address) {
+        super(OrderCHAR.CHAR_FIRMWARE_REVISION, OrderTask.RESPONSE_TYPE_READ, address);
     }
 
     @Override

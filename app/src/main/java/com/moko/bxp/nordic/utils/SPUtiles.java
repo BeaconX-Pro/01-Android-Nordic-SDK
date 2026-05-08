@@ -51,4 +51,10 @@ public class SPUtiles {
     public static float getFloatValue(Context context, String key, float defValue) {
         return context.getSharedPreferences(AppConstants.SP_NAME, Context.MODE_PRIVATE).getFloat(key, defValue);
     }
+
+    public static void removeValue(Context context, String key) {
+        Editor editor = context.getSharedPreferences(AppConstants.SP_NAME, Context.MODE_PRIVATE).edit();
+        editor.remove(key);
+        editor.commit();
+    }
 }

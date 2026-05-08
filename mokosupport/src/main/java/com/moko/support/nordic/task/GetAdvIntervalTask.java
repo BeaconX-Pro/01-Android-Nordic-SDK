@@ -7,8 +7,8 @@ public class GetAdvIntervalTask extends OrderTask {
 
     public byte[] data;
 
-    public GetAdvIntervalTask() {
-        super(OrderCHAR.CHAR_ADV_INTERVAL, OrderTask.RESPONSE_TYPE_READ);
+    public GetAdvIntervalTask(String address) {
+        super(OrderCHAR.CHAR_ADV_INTERVAL, OrderTask.RESPONSE_TYPE_READ, address);
     }
 
     @Override

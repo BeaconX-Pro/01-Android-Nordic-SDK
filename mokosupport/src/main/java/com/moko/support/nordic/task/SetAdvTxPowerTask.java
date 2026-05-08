@@ -7,8 +7,8 @@ public class SetAdvTxPowerTask extends OrderTask {
 
     public byte[] data;
 
-    public SetAdvTxPowerTask() {
-        super(OrderCHAR.CHAR_ADV_TX_POWER, OrderTask.RESPONSE_TYPE_WRITE);
+    public SetAdvTxPowerTask(String address) {
+        super(OrderCHAR.CHAR_ADV_TX_POWER, OrderTask.RESPONSE_TYPE_WRITE, address);
     }
 
     @Override

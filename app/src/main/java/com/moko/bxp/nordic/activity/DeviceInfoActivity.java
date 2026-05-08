@@ -28,6 +28,7 @@ import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.bxp.nordic.AppConstants;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.databinding.ActivityDeviceInfoBinding;
+import com.moko.bxp.nordic.utils.SPUtiles;
 import com.moko.lib.bxpui.dialog.AlertMessageDialog;
 import com.moko.lib.bxpui.dialog.LoadingMessageDialog;
 import com.moko.lib.bxpui.dialog.ModifyPasswordDialog;
@@ -55,6 +56,7 @@ import java.util.Arrays;
 
 import androidx.annotation.IdRes;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import no.nordicsemi.android.dfu.DfuProgressListener;
 import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
 import no.nordicsemi.android.dfu.DfuServiceInitiator;
@@ -85,8 +87,10 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         super.onCreate(savedInstanceState);
         mBind = ActivityDeviceInfoBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
+        mDeviceMac = getIntent().getStringExtra(AppConstants.EXTRA_KEY_ADDRESS);
         validParams = new ValidParams();
-        mPassword = getIntent().getStringExtra(AppConstants.EXTRA_KEY_PASSWORD);
+        mPassword = SPUtiles.getStringValue(this, AppConstants.SP_KEY_PASSWORD + "_" + mDeviceMac, "");
+        isNewVersion = SPUtiles.getBooleanValue(this, AppConstants.SP_KEY_IS_NEW_VERSION + "_" + mDeviceMac, false);
         fragmentManager = getFragmentManager();
         initFragment();
         mBind.rgOptions.setOnCheckedChangeListener(this);
@@ -96,7 +100,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         mReceiverTag = true;
-        isNewVersion = getIntent().getBooleanExtra(AppConstants.IS_NEW_VERSION, true);
+//        isNewVersion = getIntent().getBooleanExtra(AppConstants.IS_NEW_VERSION, true);
         if (!MokoSupport.getInstance().isBluetoothOpen()) {
             // 蓝牙未打开，开启蓝牙
             MokoSupport.getInstance().enableBluetooth();
@@ -128,19 +132,19 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.POSTING, priority = 100)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
     public void onConnectStatusEvent(ConnectStatusEvent event) {
         EventBus.getDefault().cancelEventDelivery(event);
         final String action = event.getAction();
         runOnUiThread(() -> {
             if (MokoConstants.ACTION_DISCONNECTED.equals(action)) {
-                if (MokoSupport.getInstance().thStoreData != null) {
-                    MokoSupport.getInstance().thStoreData.clear();
-                    MokoSupport.getInstance().thStoreString = null;
+                if (MokoSupport.getInstance().thStoreData.get(mDeviceMac) != null) {
+                    MokoSupport.getInstance().thStoreData.remove(mDeviceMac);
+                    MokoSupport.getInstance().thStoreString.remove(mDeviceMac);
                 }
-                if (MokoSupport.getInstance().lightSensorStoreData != null) {
-                    MokoSupport.getInstance().lightSensorStoreData.clear();
-                    MokoSupport.getInstance().lightSensorStoreString = null;
+                if (MokoSupport.getInstance().lightSensorStoreData.get(mDeviceMac) != null) {
+                    MokoSupport.getInstance().lightSensorStoreData.remove(mDeviceMac);
+                    MokoSupport.getInstance().lightSensorStoreString.remove(mDeviceMac);
                 }
                 // 设备断开，通知页面更新
                 if (mIsClose)
@@ -160,16 +164,11 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                         dialog.setCancelGone();
                         dialog.setOnAlertConfirmListener(() -> {
                             setResult(RESULT_OK);
-                            finish();
+                            back();
                         });
                         dialog.show(getSupportFragmentManager());
                     }
                 }
-            }
-            if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
-                // 设备连接成功，通知页面更新
-                showSyncingProgressDialog();
-                mBind.tvTitle.postDelayed(() -> MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getLockState()), 1500);
             }
         });
 
@@ -177,7 +176,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     private String unLockResponse;
 
-    @Subscribe(threadMode = ThreadMode.POSTING, priority = 100)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
     public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
         EventBus.getDefault().cancelEventDelivery(event);
         final String action = event.getAction();
@@ -200,7 +199,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                 dialog.setConfirm(R.string.ok);
                                 dialog.setOnAlertConfirmListener(() -> {
                                     setResult(RESULT_OK);
-                                    finish();
+                                    back();
                                 });
                                 dialog.show(getSupportFragmentManager());
                             } else if (mDisconnectType == 2) {
@@ -210,7 +209,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                 dialog.setConfirm(R.string.ok);
                                 dialog.setOnAlertConfirmListener(() -> {
                                     setResult(RESULT_OK);
-                                    finish();
+                                    back();
                                 });
                                 dialog.show(getSupportFragmentManager());
                             }
@@ -271,6 +270,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                 case SET_CLOSE:
                                     if ("eb260000".equals(MokoUtils.bytesToHexString(value).toLowerCase())) {
                                         ToastUtils.showToast(DeviceInfoActivity.this, "Success!");
+                                        setResult(RESULT_OK);
                                         back();
                                     }
                                     break;
@@ -308,7 +308,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                 case GET_NEW_PRODUCT_DATE:
                                     if (length > 0) {
                                         int year = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 6));
-                                        MokoSupport.isNewVersion = year >= 2021;
+                                        MokoSupport.getInstance().isNewVersion.put(mDeviceMac, year >= 2021);
                                         String month = String.valueOf(value[6] & 0xff);
                                         String day = String.valueOf(value[7] & 0xff);
                                         String monthStr = month.length() == 1 ? "0" + month : month;
@@ -354,7 +354,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                         // 判断新旧版本
                         String serialNumber = new String(value);
                         int year = Integer.parseInt(serialNumber.substring(0, 4));
-                        MokoSupport.isNewVersion = year >= 2021;
+                        MokoSupport.getInstance().isNewVersion.put(mDeviceMac, year >= 2021);
                         deviceFragment.setProductDate(value);
                         validParams.manufactureDate = "1";
                         break;
@@ -543,7 +543,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             // 注销广播
             unregisterReceiver(mReceiver);
         }
-        EventBus.getDefault().unregister(this);
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
     }
 
     private LoadingMessageDialog mLoadingMessageDialog;
@@ -561,17 +562,15 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     }
 
     private void back() {
-        MokoSupport.getInstance().disConnectBle();
+//        MokoSupport.getInstance().disConnectBle(mDeviceMac);
+        EventBus.getDefault().unregister(this);
         mIsClose = false;
+        finish();
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            back();
-            return false;
-        }
-        return super.onKeyDown(keyCode, event);
+    public void onBackPressed() {
+        back();
     }
 
     private void initFragment() {
@@ -700,7 +699,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         dialog.setOnAlertConfirmListener(() -> {
             isUpgrading = false;
             setResult(RESULT_OK);
-            finish();
+            back();
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -729,11 +728,12 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             mDeviceConnectCount++;
             if (mDeviceConnectCount > 3) {
                 ToastUtils.showToast(DeviceInfoActivity.this, "Error:DFU Failed");
-                MokoSupport.getInstance().disConnectBle();
+//                MokoSupport.getInstance().disConnectBle(mDeviceMac);
                 final LocalBroadcastManager manager = LocalBroadcastManager.getInstance(DeviceInfoActivity.this);
                 final Intent abortAction = new Intent(DfuServiceNordic.BROADCAST_ACTION);
                 abortAction.putExtra(DfuServiceNordic.EXTRA_ACTION, DfuServiceNordic.ACTION_ABORT);
                 manager.sendBroadcast(abortAction);
+                back();
             }
         }
 

@@ -7,8 +7,8 @@ public class SetRadioTxPowerTask extends OrderTask {
 
     public byte[] data;
 
-    public SetRadioTxPowerTask() {
-        super(OrderCHAR.CHAR_RADIO_TX_POWER, OrderTask.RESPONSE_TYPE_WRITE);
+    public SetRadioTxPowerTask(String address) {
+        super(OrderCHAR.CHAR_RADIO_TX_POWER, OrderTask.RESPONSE_TYPE_WRITE, address);
     }
 
     @Override

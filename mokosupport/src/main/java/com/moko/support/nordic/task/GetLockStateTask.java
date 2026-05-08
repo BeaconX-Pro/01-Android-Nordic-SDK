@@ -7,8 +7,8 @@ public class GetLockStateTask extends OrderTask {
 
     public byte[] data;
 
-    public GetLockStateTask() {
-        super(OrderCHAR.CHAR_LOCK_STATE, OrderTask.RESPONSE_TYPE_READ);
+    public GetLockStateTask(String address) {
+        super(OrderCHAR.CHAR_LOCK_STATE, OrderTask.RESPONSE_TYPE_READ, address);
     }
 
     @Override

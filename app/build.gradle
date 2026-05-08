@@ -6,11 +6,11 @@ if (!isLibrary.toBoolean()) {
 
 android {
     namespace "com.moko.bxp.nordic"
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         minSdk 26
-        targetSdk 34
+        targetSdk 35
         versionCode 111
         versionName "1.1.1"
         def formatDate = new Date().format("yyyyMMddHHmm")
@@ -91,6 +91,6 @@ dependencies {
     } else {
         implementation files('libs/mokoSupport.jar')
         compileOnly 'com.github.MOKO-Android-Base-Library:MKBXPUILib:1.0.3'
-        compileOnly 'com.github.MOKO-Android-Base-Library:MKBleLib:1.0.0-beacon'
+        compileOnly 'com.github.MOKO-Android-Base-Library:MKBleLib:1.0.1-beacon-multiple'
     }
 }

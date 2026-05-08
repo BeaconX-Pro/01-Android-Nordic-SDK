@@ -7,8 +7,8 @@ public class GetDeviceTypeTask extends OrderTask {
 
     public byte[] data;
 
-    public GetDeviceTypeTask() {
-        super(OrderCHAR.CHAR_DEVICE_TYPE, OrderTask.RESPONSE_TYPE_READ);
+    public GetDeviceTypeTask(String address) {
+        super(OrderCHAR.CHAR_DEVICE_TYPE, OrderTask.RESPONSE_TYPE_READ, address);
     }
 
     @Override

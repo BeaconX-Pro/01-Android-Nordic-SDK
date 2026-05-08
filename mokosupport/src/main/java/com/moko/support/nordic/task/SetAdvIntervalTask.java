@@ -7,8 +7,8 @@ public class SetAdvIntervalTask extends OrderTask {
 
     public byte[] data;
 
-    public SetAdvIntervalTask() {
-        super(OrderCHAR.CHAR_ADV_INTERVAL, OrderTask.RESPONSE_TYPE_WRITE);
+    public SetAdvIntervalTask(String address) {
+        super(OrderCHAR.CHAR_ADV_INTERVAL, OrderTask.RESPONSE_TYPE_WRITE, address);
     }
 
     @Override

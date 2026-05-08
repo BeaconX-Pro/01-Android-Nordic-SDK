@@ -7,8 +7,8 @@ public class GetModelNumberTask extends OrderTask {
 
     public byte[] data;
 
-    public GetModelNumberTask() {
-        super(OrderCHAR.CHAR_MODEL_NUMBER, OrderTask.RESPONSE_TYPE_READ);
+    public GetModelNumberTask(String address) {
+        super(OrderCHAR.CHAR_MODEL_NUMBER, OrderTask.RESPONSE_TYPE_READ, address);
     }
 
     @Override

@@ -12,6 +12,8 @@ public class AppConstants {
     public static final String SP_NAME = "sp_name_beaconx_pro";
 
     public static final String SP_KEY_DEVICE_ADDRESS = "sp_key_device_address";
+    public static final String SP_KEY_PASSWORD = "SP_KEY_PASSWORD";
+    public static final String SP_KEY_IS_NEW_VERSION = "SP_KEY_IS_NEW_VERSION";
     // extra_key
     // 设备列表
     public static final String EXTRA_KEY_RESPONSE_ORDER_TYPE = "EXTRA_KEY_RESPONSE_ORDER_TYPE";
@@ -22,6 +24,7 @@ public class AppConstants {
     public static final String EXTRA_KEY_TRIGGER_DATA = "EXTRA_KEY_TRIGGER_DATA";
     public static final String EXTRA_KEY_PASSWORD_VERIFICATION = "EXTRA_KEY_PASSWORD_VERIFICATION";
     public static final String IS_NEW_VERSION = "IS_NEW_VERSION";
+    public static final String EXTRA_KEY_ADDRESS = "EXTRA_KEY_ADDRESS";
 
     // request_code
     public static final int REQUEST_CODE_DEVICE_INFO = 0x10;

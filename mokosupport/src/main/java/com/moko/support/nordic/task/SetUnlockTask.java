@@ -7,8 +7,8 @@ public class SetUnlockTask extends OrderTask {
 
     public byte[] data;
 
-    public SetUnlockTask() {
-        super(OrderCHAR.CHAR_UNLOCK, OrderTask.RESPONSE_TYPE_WRITE);
+    public SetUnlockTask(String address) {
+        super(OrderCHAR.CHAR_UNLOCK, OrderTask.RESPONSE_TYPE_WRITE, address);
     }
 
     @Override

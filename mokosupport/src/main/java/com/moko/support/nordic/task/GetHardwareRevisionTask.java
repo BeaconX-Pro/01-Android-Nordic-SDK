@@ -7,8 +7,8 @@ public class GetHardwareRevisionTask extends OrderTask {
 
     public byte[] data;
 
-    public GetHardwareRevisionTask() {
-        super(OrderCHAR.CHAR_HARDWARE_REVISION, OrderTask.RESPONSE_TYPE_READ);
+    public GetHardwareRevisionTask(String address) {
+        super(OrderCHAR.CHAR_HARDWARE_REVISION, OrderTask.RESPONSE_TYPE_READ, address);
     }
 
     @Override

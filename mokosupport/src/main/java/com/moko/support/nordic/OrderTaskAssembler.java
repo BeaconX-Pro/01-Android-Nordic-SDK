@@ -41,12 +41,15 @@ import javax.crypto.spec.SecretKeySpec;
 import androidx.annotation.IntRange;
 
 public class OrderTaskAssembler {
-
+    public static String dataAddress;
+    public static void setAddress(String address) {
+        dataAddress = address;
+    }
     /**
      * @Description 获取设备锁状态get lock state
      */
     public static OrderTask getLockState() {
-        GetLockStateTask task = new GetLockStateTask();
+        GetLockStateTask task = new GetLockStateTask(dataAddress);
         return task;
     }
 
@@ -54,7 +57,7 @@ public class OrderTaskAssembler {
      * @Description 设置设备锁方式
      */
     public static OrderTask setLockStateDirected(int enable) {
-        SetLockStateTask task = new SetLockStateTask();
+        SetLockStateTask task = new SetLockStateTask(dataAddress);
         task.setData(MokoUtils.toByteArray(enable, 1));
         return task;
     }
@@ -78,7 +81,7 @@ public class OrderTaskAssembler {
             // 用旧密码加密新密码
             byte[] newPasswordEncryptBytes = encrypt(newPasswordBytes, passwordBytes);
             if (newPasswordEncryptBytes != null) {
-                SetLockStateTask task = new SetLockStateTask();
+                SetLockStateTask task = new SetLockStateTask(dataAddress);
                 byte[] unLockBytes = new byte[newPasswordEncryptBytes.length + 1];
                 unLockBytes[0] = 0;
                 System.arraycopy(newPasswordEncryptBytes, 0, unLockBytes, 1, newPasswordEncryptBytes.length);
@@ -93,7 +96,7 @@ public class OrderTaskAssembler {
      * @Description 获取解锁加密内容get unlock
      */
     public static OrderTask getUnLock() {
-        GetUnlockTask task = new GetUnlockTask();
+        GetUnlockTask task = new GetUnlockTask(dataAddress);
         return task;
     }
 
@@ -115,7 +118,7 @@ public class OrderTaskAssembler {
         XLog.i("密码：" + MokoUtils.bytesToHexString(passwordBytes));
         byte[] unLockBytes = encrypt(value, passwordBytes);
         if (unLockBytes != null) {
-            SetUnlockTask task = new SetUnlockTask();
+            SetUnlockTask task = new SetUnlockTask(dataAddress);
             task.setData(unLockBytes);
             return task;
         }
@@ -145,7 +148,7 @@ public class OrderTaskAssembler {
      * @Description 获取通道类型
      */
     public static OrderTask getSlotType() {
-        GetSlotTypeTask task = new GetSlotTypeTask();
+        GetSlotTypeTask task = new GetSlotTypeTask(dataAddress);
         return task;
     }
 
@@ -154,7 +157,7 @@ public class OrderTaskAssembler {
      * @Description 获取设备类型
      */
     public static OrderTask getDeviceType() {
-        GetDeviceTypeTask task = new GetDeviceTypeTask();
+        GetDeviceTypeTask task = new GetDeviceTypeTask(dataAddress);
         return task;
     }
 
@@ -162,7 +165,7 @@ public class OrderTaskAssembler {
      * @Description 获取3轴参数
      */
     public static OrderTask getAxisParams() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_AXIS_PARAMS);
         return task;
     }
@@ -171,7 +174,7 @@ public class OrderTaskAssembler {
      * @Description 设置3轴参数
      */
     public static OrderTask setAxisParams(int rate, int scale, int sensitivity) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setAxisParams(rate, scale, sensitivity);
         return task;
     }
@@ -180,7 +183,7 @@ public class OrderTaskAssembler {
      * @Description 获取温湿度采样率
      */
     public static OrderTask getTHPeriod() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_TH_PERIOD);
         return task;
     }
@@ -189,7 +192,7 @@ public class OrderTaskAssembler {
      * @Description 设置温湿度采样率
      */
     public static OrderTask setTHPeriod(int period) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setTHPriod(period);
         return task;
     }
@@ -198,7 +201,7 @@ public class OrderTaskAssembler {
      * @Description 获取存储条件
      */
     public static OrderTask getStorageCondition() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_STORAGE_CONDITION);
         return task;
     }
@@ -207,7 +210,7 @@ public class OrderTaskAssembler {
      * @Description 设置存储条件
      */
     public static OrderTask setStorageCondition(int storageType, String storageData) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setStorageCondition(storageType, storageData);
         return task;
     }
@@ -216,7 +219,7 @@ public class OrderTaskAssembler {
      * @Description 获取设备时间
      */
     public static OrderTask getDeviceTime() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_DEVICE_TIME);
         return task;
     }
@@ -225,13 +228,13 @@ public class OrderTaskAssembler {
      * @Description 设置设备时间
      */
     public static OrderTask setDeviceTime(int year, int month, int day, int hour, int minute, int second) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setDeviceTime(year, month, day, hour, minute, second);
         return task;
     }
 
     public static OrderTask setTHEmpty() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.SET_TH_EMPTY);
         return task;
     }
@@ -240,7 +243,7 @@ public class OrderTaskAssembler {
      * @Description 获取设备MAC
      */
     public static OrderTask getDeviceMac() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_DEVICE_MAC);
         return task;
     }
@@ -249,7 +252,7 @@ public class OrderTaskAssembler {
      * @Description 获取连接状态
      */
     public static OrderTask getConnectable() {
-        GetConnectableTask task = new GetConnectableTask();
+        GetConnectableTask task = new GetConnectableTask(dataAddress);
         return task;
     }
 
@@ -257,7 +260,7 @@ public class OrderTaskAssembler {
      * @Description 设置连接状态
      */
     public static OrderTask setConnectable(int enable) {
-        SetConnectableTask task = new SetConnectableTask();
+        SetConnectableTask task = new SetConnectableTask(dataAddress);
         task.setData(MokoUtils.toByteArray(enable, 1));
         return task;
     }
@@ -266,7 +269,7 @@ public class OrderTaskAssembler {
      * @Description 获取按键关键
      */
     public static OrderTask getButtonPower() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_BUTTON_POWER);
         return task;
     }
@@ -275,19 +278,19 @@ public class OrderTaskAssembler {
      * @Description 设置按键关键
      */
     public static OrderTask setButtonPower(boolean enable) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setButtonPower(enable);
         return task;
     }
 
     public static OrderTask setResponsePackageSwitch(int enable) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setResponsePackageSwitch(enable);
         return task;
     }
 
     public static OrderTask getResponsePackageSwitch(){
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_RESPONSE_PACKAGE_SWITCH);
         return task;
     }
@@ -296,12 +299,12 @@ public class OrderTaskAssembler {
      * @Description 获取制造商
      */
     public static OrderTask getManufacturer() {
-        GetManufacturerNameTask task = new GetManufacturerNameTask();
+        GetManufacturerNameTask task = new GetManufacturerNameTask(dataAddress);
         return task;
     }
 
     public static OrderTask getNewManufacturer(){
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_NEW_MANUFACTURER_NAME);
         return task;
     }
@@ -310,12 +313,12 @@ public class OrderTaskAssembler {
      * @Description 获取设备型号
      */
     public static OrderTask getDeviceModel() {
-        GetModelNumberTask task = new GetModelNumberTask();
+        GetModelNumberTask task = new GetModelNumberTask(dataAddress);
         return task;
     }
 
     public static OrderTask getNewDeviceModel(){
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_NEW_PRODUCT_MODE);
         return task;
     }
@@ -324,12 +327,12 @@ public class OrderTaskAssembler {
      * @Description 获取生产日期
      */
     public static OrderTask getProductDate() {
-        GetSerialNumberTask task = new GetSerialNumberTask();
+        GetSerialNumberTask task = new GetSerialNumberTask(dataAddress);
         return task;
     }
 
     public static OrderTask getNewProductDate(){
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_NEW_PRODUCT_DATE);
         return task;
     }
@@ -338,12 +341,12 @@ public class OrderTaskAssembler {
      * @Description 获取硬件版本
      */
     public static OrderTask getHardwareVersion() {
-        GetHardwareRevisionTask task = new GetHardwareRevisionTask();
+        GetHardwareRevisionTask task = new GetHardwareRevisionTask(dataAddress);
         return task;
     }
 
     public static OrderTask getNewHardwareVersion(){
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_NEW_HARDWARE_VERSION);
         return task;
     }
@@ -352,12 +355,12 @@ public class OrderTaskAssembler {
      * @Description 获取固件版本
      */
     public static OrderTask getFirmwareVersion() {
-        GetFirmwareRevisionTask task = new GetFirmwareRevisionTask();
+        GetFirmwareRevisionTask task = new GetFirmwareRevisionTask(dataAddress);
         return task;
     }
 
     public static OrderTask getNewFirmwareVersion(){
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_NEW_FIRMWARE_VERSION);
         return task;
     }
@@ -366,12 +369,12 @@ public class OrderTaskAssembler {
      * @Description 获取软件版本
      */
     public static OrderTask getSoftwareVersion() {
-        GetSoftwareRevisionTask task = new GetSoftwareRevisionTask();
+        GetSoftwareRevisionTask task = new GetSoftwareRevisionTask(dataAddress);
         return task;
     }
 
     public static OrderTask getNewSoftwareVersion(){
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_NEW_SOFTWARE_VERSION);
         return task;
     }
@@ -380,7 +383,7 @@ public class OrderTaskAssembler {
      * @Description 获取电池电量
      */
     public static OrderTask getBattery() {
-        GetBatteryTask task = new GetBatteryTask();
+        GetBatteryTask task = new GetBatteryTask(dataAddress);
         return task;
     }
 
@@ -388,7 +391,7 @@ public class OrderTaskAssembler {
      * @Description 切换通道
      */
     public static OrderTask setSlot(SlotEnum slot) {
-        SetAdvSlotTask task = new SetAdvSlotTask();
+        SetAdvSlotTask task = new SetAdvSlotTask(dataAddress);
         task.setData(slot);
         return task;
     }
@@ -397,7 +400,7 @@ public class OrderTaskAssembler {
      * @Description 获取通道数据
      */
     public static OrderTask getSlotData() {
-        GetAdvSlotDataTask task = new GetAdvSlotDataTask();
+        GetAdvSlotDataTask task = new GetAdvSlotDataTask(dataAddress);
         return task;
     }
 
@@ -405,7 +408,7 @@ public class OrderTaskAssembler {
      * @Description 设置通道信息
      */
     public static OrderTask setSlotData(byte[] data) {
-        SetAdvSlotDataTask task = new SetAdvSlotDataTask();
+        SetAdvSlotDataTask task = new SetAdvSlotDataTask(dataAddress);
         task.setData(data);
         return task;
     }
@@ -414,7 +417,7 @@ public class OrderTaskAssembler {
      * @Description 获取信号强度
      */
     public static OrderTask getRadioTxPower() {
-        GetRadioTxPowerTask task = new GetRadioTxPowerTask();
+        GetRadioTxPowerTask task = new GetRadioTxPowerTask(dataAddress);
         return task;
     }
 
@@ -422,7 +425,7 @@ public class OrderTaskAssembler {
      * @Description 设置信号强度
      */
     public static OrderTask setRadioTxPower(byte[] data) {
-        SetRadioTxPowerTask task = new SetRadioTxPowerTask();
+        SetRadioTxPowerTask task = new SetRadioTxPowerTask(dataAddress);
         task.setData(data);
         return task;
     }
@@ -431,7 +434,7 @@ public class OrderTaskAssembler {
      * @Description 获取广播间隔
      */
     public static OrderTask getAdvInterval() {
-        GetAdvIntervalTask task = new GetAdvIntervalTask();
+        GetAdvIntervalTask task = new GetAdvIntervalTask(dataAddress);
         return task;
     }
 
@@ -439,7 +442,7 @@ public class OrderTaskAssembler {
      * @Description 设置广播间隔
      */
     public static OrderTask setAdvInterval(byte[] data) {
-        SetAdvIntervalTask task = new SetAdvIntervalTask();
+        SetAdvIntervalTask task = new SetAdvIntervalTask(dataAddress);
         task.setData(data);
         return task;
     }
@@ -448,7 +451,7 @@ public class OrderTaskAssembler {
      * @Description 设置广播强度
      */
     public static OrderTask setRssi(byte[] data) {
-        SetAdvTxPowerTask advTxPowerTask = new SetAdvTxPowerTask();
+        SetAdvTxPowerTask advTxPowerTask = new SetAdvTxPowerTask(dataAddress);
         advTxPowerTask.setData(data);
         return advTxPowerTask;
     }
@@ -457,7 +460,7 @@ public class OrderTaskAssembler {
      * @Description 设置广播强度
      */
     public static OrderTask getRssi() {
-        GetAdvTxPowerTask task = new GetAdvTxPowerTask();
+        GetAdvTxPowerTask task = new GetAdvTxPowerTask(dataAddress);
         return task;
     }
 
@@ -465,7 +468,7 @@ public class OrderTaskAssembler {
      * @Description 关机
      */
     public static OrderTask setClose() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.SET_CLOSE);
         return task;
     }
@@ -474,59 +477,59 @@ public class OrderTaskAssembler {
      * @Description 恢复出厂设置
      */
     public static OrderTask resetDevice() {
-        ResetDeviceTask task = new ResetDeviceTask();
+        ResetDeviceTask task = new ResetDeviceTask(dataAddress);
         return task;
     }
 
     public static OrderTask getTrigger() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_TRIGGER_DATA);
         return task;
     }
 
     public static OrderTask setTriggerClose() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setTriggerData();
         return task;
     }
 
     public static OrderTask setTHTrigger(int triggerType, boolean isAbove, int params, boolean isStart) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setTriggerData(triggerType, isAbove, params, isStart);
         return task;
     }
 
     public static OrderTask setTappedMovesTrigger(int triggerType, int params, boolean isStart) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setTriggerData(triggerType, params, isStart);
         return task;
     }
 
     public static OrderTask setLightTrigger(int triggerType, int params, boolean isAlways, boolean isStart) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setTriggerData(triggerType, params, isAlways, isStart);
         return task;
     }
 
     public static OrderTask getHWResetEnable() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_HW_RESET_ENABLE);
         return task;
     }
 
     public static OrderTask setHWResetEnable(int enable) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setHWResetEnable(enable);
         return task;
     }
 
     public static OrderTask getLightSensorCurrent() {
-        GetLightSensorCurrentTask task = new GetLightSensorCurrentTask();
+        GetLightSensorCurrentTask task = new GetLightSensorCurrentTask(dataAddress);
         return task;
     }
 
     public static OrderTask getTriggerLEDNotifyEnable() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_TRIGGER_LED_NOTIFICATION);
         return task;
     }
@@ -534,25 +537,25 @@ public class OrderTaskAssembler {
 
 
     public static OrderTask setLightSensorEmpty() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.SET_LIGHT_SENSOR_EMPTY);
         return task;
     }
 
     public static OrderTask setTriggerLEDNotifyEnable(int enable) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setTriggerLEDNotifyEnable(enable);
         return task;
     }
 
     public static OrderTask getEffectiveClickInterval() {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.GET_EFFECTIVE_CLICK_INTERVAL);
         return task;
     }
 
     public static OrderTask setEffectiveClickInterval(@IntRange(from = 500, to = 1500) int interval) {
-        ParamsTask task = new ParamsTask();
+        ParamsTask task = new ParamsTask(dataAddress);
         task.setEffectiveClickInterval(interval);
         return task;
     }

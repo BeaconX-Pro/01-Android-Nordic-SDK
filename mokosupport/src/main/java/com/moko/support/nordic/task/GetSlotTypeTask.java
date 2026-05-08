@@ -7,8 +7,8 @@ public class GetSlotTypeTask extends OrderTask {
 
     public byte[] data;
 
-    public GetSlotTypeTask() {
-        super(OrderCHAR.CHAR_SLOT_TYPE, OrderTask.RESPONSE_TYPE_READ);
+    public GetSlotTypeTask(String address) {
+        super(OrderCHAR.CHAR_SLOT_TYPE, OrderTask.RESPONSE_TYPE_READ, address);
     }
 
     @Override

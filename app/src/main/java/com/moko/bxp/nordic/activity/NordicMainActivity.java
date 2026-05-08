@@ -30,6 +30,7 @@ import com.moko.bxp.nordic.BuildConfig;
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.adapter.BeaconXListAdapter;
 import com.moko.bxp.nordic.databinding.ActivityMainBinding;
+import com.moko.bxp.nordic.utils.SPUtiles;
 import com.moko.lib.bxpui.dialog.AlertMessageDialog;
 import com.moko.lib.bxpui.dialog.LoadingDialog;
 import com.moko.lib.bxpui.dialog.LoadingMessageDialog;
@@ -104,7 +105,11 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
         itemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.shape_recycleview_divider));
         mBind.rvDevices.addItemDecoration(itemDecoration);
         mBind.rvDevices.setAdapter(adapter);
-
+        mBind.tvConnectedDevices.setOnClickListener(v -> {
+            if (isWindowLocked()) return;
+            Intent deviceInfoIntent = new Intent(NordicMainActivity.this, ConnectedListActivity.class);
+            startActivityForResult(deviceInfoIntent, AppConstants.REQUEST_CODE_DEVICE_INFO);
+        });
         mHandler = new Handler(Looper.getMainLooper());
         mokoBleScanner = new MokoBleScanner(this);
         EventBus.getDefault().register(this);
@@ -221,7 +226,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
                     String valueStr = MokoUtils.bytesToHexString(value);
                     dismissLoadingMessageDialog();
                     if ("00".equals(valueStr)) {
-                        MokoSupport.getInstance().disConnectBle();
+                        MokoSupport.getInstance().disConnectBle(response.address);
                         if (TextUtils.isEmpty(unLockResponse)) {
                             mInputPassword = true;
                             // 弹出密码框
@@ -261,20 +266,24 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
                         }
                     } else if ("02".equals(valueStr)) {
                         // 不需要密码验证
-                        BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_MODEL_NUMBER);
-                        Intent deviceInfoIntent = new Intent(NordicMainActivity.this, DeviceInfoActivity.class);
-                        deviceInfoIntent.putExtra(AppConstants.EXTRA_KEY_PASSWORD, mPassword);
-                        deviceInfoIntent.putExtra(AppConstants.IS_NEW_VERSION, null == modelNumberChar);
+                        BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(response.address, OrderCHAR.CHAR_MODEL_NUMBER);
+                        Intent deviceInfoIntent = new Intent(NordicMainActivity.this, ConnectedListActivity.class);
+                        SPUtiles.setStringValue(this, AppConstants.SP_KEY_PASSWORD + "_" + response.address, mPassword);
+                        SPUtiles.setBooleanValue(this, AppConstants.SP_KEY_IS_NEW_VERSION + "_" + response.address, null == modelNumberChar);
+//                        deviceInfoIntent.putExtra(AppConstants.EXTRA_KEY_PASSWORD + "_" + response.address, mPassword);
+//                        deviceInfoIntent.putExtra(AppConstants.IS_NEW_VERSION + "_" + response.address, null == modelNumberChar);
                         startActivityForResult(deviceInfoIntent, AppConstants.REQUEST_CODE_DEVICE_INFO);
                     } else {
                         // 解锁成功
                         XLog.i("解锁成功");
                         unLockResponse = "";
                         mSavedPassword = mPassword;
-                        BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_MODEL_NUMBER);
-                        Intent deviceInfoIntent = new Intent(NordicMainActivity.this, DeviceInfoActivity.class);
-                        deviceInfoIntent.putExtra(AppConstants.EXTRA_KEY_PASSWORD, mPassword);
-                        deviceInfoIntent.putExtra(AppConstants.IS_NEW_VERSION, null == modelNumberChar);
+                        BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(response.address, OrderCHAR.CHAR_MODEL_NUMBER);
+                        Intent deviceInfoIntent = new Intent(NordicMainActivity.this, ConnectedListActivity.class);
+                        SPUtiles.setStringValue(this, AppConstants.SP_KEY_PASSWORD + "_" + response.address, mPassword);
+                        SPUtiles.setBooleanValue(this, AppConstants.SP_KEY_IS_NEW_VERSION + "_" + response.address, null == modelNumberChar);
+//                        deviceInfoIntent.putExtra(AppConstants.EXTRA_KEY_PASSWORD + "_" + response.address, mPassword);
+//                        deviceInfoIntent.putExtra(AppConstants.IS_NEW_VERSION + "_" + response.address, null == modelNumberChar);
                         startActivityForResult(deviceInfoIntent, AppConstants.REQUEST_CODE_DEVICE_INFO);
                     }
                     break;
@@ -476,6 +485,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
                 mokoBleScanner.stopScanDevice();
             }
             mSelectedBeaconXMac = beaconXInfo.mac;
+            OrderTaskAssembler.setAddress(beaconXInfo.mac);
             showLoadingProgressDialog();
             mBind.ivRefresh.postDelayed(new Runnable() {
                 @Override

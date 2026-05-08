@@ -11,8 +11,8 @@ import androidx.annotation.IntRange;
 public class ParamsTask extends OrderTask {
     public byte[] data;
 
-    public ParamsTask() {
-        super(OrderCHAR.CHAR_PARAMS, OrderTask.RESPONSE_TYPE_WRITE_NO_RESPONSE);
+    public ParamsTask(String address) {
+        super(OrderCHAR.CHAR_PARAMS, OrderTask.RESPONSE_TYPE_WRITE_NO_RESPONSE, address);
     }
 
     @Override

@@ -8,8 +8,8 @@ public class GetSoftwareRevisionTask extends OrderTask {
 
     public byte[] data;
 
-    public GetSoftwareRevisionTask() {
-        super(OrderCHAR.CHAR_SOFTWARE_REVISION, OrderTask.RESPONSE_TYPE_READ);
+    public GetSoftwareRevisionTask(String address) {
+        super(OrderCHAR.CHAR_SOFTWARE_REVISION, OrderTask.RESPONSE_TYPE_READ, address);
     }
 
     @Override
