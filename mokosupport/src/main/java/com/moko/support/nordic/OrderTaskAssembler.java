@@ -535,7 +535,6 @@ public class OrderTaskAssembler {
     }
 
 
-
     public static OrderTask setLightSensorEmpty() {
         ParamsTask task = new ParamsTask(dataAddress);
         task.setData(ParamsKeyEnum.SET_LIGHT_SENSOR_EMPTY);
@@ -557,6 +556,30 @@ public class OrderTaskAssembler {
     public static OrderTask setEffectiveClickInterval(@IntRange(from = 500, to = 1500) int interval) {
         ParamsTask task = new ParamsTask(dataAddress);
         task.setEffectiveClickInterval(interval);
+        return task;
+    }
+
+    public static OrderTask getRemoteLEDAlarmParams() {
+        ParamsTask task = new ParamsTask(dataAddress);
+        task.setData(ParamsKeyEnum.GET_REMOTE_LED_ALARM_PARAMS);
+        return task;
+    }
+
+    public static OrderTask setRemoteLEDAlarmParams(@IntRange(from = 3, to = 5) int color, @IntRange(from = 10, to = 6000) int duration, @IntRange(from = 1, to = 100) int interval) {
+        ParamsTask task = new ParamsTask(dataAddress);
+        task.setRemoteLEDAlarmParams(color, duration, interval);
+        return task;
+    }
+
+    public static OrderTask getRemoteBuzzerAlarmParams() {
+        ParamsTask task = new ParamsTask(dataAddress);
+        task.setData(ParamsKeyEnum.GET_REMOTE_BUZZER_ALARM_PARAMS);
+        return task;
+    }
+
+    public static OrderTask setRemoteBuzzerAlarmParams(@IntRange(from = 10, to = 6000) int duration, @IntRange(from = 1, to = 100) int interval) {
+        ParamsTask task = new ParamsTask(dataAddress);
+        task.setRemoteBuzzerAlarmParams(duration, interval);
         return task;
     }
 }

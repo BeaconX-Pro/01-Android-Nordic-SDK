@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_f2f2f2"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/blue_2f84d0">
+
+        <TextView
+            android:id="@+id/tv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:drawableLeft="@drawable/ic_back"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:onClick="onBack"
+            android:paddingLeft="16dp"
+            android:text=""
+            android:textColor="@color/white_ffffff"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Remote reminder"
+            android:textColor="@color/white_ffffff"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/shape_radius_white_bg"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_led_notify"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/led_notify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="LED notification"
+                android:textColor="@color/black_333333"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:layout_constraintBaseline_toBaselineOf="@id/led_notify_remind"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <TextView
+                android:id="@+id/led_notify_remind"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:background="@drawable/shape_radius_blue_btn_bg"
+                android:clickable="true"
+                android:gravity="center"
+                android:minWidth="70dp"
+                android:minHeight="30dp"
+                android:onClick="onLedNotifyRemind"
+                android:text="Remind"
+                android:textColor="@color/white_ffffff"
+                android:textSize="15sp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                style="@style/divider_line"
+                android:layout_marginTop="10dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/led_notify_remind" />
+
+            <TextView
+                android:id="@+id/tvLedNotifyColor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/shape_radius_blue_btn_bg"
+                android:clickable="true"
+                android:gravity="center"
+                android:minWidth="70dp"
+                android:minHeight="30dp"
+                android:onClick="selectLedColor"
+                android:text="Red"
+                android:textColor="@color/white_ffffff"
+                android:textSize="15sp"
+                app:layout_constraintRight_toRightOf="@id/led_notify_remind"
+                app:layout_constraintTop_toBottomOf="@id/led_notify_remind" />
+
+            <TextView
+                android:id="@+id/ledColor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LED color"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/tvLedNotifyColor"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <TextView
+                android:id="@+id/blinking_time_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="s"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_blinking_time"
+                app:layout_constraintRight_toRightOf="parent" />
+
+
+            <EditText
+                android:id="@+id/et_blinking_time"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:hint="1~600"
+                android:inputType="number"
+                android:maxLength="3"
+                android:singleLine="true"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintRight_toLeftOf="@id/blinking_time_unit"
+                app:layout_constraintTop_toBottomOf="@id/tvLedNotifyColor" />
+
+            <TextView
+                android:id="@+id/blinking_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Blinking time"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_blinking_time"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <TextView
+                android:id="@+id/blinking_interval_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="x100ms"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_blinking_interval"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <EditText
+                android:id="@+id/et_blinking_interval"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:hint="1~100"
+                android:inputType="number"
+                android:maxLength="3"
+                android:singleLine="true"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintRight_toLeftOf="@id/blinking_interval_unit"
+                app:layout_constraintTop_toBottomOf="@id/et_blinking_time" />
+
+            <TextView
+                android:id="@+id/blinking_interval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Blinking interval"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_blinking_interval"
+                app:layout_constraintLeft_toLeftOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_vibration_notify"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/vibration_notify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="Vibration notification"
+                android:textColor="@color/black_333333"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/vibration_notify_remind"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:background="@drawable/shape_radius_blue_btn_bg"
+                android:clickable="true"
+                android:gravity="center"
+                android:minWidth="70dp"
+                android:minHeight="30dp"
+                android:onClick="onVibrationNotifyRemind"
+                android:text="Remind"
+                android:textColor="@color/white_ffffff"
+                android:textSize="15sp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                style="@style/divider_line"
+                android:layout_marginTop="10dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/vibration_notify_remind" />
+
+            <TextView
+                android:id="@+id/vibration_time_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="x100ms"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_vibration_time"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <EditText
+                android:id="@+id/et_vibration_time"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:hint="1~6000"
+                android:inputType="number"
+                android:maxLength="4"
+                android:singleLine="true"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintRight_toLeftOf="@id/vibration_time_unit"
+                app:layout_constraintTop_toBottomOf="@id/vibration_notify" />
+
+            <TextView
+                android:id="@+id/vibration_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vibrating time"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_vibration_time"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <TextView
+                android:id="@+id/vibration_interval_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="x100ms"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_vibration_interval"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <EditText
+                android:id="@+id/et_vibration_interval"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:hint="0~100"
+                android:inputType="number"
+                android:maxLength="3"
+                android:singleLine="true"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintRight_toLeftOf="@id/vibration_interval_unit"
+                app:layout_constraintTop_toBottomOf="@id/et_vibration_time" />
+
+            <TextView
+                android:id="@+id/vibration_interval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vibrating interval"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_vibration_interval"
+                app:layout_constraintLeft_toLeftOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_buzzer_notify"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/buzzer_notify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="Buzzer notification"
+                android:textColor="@color/black_333333"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:layout_constraintBaseline_toBaselineOf="@id/buzzer_notify_remind"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <TextView
+                android:id="@+id/buzzer_notify_remind"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:background="@drawable/shape_radius_blue_btn_bg"
+                android:clickable="true"
+                android:gravity="center"
+                android:minWidth="70dp"
+                android:minHeight="30dp"
+                android:onClick="onBuzzerNotifyRemind"
+                android:text="Remind"
+                android:textColor="@color/white_ffffff"
+                android:textSize="15sp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                style="@style/divider_line"
+                android:layout_marginTop="10dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/buzzer_notify_remind" />
+
+            <TextView
+                android:id="@+id/ringing_time_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="s"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_ringing_time"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <EditText
+                android:id="@+id/et_ringing_time"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:hint="1~600"
+                android:inputType="number"
+                android:maxLength="3"
+                android:singleLine="true"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintRight_toLeftOf="@id/ringing_time_unit"
+                app:layout_constraintTop_toBottomOf="@id/buzzer_notify" />
+
+            <TextView
+                android:id="@+id/ringing_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ringing time"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_ringing_time"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <TextView
+                android:id="@+id/ringing_interval_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="x100ms"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_ringing_interval"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <EditText
+                android:id="@+id/et_ringing_interval"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:hint="1~100"
+                android:inputType="number"
+                android:maxLength="3"
+                android:singleLine="true"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintRight_toLeftOf="@id/ringing_interval_unit"
+                app:layout_constraintTop_toBottomOf="@id/et_ringing_time" />
+
+            <TextView
+                android:id="@+id/ringing_interval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ringing interval"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/et_ringing_interval"
+                app:layout_constraintLeft_toLeftOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</LinearLayout>

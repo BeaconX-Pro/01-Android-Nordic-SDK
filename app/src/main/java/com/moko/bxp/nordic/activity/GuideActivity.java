@@ -13,8 +13,8 @@ import android.provider.Settings;
 
 import com.elvishew.xlog.XLog;
 import com.moko.bxp.nordic.R;
-import com.moko.lib.bxpui.dialog.PermissionDialog;
 import com.moko.bxp.nordic.utils.Utils;
+import com.moko.lib.bxpui.dialog.PermissionDialog;
 import com.permissionx.guolindev.PermissionX;
 
 import androidx.activity.result.ActivityResultLauncher;

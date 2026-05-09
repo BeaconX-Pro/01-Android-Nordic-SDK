@@ -16,7 +16,7 @@ import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.able.ISlotDataAction;
 import com.moko.bxp.nordic.activity.SlotDataActivity;
 import com.moko.bxp.nordic.databinding.FragmentUidBinding;
-import com.moko.bxp.nordic.utils.ToastUtils;
+import com.moko.lib.bxpui.utils.ToastUtils;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 import com.moko.support.nordic.entity.SlotFrameTypeEnum;

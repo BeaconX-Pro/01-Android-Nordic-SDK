@@ -31,14 +31,14 @@ import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.adapter.BeaconXListAdapter;
 import com.moko.bxp.nordic.databinding.ActivityMainBinding;
 import com.moko.bxp.nordic.utils.SPUtiles;
+import com.moko.bxp.nordic.entity.BeaconXInfo;
+import com.moko.bxp.nordic.utils.BeaconXInfoParseableImpl;
+import com.moko.lib.bxpui.utils.ToastUtils;
 import com.moko.lib.bxpui.dialog.AlertMessageDialog;
 import com.moko.lib.bxpui.dialog.LoadingDialog;
 import com.moko.lib.bxpui.dialog.LoadingMessageDialog;
 import com.moko.lib.bxpui.dialog.PasswordDialog;
 import com.moko.lib.bxpui.dialog.ScanFilterDialog;
-import com.moko.bxp.nordic.entity.BeaconXInfo;
-import com.moko.bxp.nordic.utils.BeaconXInfoParseableImpl;
-import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.support.nordic.MokoBleScanner;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
@@ -182,19 +182,27 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
 //            BluetoothGattCharacteristic modelNumberChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_MODEL_NUMBER);
 //            BluetoothGattCharacteristic deviceTypeChar = MokoSupport.getInstance().getCharacteristic(OrderCHAR.CHAR_DEVICE_TYPE);
 //            if (modelNumberChar != null && deviceTypeChar != null) {
-            showLoadingMessageDialog();
-            mHandler.postDelayed(() -> {
-                if (TextUtils.isEmpty(mPassword)) {
-                    ArrayList<OrderTask> orderTasks = new ArrayList<>();
-                    orderTasks.add(OrderTaskAssembler.getLockState());
-                    MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                } else {
-                    XLog.i("锁定状态，获取unLock，解锁");
-                    ArrayList<OrderTask> orderTasks = new ArrayList<>();
-                    orderTasks.add(OrderTaskAssembler.getUnLock());
-                    MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                }
-            }, 500);
+            if (isOTA) {
+                //连接成功不需要密码
+                dismissLoadingProgressDialog();
+                Intent intent = new Intent(this, DfuActivity.class);
+                intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_MAC, mSelectedBeaconXMac);
+                startActivityForResult(intent, AppConstants.REQUEST_CODE_DEVICE_INFO);
+            } else {
+                showLoadingMessageDialog();
+                mHandler.postDelayed(() -> {
+                    if (TextUtils.isEmpty(mPassword)) {
+                        ArrayList<OrderTask> orderTasks = new ArrayList<>();
+                        orderTasks.add(OrderTaskAssembler.getLockState());
+                        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+                    } else {
+                        XLog.i("锁定状态，获取unLock，解锁");
+                        ArrayList<OrderTask> orderTasks = new ArrayList<>();
+                        orderTasks.add(OrderTaskAssembler.getUnLock());
+                        MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+                    }
+                }, 500);
+            }
 
 //            } else {
 //                MokoSupport.getInstance().disConnectBle();
@@ -470,6 +478,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
     private String mPassword;
     private String mSavedPassword;
     private String mSelectedBeaconXMac;
+    private boolean isOTA;
 
     @Override
     public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
@@ -478,6 +487,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
             MokoSupport.getInstance().enableBluetooth();
             return;
         }
+        if (isWindowLocked()) return;
         int size = MokoSupport.getInstance().getConnectedDeviceList().size();
         if (size == 8) {
             ToastUtils.showToast(this, "Up to 8 devices can be connected.");
@@ -490,6 +500,7 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
                 mokoBleScanner.stopScanDevice();
             }
             mSelectedBeaconXMac = beaconXInfo.mac;
+            isOTA = beaconXInfo.isOTA;
             OrderTaskAssembler.setAddress(beaconXInfo.mac);
             showLoadingProgressDialog();
             mBind.ivRefresh.postDelayed(new Runnable() {

@@ -19,6 +19,7 @@ public class BeaconXInfo implements Serializable {
     public static final int VALID_DATA_FRAME_TYPE_INFO = 0x40;
     public static final int VALID_DATA_FRAME_TYPE_AXIS = 0x60;
     public static final int VALID_DATA_FRAME_TYPE_TH = 0x70;
+    public static final int VALID_DATA_FRAME_TYPE_OTA = 0x100;
 
 
     public String name;
@@ -28,7 +29,9 @@ public class BeaconXInfo implements Serializable {
     public int battery;
     public int lockState;
     public int ambientLightState;
-//    public int ambientLightSupport;
+    public int tamperState;
+    //    public int ambientLightSupport;
+    public boolean isOTA;
     public int connectState;
     public long intervalTime;
     public long scanTime;

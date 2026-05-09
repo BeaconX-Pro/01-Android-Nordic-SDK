@@ -13,25 +13,25 @@ import android.widget.RadioGroup;
 
 import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.activity.SlotDataActivity;
-import com.moko.bxp.nordic.databinding.FragmentTriggerTappedBinding;
+import com.moko.bxp.nordic.databinding.FragmentTriggerTamperDetectBinding;
 import com.moko.lib.bxpui.utils.ToastUtils;
 
-public class TriggerTappedFragment extends Fragment implements RadioGroup.OnCheckedChangeListener {
+public class TriggerTamperDetectFragment extends Fragment implements RadioGroup.OnCheckedChangeListener {
 
-    private static final String TAG = "TappedFragment";
+    private static final String TAG = "TamperDetectFragment";
 
 
-   private FragmentTriggerTappedBinding mBind;
+    private FragmentTriggerTamperDetectBinding mBind;
 
 
     private SlotDataActivity activity;
 
 
-    public TriggerTappedFragment() {
+    public TriggerTamperDetectFragment() {
     }
 
-    public static TriggerTappedFragment newInstance() {
-        TriggerTappedFragment fragment = new TriggerTappedFragment();
+    public static TriggerTamperDetectFragment newInstance() {
+        TriggerTamperDetectFragment fragment = new TriggerTamperDetectFragment();
         return fragment;
     }
 
@@ -45,7 +45,7 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        mBind = FragmentTriggerTappedBinding.inflate(inflater, container, false);
+        mBind = FragmentTriggerTamperDetectBinding.inflate(inflater, container, false);
         activity = (SlotDataActivity) getActivity();
         if (mDuration == 0) {
             if (mIsStart) {
@@ -80,13 +80,7 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                 String duration = s.toString();
                 if (mBind.rbStartAdvertising.isChecked() && !TextUtils.isEmpty(duration)) {
                     mDuration = Integer.parseInt(duration);
-                    String tips = "";
-                    if (mTrapType == 0)
-                        tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "single click button");
-                    if (mTrapType == 1)
-                        tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button twice");
-                    if (mTrapType == 2)
-                        tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button three times");
+                    String tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "the tamper wire is disconnected");
                     mBind.tvTriggerTips.setText(tips);
                 }
             }
@@ -107,14 +101,8 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
                 String duration = s.toString();
                 if (mBind.rbStopAdvertising.isChecked() && !TextUtils.isEmpty(duration)) {
                     mDuration = Integer.parseInt(duration);
-                    String tips = "";
-                    if (mTrapType == 0)
-                        tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "single click button");
-                    if (mTrapType == 1)
-                        tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button twice");
-                    if (mTrapType == 2)
-                        tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button three times");
-                    mBind.tvTriggerTips.setText(tips);
+                    String tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "the tamper wire is disconnected");
+                     mBind.tvTriggerTips.setText(tips);
                 }
             }
         });
@@ -123,33 +111,15 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
 
     public void updateTips() {
         if (mBind.rbAlwaysStart.isChecked()) {
-            String tips = "";
-            if (mTrapType == 0)
-                tips = getString(R.string.trigger_tapped_tips_1, "single click button");
-            if (mTrapType == 1)
-                tips = getString(R.string.trigger_tapped_tips_1, "press the button twice");
-            if (mTrapType == 2)
-                tips = getString(R.string.trigger_tapped_tips_1, "press the button three times");
+            String tips = getString(R.string.trigger_tapped_tips_1, "the tamper wire is disconnected");
             mBind.tvTriggerTips.setText(tips);
         } else if (mBind.rbStartAdvertising.isChecked()) {
             mDuration = Integer.parseInt(mBind.etStart.getText().toString());
-            String tips = "";
-            if (mTrapType == 0)
-                tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "single click button");
-            if (mTrapType == 1)
-                tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button twice");
-            if (mTrapType == 2)
-                tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button three times");
+            String tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "the tamper wire is disconnected");
             mBind.tvTriggerTips.setText(tips);
         } else {
             mDuration = Integer.parseInt(mBind.etStop.getText().toString());
-            String tips = "";
-            if (mTrapType == 0)
-                tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "single click button");
-            if (mTrapType == 1)
-                tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button twice");
-            if (mTrapType == 2)
-                tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button three times");
+            String tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "the tamper wire is disconnected");
             mBind.tvTriggerTips.setText(tips);
         }
     }
@@ -174,19 +144,12 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
 
     private boolean mIsStart = true;
     private int mDuration = 30;
-    private int mTrapType = 1;
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         if (checkedId == R.id.rb_always_start) {
             mIsStart = true;
-            String tips = "";
-            if (mTrapType == 0)
-                tips = getString(R.string.trigger_tapped_tips_1, "single click button");
-            if (mTrapType == 1)
-                tips = getString(R.string.trigger_tapped_tips_1,  "press the button twice");
-            if (mTrapType == 2)
-                tips = getString(R.string.trigger_tapped_tips_1, "press the button three times");
+            String tips = getString(R.string.trigger_tapped_tips_1, "the tamper wire is disconnected");
             mBind.tvTriggerTips.setText(tips);
         } else if (checkedId == R.id.rb_start_advertising) {
             mIsStart = true;
@@ -196,13 +159,7 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
             } else {
                 mDuration = Integer.parseInt(startDuration);
             }
-            String tips = "";
-            if (mTrapType == 0)
-                tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "single click button");
-            if (mTrapType == 1)
-                tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button twice");
-            if (mTrapType == 2)
-                tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "press the button three times");
+            String tips = getString(R.string.trigger_tapped_tips_2, "start advertising", String.format("%ds", mDuration), "the tamper wire is disconnected");
             mBind.tvTriggerTips.setText(tips);
         } else if (checkedId == R.id.rb_stop_advertising) {
             mIsStart = false;
@@ -212,13 +169,7 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
             } else {
                 mDuration = Integer.parseInt(stopDuration);
             }
-            String tips = "";
-            if (mTrapType == 0)
-                tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "single click button");
-            if (mTrapType == 1)
-                tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button twice");
-            if (mTrapType == 2)
-                tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "press the button three times");
+            String tips = getString(R.string.trigger_tapped_tips_2, "stop advertising", String.format("%ds", mDuration), "the tamper wire is disconnected");
             mBind.tvTriggerTips.setText(tips);
         }
     }
@@ -255,13 +206,5 @@ public class TriggerTappedFragment extends Fragment implements RadioGroup.OnChec
             return -1;
         }
         return mDuration;
-    }
-
-    public int getTrapType() {
-        return mTrapType;
-    }
-
-    public void setTrapType(int trapType) {
-        this.mTrapType = trapType;
     }
 }

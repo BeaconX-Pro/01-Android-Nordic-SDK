@@ -89,6 +89,10 @@ public class SettingFragment extends Fragment {
         mBind.etEffectiveClickInterval.setText(String.valueOf(interval / 100));
     }
 
+    public void setRemoteReminderShown() {
+        mBind.tvRemoteReminder.setVisibility(View.VISIBLE);
+    }
+
     public boolean isValid() {
         String intervalStr = mBind.etEffectiveClickInterval.getText().toString();
         if (TextUtils.isEmpty(intervalStr))

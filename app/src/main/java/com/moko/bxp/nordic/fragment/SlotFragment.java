@@ -34,8 +34,11 @@ public class SlotFragment extends Fragment {
     private DeviceInfoActivity activity;
     private SlotData slotData;
     private int deviceType;
+    private boolean mSupportTamperDetect;
+    private boolean mNoSingleTrigger;
     private int triggerType;
     private String triggerData;
+    private int slotEnable;
 
     public SlotFragment() {
     }
@@ -52,8 +55,7 @@ public class SlotFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
         mBind = FragmentSlotBinding.inflate(inflater, container, false);
         activity = (DeviceInfoActivity) getActivity();
@@ -86,7 +88,10 @@ public class SlotFragment extends Fragment {
             case NO_DATA:
                 Intent intent = new Intent(getActivity(), SlotDataActivity.class);
                 intent.putExtra(AppConstants.EXTRA_KEY_SLOT_DATA, slotData);
+                intent.putExtra(AppConstants.EXTRA_KEY_SLOT_ENABLE, slotEnable);
                 intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, deviceType);
+                intent.putExtra(AppConstants.EXTRA_KEY_TAMPER_DETECT, mSupportTamperDetect);
+                intent.putExtra(AppConstants.EXTRA_KEY_NO_SINGLE_TRIGGER, mNoSingleTrigger);
                 startActivityForResult(intent, AppConstants.REQUEST_CODE_SLOT_DATA);
                 break;
             case IBEACON:
@@ -126,20 +131,20 @@ public class SlotFragment extends Fragment {
 
     // 10 20 50 40 FF FF
     public void updateSlotType(byte[] value) {
-        changeView((int) value[0] & 0xff, mBind.tvSlot1, mBind.rlSlot1);
-        changeView((int) value[1] & 0xff, mBind.tvSlot2, mBind.rlSlot2);
-        changeView((int) value[2] & 0xff, mBind.tvSlot3, mBind.rlSlot3);
-        changeView((int) value[3] & 0xff, mBind.tvSlot4, mBind.rlSlot4);
-        changeView((int) value[4] & 0xff, mBind.tvSlot5, mBind.rlSlot5);
-        changeView((int) value[5] & 0xff, mBind.tvSlot6, mBind.rlSlot6);
-
+        changeView((int) value[0] & 0xff, 0, mBind.tvSlot1, mBind.rlSlot1);
+        changeView((int) value[1] & 0xff, 1, mBind.tvSlot2, mBind.rlSlot2);
+        changeView((int) value[2] & 0xff, 2, mBind.tvSlot3, mBind.rlSlot3);
+        changeView((int) value[3] & 0xff, 3, mBind.tvSlot4, mBind.rlSlot4);
+        changeView((int) value[4] & 0xff, 4, mBind.tvSlot5, mBind.rlSlot5);
+        changeView((int) value[5] & 0xff, 5, mBind.tvSlot6, mBind.rlSlot6);
     }
 
-    private void changeView(int frameType, TextView tvSlot, RelativeLayout rlSlot) {
+    private void changeView(int frameType, int slot, TextView tvSlot, RelativeLayout rlSlot) {
         SlotFrameTypeEnum slotFrameTypeEnum = SlotFrameTypeEnum.fromFrameType(frameType);
         if (slotFrameTypeEnum == null) {
             return;
         }
+        if (frameType != 0xFF) slotEnable += 1 << slot;
         tvSlot.setText(slotFrameTypeEnum.getShowName());
         rlSlot.setTag(slotFrameTypeEnum);
     }
@@ -196,9 +201,12 @@ public class SlotFragment extends Fragment {
     public void gotoSlotDataDetail() {
         Intent intent = new Intent(getActivity(), SlotDataActivity.class);
         intent.putExtra(AppConstants.EXTRA_KEY_SLOT_DATA, slotData);
+        intent.putExtra(AppConstants.EXTRA_KEY_SLOT_ENABLE, slotEnable);
         intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_TYPE, deviceType);
         intent.putExtra(AppConstants.EXTRA_KEY_TRIGGER_TYPE, triggerType);
         intent.putExtra(AppConstants.EXTRA_KEY_TRIGGER_DATA, triggerData);
+        intent.putExtra(AppConstants.EXTRA_KEY_TAMPER_DETECT, mSupportTamperDetect);
+        intent.putExtra(AppConstants.EXTRA_KEY_NO_SINGLE_TRIGGER, mNoSingleTrigger);
         startActivityForResult(intent, AppConstants.REQUEST_CODE_SLOT_DATA);
     }
 
@@ -208,6 +216,7 @@ public class SlotFragment extends Fragment {
         if (resultCode == getActivity().RESULT_OK) {
             if (requestCode == AppConstants.REQUEST_CODE_SLOT_DATA) {
                 Log.i(TAG, "onActivityResult: ");
+                slotEnable = 0;
                 activity.getSlotType();
             }
         }
@@ -254,6 +263,14 @@ public class SlotFragment extends Fragment {
 
     public void setDeviceType(int deviceType) {
         this.deviceType = deviceType;
+    }
+
+    public void setSupportTamperDetect(boolean supportTamperDetect) {
+        this.mSupportTamperDetect = supportTamperDetect;
+    }
+
+    public void setNoSingleTrigger(boolean noSingleTrigger) {
+        this.mNoSingleTrigger = noSingleTrigger;
     }
 
 

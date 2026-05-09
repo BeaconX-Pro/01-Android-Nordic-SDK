@@ -13,6 +13,7 @@ import com.moko.support.nordic.service.DeviceInfoParseable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import no.nordicsemi.android.support.v18.scanner.ScanRecord;
@@ -38,18 +39,21 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
         int lockState = -1;
 //        int ambientLightSupport = -1;
         int ambientLightState = -1;
+        int tamperState = -1;
         ScanResult result = deviceInfo.scanResult;
         ScanRecord record = result.getScanRecord();
         Map<ParcelUuid, byte[]> map = record.getServiceData();
+        List<ParcelUuid> list = record.getServiceUuids();
         // filter
         boolean isEddystone = false;
         boolean isBeaconXPro = false;
         boolean isBeacon = false;
+        boolean isOta = false;
         byte[] values = null;
         int type = -1;
         int needParseData = -1;
         byte[] manufacturerBytes = record.getManufacturerSpecificData(0x004C);
-        if (null != manufacturerBytes && manufacturerBytes.length ==23) {
+        if (null != manufacturerBytes && manufacturerBytes.length == 23) {
             isBeacon = true;
             type = BeaconXInfo.VALID_DATA_TYPE_IBEACON_APPLE;
             values = manufacturerBytes;
@@ -99,6 +103,10 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                                 int ambientLightSupport = bytes[5] & 4;// 0 or 4
                                 if (ambientLightSupport == 4) {
                                     ambientLightState = bytes[6] & 2;
+                                }
+                                int tamperSupport = bytes[5] & 16;//0 or 16
+                                if (tamperSupport == 16) {
+                                    tamperState = bytes[6] & 8;
                                 }
 //                                connectState = bytes[6] & 0xff;
                                 // 40000a0d0d0001ff02030405063001
@@ -173,7 +181,18 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
                 }
             }
         }
-        if ((!isEddystone && !isBeaconXPro && !isBeacon) || values == null || type == -1) {
+        if (list != null && !list.isEmpty()) {
+            Iterator iterator = list.iterator();
+            if (iterator.hasNext()) {
+                ParcelUuid parcelUuid = (ParcelUuid) iterator.next();
+                if (parcelUuid.toString().startsWith("0000eaff") && "MK_OTA".equals(deviceInfo.name)) {
+                    isOta = true;
+                    type = BeaconXInfo.VALID_DATA_FRAME_TYPE_OTA;
+                    values = MokoUtils.hex2bytes(parcelUuid.toString());
+                }
+            }
+        }
+        if ((!isEddystone && !isBeaconXPro && !isBeacon && !isOta) || values == null || type == -1) {
             return null;
         }
         // avoid repeat
@@ -196,6 +215,8 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
             if (ambientLightState >= 0) {
                 beaconXInfo.ambientLightState = ambientLightState;
             }
+            beaconXInfo.tamperState = tamperState;
+            beaconXInfo.isOTA = isOta;
             if (result.isConnectable())
                 beaconXInfo.connectState = 1;
             beaconXInfo.scanRecord = deviceInfo.scanRecord;
@@ -223,6 +244,8 @@ public class BeaconXInfoParseableImpl implements DeviceInfoParseable<BeaconXInfo
             } else {
                 beaconXInfo.ambientLightState = ambientLightState;
             }
+            beaconXInfo.tamperState = tamperState;
+            beaconXInfo.isOTA = isOta;
             if (result.isConnectable()) {
                 beaconXInfo.connectState = 1;
             } else {

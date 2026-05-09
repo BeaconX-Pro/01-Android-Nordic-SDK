@@ -119,6 +119,18 @@
             android:textColor="@color/grey_666666"
             android:textSize="10sp" />
 
+        <TextView
+            android:id="@+id/tv_tamper_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/tv_mac"
+            android:layout_alignParentRight="true"
+            android:includeFontPadding="false"
+            android:text="Tamper normal"
+            android:textColor="@color/grey_666666"
+            android:textSize="10sp"
+            android:visibility="gone" />
+
         <!--<TextView
             android:id="@+id/tv_conn_state"
             android:layout_width="wrap_content"

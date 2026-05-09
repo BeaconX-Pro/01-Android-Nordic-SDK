@@ -4,7 +4,6 @@
     <string name="slot_title">SLOT</string>
     <string name="setting_title">SETTING</string>
     <string name="device_title">DEVICE</string>
-    <string name="h_t"><![CDATA[T&H]]></string>
     <string name="humi_temp"><![CDATA[Temperature & Humidity]]></string>
     <string name="storage_condition">Storage trigger</string>
     <string name="export_data"><![CDATA[Export T&H Data]]></string>
