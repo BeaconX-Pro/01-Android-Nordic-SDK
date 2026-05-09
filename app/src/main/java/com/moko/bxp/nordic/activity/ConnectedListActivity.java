@@ -20,8 +20,8 @@ import com.moko.bxp.nordic.R;
 import com.moko.bxp.nordic.adapter.ConnectedListAdapter;
 import com.moko.bxp.nordic.databinding.ActivityConnectedListBinding;
 import com.moko.bxp.nordic.utils.SPUtiles;
-import com.moko.bxp.nordic.utils.ToastUtils;
 import com.moko.lib.bxpui.dialog.LoadingDialog;
+import com.moko.lib.bxpui.utils.ToastUtils;
 import com.moko.support.nordic.MokoSupport;
 import com.moko.support.nordic.OrderTaskAssembler;
 

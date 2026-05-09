@@ -61,7 +61,7 @@ public class DfuActivity extends BaseActivity {
 
     private void back() {
         if (MokoSupport.getInstance().isConnDevice(mDeviceMac)) {
-            MokoSupport.getInstance().disConnectBle();
+            MokoSupport.getInstance().disConnectBle(mDeviceMac);
 
         }
         setResult(RESULT_OK);
@@ -182,7 +182,7 @@ public class DfuActivity extends BaseActivity {
             mDeviceConnectCount++;
             if (mDeviceConnectCount > 3) {
                 ToastUtils.showToast(DfuActivity.this, "Error:DFU Failed");
-                MokoSupport.getInstance().disConnectBle();
+                MokoSupport.getInstance().disConnectBle(mDeviceMac);
                 final LocalBroadcastManager manager = LocalBroadcastManager.getInstance(DfuActivity.this);
                 final Intent abortAction = new Intent(DfuServiceNordic.BROADCAST_ACTION);
                 abortAction.putExtra(DfuServiceNordic.EXTRA_ACTION, DfuServiceNordic.ACTION_ABORT);
