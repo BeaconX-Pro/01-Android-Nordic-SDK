@@ -478,6 +478,11 @@ public class NordicMainActivity extends BaseActivity implements MokoScanDeviceCa
             MokoSupport.getInstance().enableBluetooth();
             return;
         }
+        int size = MokoSupport.getInstance().getConnectedDeviceList().size();
+        if (size == 8) {
+            ToastUtils.showToast(this, "Up to 8 devices can be connected.");
+            return;
+        }
         final BeaconXInfo beaconXInfo = (BeaconXInfo) adapter.getItem(position);
         if (beaconXInfo != null && !isFinishing()) {
             if (animation != null) {

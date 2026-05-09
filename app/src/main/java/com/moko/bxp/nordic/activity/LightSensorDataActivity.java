@@ -93,7 +93,7 @@ public class LightSensorDataActivity extends BaseActivity {
 
         mHandler = new Handler();
         EventBus.getDefault().register(this);
-        MokoSupport.getInstance().enableLightSensorCurrentNotify();
+        MokoSupport.getInstance().enableLightSensorCurrentNotify(OrderTaskAssembler.dataAddress);
         showSyncingProgressDialog();
         ArrayList<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.getLightSensorCurrent());
@@ -250,7 +250,7 @@ public class LightSensorDataActivity extends BaseActivity {
                             mHandler.removeMessages(0);
                         mHandler.postDelayed(() -> {
                             XLog.i("Timeout");
-                            MokoSupport.getInstance().disableLightSensorNotify();
+                            MokoSupport.getInstance().disableLightSensorNotify(OrderTaskAssembler.dataAddress);
                             isSync = false;
                             mBind.ivSync.clearAnimation();
                             mBind.tvSync.setText("Sync");
@@ -285,8 +285,8 @@ public class LightSensorDataActivity extends BaseActivity {
 
     private void back() {
         // 关闭通知
-        MokoSupport.getInstance().disableLightSensorCurrentNotify();
-        MokoSupport.getInstance().disableLightSensorNotify();
+        MokoSupport.getInstance().disableLightSensorCurrentNotify(OrderTaskAssembler.dataAddress);
+        MokoSupport.getInstance().disableLightSensorNotify(OrderTaskAssembler.dataAddress);
         MokoSupport.getInstance().lightSensorStoreData.put(OrderTaskAssembler.dataAddress, lightSensorStoreData);
         MokoSupport.getInstance().lightSensorStoreString.put(OrderTaskAssembler.dataAddress, lightSensorStoreString);
         finish();
@@ -322,14 +322,14 @@ public class LightSensorDataActivity extends BaseActivity {
             return;
         if (!isSync) {
             isSync = true;
-            MokoSupport.getInstance().enableLightSensorNotify();
+            MokoSupport.getInstance().enableLightSensorNotify(OrderTaskAssembler.dataAddress);
             Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
             mBind.ivSync.startAnimation(animation);
             mBind.tvSync.setText("Stop");
         } else {
             if (mHandler.hasMessages(0))
                 mHandler.removeMessages(0);
-            MokoSupport.getInstance().disableLightSensorNotify();
+            MokoSupport.getInstance().disableLightSensorNotify(OrderTaskAssembler.dataAddress);
             isSync = false;
             mBind.ivSync.clearAnimation();
             mBind.tvSync.setText("Sync");

@@ -28,7 +28,7 @@ android {
 }
 
 dependencies {
-    api 'com.github.MOKO-Android-Base-Library:MKBleLib:1.0.1-beacon-multiple'
+    api 'com.github.MOKO-Android-Base-Library:MKBleLib:1.0.2-beacon-multiple'
     implementation 'androidx.appcompat:appcompat:1.6.1'
 }
 

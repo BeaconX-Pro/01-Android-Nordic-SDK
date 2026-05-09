@@ -87,7 +87,7 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
             // 蓝牙未打开，开启蓝牙
             MokoSupport.getInstance().enableBluetooth();
         } else {
-            MokoSupport.getInstance().enableTHNotify();
+            MokoSupport.getInstance().enableTHNotify(OrderTaskAssembler.dataAddress);
             showSyncingProgressDialog();
             ArrayList<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.getTHPeriod());
@@ -359,7 +359,7 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
 
     private void back() {
         // 关闭通知
-        MokoSupport.getInstance().disableTHNotify();
+        MokoSupport.getInstance().disableTHNotify(OrderTaskAssembler.dataAddress);
         finish();
     }
 

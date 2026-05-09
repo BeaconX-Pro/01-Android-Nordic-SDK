@@ -129,7 +129,7 @@ public class ExportDataActivity extends BaseActivity {
             // 蓝牙未打开，开启蓝牙
             MokoSupport.getInstance().enableBluetooth();
         } else {
-            MokoSupport.getInstance().enableStoreNotify();
+            MokoSupport.getInstance().enableStoreNotify(OrderTaskAssembler.dataAddress);
             Animation animation = AnimationUtils.loadAnimation(ExportDataActivity.this, R.anim.rotate_refresh);
             mBind.ivSync.startAnimation(animation);
             mBind.tvSync.setText("Stop");
@@ -323,7 +323,7 @@ public class ExportDataActivity extends BaseActivity {
                             mHandler.removeMessages(0);
                         mHandler.postDelayed(() -> {
                             XLog.i("Timeout");
-                            MokoSupport.getInstance().disableStoreNotify();
+                            MokoSupport.getInstance().disableStoreNotify(OrderTaskAssembler.dataAddress);
                             isSync = false;
                             mBind.ivSync.clearAnimation();
                             mBind.tvSync.setText("Sync");
@@ -387,7 +387,7 @@ public class ExportDataActivity extends BaseActivity {
 
     private void back() {
         // 关闭通知
-        MokoSupport.getInstance().disableStoreNotify();
+        MokoSupport.getInstance().disableStoreNotify(OrderTaskAssembler.dataAddress);
         MokoSupport.getInstance().thStoreData.put(OrderTaskAssembler.dataAddress, thStoreData);
         MokoSupport.getInstance().thStoreString.put(OrderTaskAssembler.dataAddress, thStoreString);
         finish();
@@ -434,7 +434,7 @@ public class ExportDataActivity extends BaseActivity {
             return;
         if (!isSync) {
             isSync = true;
-            MokoSupport.getInstance().enableStoreNotify();
+            MokoSupport.getInstance().enableStoreNotify(OrderTaskAssembler.dataAddress);
             Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
             mBind.ivSync.startAnimation(animation);
             mBind.tvSync.setText("Stop");
@@ -443,7 +443,7 @@ public class ExportDataActivity extends BaseActivity {
         } else {
             if (mHandler.hasMessages(0))
                 mHandler.removeMessages(0);
-            MokoSupport.getInstance().disableStoreNotify();
+            MokoSupport.getInstance().disableStoreNotify(OrderTaskAssembler.dataAddress);
             isSync = false;
             mBind.ivSync.clearAnimation();
             mBind.tvSync.setText("Sync");

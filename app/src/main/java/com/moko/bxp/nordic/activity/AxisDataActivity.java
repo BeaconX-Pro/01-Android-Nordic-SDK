@@ -242,7 +242,7 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
 
     private void back() {
         // 关闭通知
-        MokoSupport.getInstance().disableThreeAxisNotify();
+        MokoSupport.getInstance().disableThreeAxisNotify(OrderTaskAssembler.dataAddress);
         finish();
     }
 
@@ -295,12 +295,12 @@ public class AxisDataActivity extends BaseActivity implements SeekBar.OnSeekBarC
             return;
         if (!isSync) {
             isSync = true;
-            MokoSupport.getInstance().enableThreeAxisNotify();
+            MokoSupport.getInstance().enableThreeAxisNotify(OrderTaskAssembler.dataAddress);
             Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
             mBind.ivSync.startAnimation(animation);
             mBind.tvSync.setText("Stop");
         } else {
-            MokoSupport.getInstance().disableThreeAxisNotify();
+            MokoSupport.getInstance().disableThreeAxisNotify(OrderTaskAssembler.dataAddress);
             isSync = false;
             mBind.ivSync.clearAnimation();
             mBind.tvSync.setText("Sync");

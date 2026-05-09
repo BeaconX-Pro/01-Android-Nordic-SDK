@@ -32,8 +32,7 @@ public class MokoSupport extends MokoBleLib {
     private static volatile MokoSupport INSTANCE;
 
     private Context mContext;
-
-    private MokoBleConfig mBleConfig;
+    private Map<String, MokoBleConfig> mBleConfigMap = new LinkedHashMap<>();
 
     private MokoSupport() {
         //no instance
@@ -57,20 +56,20 @@ public class MokoSupport extends MokoBleLib {
 
 
     @Override
-    public MokoBleManager getMokoBleManager() {
-        mBleConfig = new MokoBleConfig(mContext, this);
-        return mBleConfig;
+    public MokoBleManager getMokoBleManager(String address) {
+        MokoBleConfig bleConfig = mBleConfigMap.get(address);
+        if (bleConfig == null) {
+            bleConfig = new MokoBleConfig(mContext, this);
+            mBleConfigMap.put(address, bleConfig);
+        }
+        return bleConfig;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // connect
-    ///////////////////////////////////////////////////////////////////////////
+    /// Connect
 
     @Override
     public void onDeviceConnected(BluetoothGatt gatt) {
-        if (mCharacteristicMap.get(gatt.getDevice().getAddress()) == null) {
-            mCharacteristicMap.put(gatt.getDevice().getAddress(), new MokoCharacteristicHandler().getCharacteristics(gatt));
-        }
+        mCharacteristicMap.putIfAbsent(gatt.getDevice().getAddress(), new MokoCharacteristicHandler().getCharacteristics(gatt));
         ConnectStatusEvent connectStatusEvent = new ConnectStatusEvent();
         connectStatusEvent.setAction(MokoConstants.ACTION_DISCOVER_SUCCESS);
         connectStatusEvent.setBluetoothDevice(gatt.getDevice());
@@ -79,6 +78,7 @@ public class MokoSupport extends MokoBleLib {
 
     @Override
     public void onDeviceDisconnected(BluetoothDevice device) {
+        mBleConfigMap.remove(device.getAddress());
         mCharacteristicMap.remove(device.getAddress());
         ConnectStatusEvent connectStatusEvent = new ConnectStatusEvent();
         connectStatusEvent.setAction(MokoConstants.ACTION_DISCONNECTED);
@@ -95,9 +95,7 @@ public class MokoSupport extends MokoBleLib {
         return new ArrayList<>(mCharacteristicMap.keySet());
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // order
-    ///////////////////////////////////////////////////////////////////////////
+    /// OrderTask
 
     @Override
     public boolean isCHARNull(String address) {
@@ -142,7 +140,7 @@ public class MokoSupport extends MokoBleLib {
 
 
     @Override
-    public boolean orderNotify(BluetoothGattCharacteristic characteristic, byte[] value) {
+    public boolean orderNotify(BluetoothDevice device, BluetoothGattCharacteristic characteristic, byte[] value) {
         final UUID responseUUID = characteristic.getUuid();
         OrderCHAR orderCHAR = null;
         if (responseUUID.equals(OrderCHAR.CHAR_LOCKED_NOTIFY.getUuid())) {
@@ -176,6 +174,7 @@ public class MokoSupport extends MokoBleLib {
         OrderTaskResponse response = new OrderTaskResponse();
         response.orderCHAR = orderCHAR;
         response.responseValue = value;
+        response.address = device.getAddress();
         OrderTaskResponseEvent event = new OrderTaskResponseEvent();
         event.setAction(MokoConstants.ACTION_CURRENT_DATA);
         event.setResponse(response);
@@ -183,54 +182,54 @@ public class MokoSupport extends MokoBleLib {
         return true;
     }
 
-    public void enableTHNotify() {
-        if (mBleConfig != null)
-            mBleConfig.enableTHNotify();
+    public void enableTHNotify(String address) {
+        if (mBleConfigMap.get(address) != null)
+            mBleConfigMap.get(address).enableTHNotify();
     }
 
-    public void disableTHNotify() {
-        if (mBleConfig != null)
-            mBleConfig.disableTHNotify();
+    public void disableTHNotify(String address) {
+        if (mBleConfigMap.get(address) != null)
+            mBleConfigMap.get(address).disableTHNotify();
     }
 
-    public void enableStoreNotify() {
-        if (mBleConfig != null)
-            mBleConfig.enableStoreNotify();
+    public void enableStoreNotify(String address) {
+        if (mBleConfigMap.get(address) != null)
+            mBleConfigMap.get(address).enableStoreNotify();
     }
 
-    public void disableStoreNotify() {
-        if (mBleConfig != null)
-            mBleConfig.disableStoreNotify();
+    public void disableStoreNotify(String address) {
+        if (mBleConfigMap.get(address) != null)
+            mBleConfigMap.get(address).disableStoreNotify();
     }
 
-    public void enableThreeAxisNotify() {
-        if (mBleConfig != null)
-            mBleConfig.enableThreeAxisNotify();
+    public void enableThreeAxisNotify(String address) {
+        if (mBleConfigMap.get(address) != null)
+            mBleConfigMap.get(address).enableThreeAxisNotify();
     }
 
-    public void disableThreeAxisNotify() {
-        if (mBleConfig != null)
-            mBleConfig.disableThreeAxisNotify();
+    public void disableThreeAxisNotify(String address) {
+        if (mBleConfigMap.get(address) != null)
+            mBleConfigMap.get(address).disableThreeAxisNotify();
     }
 
-    public void enableLightSensorNotify() {
-        if (mBleConfig != null)
-            mBleConfig.enableLightSensorNotify();
+    public void enableLightSensorNotify(String address) {
+        if (mBleConfigMap.get(address) != null)
+            mBleConfigMap.get(address).enableLightSensorNotify();
     }
 
-    public void disableLightSensorNotify() {
-        if (mBleConfig != null)
-            mBleConfig.disableLightSensorNotify();
+    public void disableLightSensorNotify(String address) {
+        if (mBleConfigMap.get(address) != null)
+            mBleConfigMap.get(address).disableLightSensorNotify();
     }
 
-    public void enableLightSensorCurrentNotify() {
-        if (mBleConfig != null)
-            mBleConfig.enableLightSensorCurrentNotify();
+    public void enableLightSensorCurrentNotify(String address) {
+        if (mBleConfigMap.get(address) != null)
+            mBleConfigMap.get(address).enableLightSensorCurrentNotify();
     }
 
-    public void disableLightSensorCurrentNotify() {
-        if (mBleConfig != null)
-            mBleConfig.disableLightSensorCurrentNotify();
+    public void disableLightSensorCurrentNotify(String address) {
+        if (mBleConfigMap.get(address) != null)
+            mBleConfigMap.get(address).disableLightSensorCurrentNotify();
     }
 
     public HashMap<String, Boolean> isNewVersion = new HashMap<>();

@@ -60,13 +60,13 @@ final class MokoBleConfig extends MokoBleManager {
     }
 
     @Override
-    public void write(BluetoothGattCharacteristic characteristic, byte[] value) {
-        mMokoResponseCallback.onCharacteristicWrite(characteristic, value);
+    public void write(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, byte[] value) {
+        mMokoResponseCallback.onCharacteristicWrite(gatt.getDevice(), characteristic, value);
     }
 
     @Override
-    public void read(BluetoothGattCharacteristic characteristic, byte[] value) {
-        mMokoResponseCallback.onCharacteristicRead(characteristic, value);
+    public void read(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, byte[] value) {
+        mMokoResponseCallback.onCharacteristicRead(gatt.getDevice(), characteristic, value);
     }
 
     @Override
@@ -104,7 +104,7 @@ final class MokoBleConfig extends MokoBleManager {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
-            mMokoResponseCallback.onCharacteristicChanged(thCharacteristic, value);
+            mMokoResponseCallback.onCharacteristicChanged(device, thCharacteristic, value);
         });
         enableNotifications(thCharacteristic).enqueue();
     }
@@ -118,7 +118,7 @@ final class MokoBleConfig extends MokoBleManager {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
-            mMokoResponseCallback.onCharacteristicChanged(storeCharacteristic, value);
+            mMokoResponseCallback.onCharacteristicChanged(device, storeCharacteristic, value);
         });
         enableNotifications(storeCharacteristic).enqueue();
     }
@@ -132,7 +132,7 @@ final class MokoBleConfig extends MokoBleManager {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
-            mMokoResponseCallback.onCharacteristicChanged(threeAxisCharacteristic, value);
+            mMokoResponseCallback.onCharacteristicChanged(device, threeAxisCharacteristic, value);
         });
         enableNotifications(threeAxisCharacteristic).enqueue();
     }
@@ -147,7 +147,7 @@ final class MokoBleConfig extends MokoBleManager {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
-            mMokoResponseCallback.onCharacteristicChanged(lockedCharacteristic, value);
+            mMokoResponseCallback.onCharacteristicChanged(device, lockedCharacteristic, value);
         });
         enableNotifications(lockedCharacteristic).done(device -> mMokoResponseCallback.onServicesDiscovered(gatt)).enqueue();
     }
@@ -161,7 +161,7 @@ final class MokoBleConfig extends MokoBleManager {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
-            mMokoResponseCallback.onCharacteristicChanged(disconnectCharacteristic, value);
+            mMokoResponseCallback.onCharacteristicChanged(device, disconnectCharacteristic, value);
         });
         enableNotifications(disconnectCharacteristic).enqueue();
     }
@@ -177,7 +177,7 @@ final class MokoBleConfig extends MokoBleManager {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
-            mMokoResponseCallback.onCharacteristicChanged(lightSensorNotifyCharacteristic, value);
+            mMokoResponseCallback.onCharacteristicChanged(device, lightSensorNotifyCharacteristic, value);
         });
         enableNotifications(lightSensorNotifyCharacteristic).enqueue();
     }
@@ -195,7 +195,7 @@ final class MokoBleConfig extends MokoBleManager {
             final byte[] value = data.getValue();
             XLog.e("onDataReceived");
             XLog.e("device to app : " + MokoUtils.bytesToHexString(value));
-            mMokoResponseCallback.onCharacteristicChanged(lightSensorCurrentCharacteristic, value);
+            mMokoResponseCallback.onCharacteristicChanged(device, lightSensorCurrentCharacteristic, value);
         });
         enableNotifications(lightSensorCurrentCharacteristic).enqueue();
     }
