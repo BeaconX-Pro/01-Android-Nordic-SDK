@@ -7,20 +7,20 @@ import android.view.View;
 
 import com.moko.bxp.nordic.BuildConfig;
 import com.moko.bxp.nordic.R;
-import com.moko.bxp.nordic.databinding.ActivityAboutBinding;
-import com.moko.lib.bxpui.utils.ToastUtils;
+import com.moko.bxp.nordic.databinding.ActivityAboutNordicBinding;
 import com.moko.bxp.nordic.utils.Utils;
+import com.moko.lib.bxpui.utils.ToastUtils;
 
 import java.io.File;
 import java.util.Calendar;
 
 public class AboutActivity extends BaseActivity {
-    private ActivityAboutBinding mBind;
+    private ActivityAboutNordicBinding mBind;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBind = ActivityAboutBinding.inflate(getLayoutInflater());
+        mBind = ActivityAboutNordicBinding.inflate(getLayoutInflater());
         setContentView(mBind.getRoot());
         if (!BuildConfig.IS_LIBRARY) {
             mBind.appVersion.setText(String.format("APP Version:V%s", Utils.getVersionInfo(this)));
