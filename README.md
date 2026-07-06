@@ -1,382 +1,580 @@
-# BeaconXPro Android SDK Guide（English）
+# MOKO BXP-Nordic Android SDK
 
-## Intro
+Native Android SDK and demo app for BXP-Nordic devices. Supports BLE scanning and advertisement parsing (Eddystone UID/URL/TLM, iBeacon, T&H, 3-Axis), connection with optional password lock, 6-slot broadcast configuration, sensor triggers, T&H / 3-Axis / storage / light-sensor data via Notify, remote LED/buzzer alarms, and Nordic DFU firmware updates.
 
-Please read the part of this document which you need.
+Cross-platform reference (same protocol): [Flutter-Nordic-SDK](https://github.com/BeaconX-Pro/Flutter-Nordic-SDK.git).
 
-* We will explain the important classes in the SDK.
+---
 
-* will help developers to get started.
+## Requirements
 
-* will explain notes in your developing progress.
+| Item | Description |
+|------|-------------|
+| Android Studio | 3.6+ (8.x recommended) |
+| minSdk | 28 |
+| compileSdk | 35 |
+| Device | Physical device required (emulators do not support BLE) |
 
+---
 
-## Design instructions
-
-We divide the communications between SDK and devices into three stages: Scanning stage, Connection stage, Communication stage. For ease of understanding, let's take a look at the related classes and the relationships between them.
-
-### 1.Scanning stage
-
-**`com.moko.support.nordic.MokoBleScanner`**
-
-Scanning processing class, support to open scan, close scan and get the raw data of the scanned device.
-
-**`com.moko.support.nordic.callback.MokoScanDeviceCallback`**
-
-Scanning callback interface,this interface can be used to obtain the scan status and device data.
-
-**`com.moko.support.nordic.service.DeviceInfoParseable`**
-
-Parsed data interface,this interface can parsed the device broadcast frame, get the specific data. the implementation can refer to `BeaconXInfoParseableImpl` in the project,the `DeviceInfo` will be parsed to `BeaconXInfo`.
-
-**`com.moko.bxp.nordic.utils.BeaconXParser`**
-
-Parsed data utils class, use this class to convert `BeaconXInfo.ValidData` to UID, URL, TLM, IBeacon, T&H, 3-Axis.
-
-### 2.Connection stage
-
-**`com.moko.support.nordic.MokoSupport`**
-
-BLE operation core class, extends from `Mokoblelib`.It can connect the device, disconnect the device, send the device connection status, turn on Bluetooth, turn off Bluetooth, judge whether Bluetooth is on or not, receive data from the device and send data to the device, notify the page data update, turn on and off characteristic notification.
-
-### 3.Communication stage
-
-**`com.moko.support.nordic.OrderTaskAssembler`**
-
-We assemble read data and write data to `OrderTask`, send the task to the device through `MokoSupport`, and receive the resopnse.
-
-**`com.moko.ble.lib.event.ConnectStatusEvent`**
-
-The connection status is notified by `EventBus`, the device connection status and disconnection status are obtained from this event.
-
-**`com.moko.ble.lib.event.OrderTaskResponseEvent`**
-
-The response is notified by `EventBus`, we can get result when we send task to device from this event,distinguish between function via `OrderTaskResponse`.
-
-## Get Started
-
-### Prepare
-
-**Development environment:**
-
-* Android Studio 3.6.+
-
-* minSdkVersion 28
-
-**Import to Project**
-
-Copy the module mokosupport into the project root directory and add dependencies in build.gradle. As shown below:
+## Project Structure
 
 ```
+BXP_Nordic/
+├── app/                      # Demo app (scan, connect, configure, DFU, full UI)
+│   ├── activity/             # NordicMainActivity, DeviceInfoActivity, DfuActivity, ...
+│   ├── fragment/             # Slot / Device / Setting tabs
+│   └── utils/
+│       ├── BeaconXInfoParseableImpl.java   # Advertisement parser (demo impl)
+│       └── BeaconXParser.java              # UID, URL, TLM, iBeacon, T&H, Axis parser
+└── mokosupport/              # BLE SDK module (primary integration dependency)
+    ├── MokoSupport.java      # Connect, send commands, Notify control, event callbacks
+    ├── MokoBleScanner.java   # Scanning
+    ├── OrderTaskAssembler.java   # Read/write task assembly (API entry)
+    └── entity/
+        ├── OrderCHAR.java        # GATT characteristic mapping
+        ├── ParamsKeyEnum.java    # Protocol parameter keys
+        └── SlotEnum.java         # SLOT_1 ~ SLOT_6
+```
+
+Communication has three stages: **scan → connect → command exchange**. The SDK reports connection status and command results via **EventBus** (you can switch to another bus in `MokoSupport`).
+
+---
+
+## Integrating the SDK
+
+### 1. Add the module
+
+Copy `mokosupport` into your project root and add to `settings.gradle`:
+
+```gradle
+include ':app', ':mokosupport'
+```
+
+In the app module `build.gradle`:
+
+```gradle
 dependencies {
-    ...
     implementation project(path: ':mokosupport')
 }
 ```
 
-add mokosupport in settings.gradle.As shown below:
+### 2. Initialize
 
-```
-include ':app', ':mokosupport'
-```
+Initialize in `Application.onCreate()` or your first Activity:
 
-### Start Developing
-
-**Initialize**
-
-First of all, you should initialize the MokoSupport.We recommend putting it in Application.
-
-```
+```java
 MokoSupport.getInstance().init(getApplicationContext());
 ```
 
-**Scan devices**
+### 3. Permissions
 
-Before operating the Bluetooth scanning device, we need to apply for permission, which we have added in mokosupport `AndroidManifest.xml`
+`mokosupport` declares base BLE permissions in its `AndroidManifest.xml`. On Android 6.0+, scanning requires **runtime location permission**; on Android 12+, also request `BLUETOOTH_SCAN` and `BLUETOOTH_CONNECT`.
 
+```java
+// Example: request location (required for scanning)
+if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        != PackageManager.PERMISSION_GRANTED) {
+    ActivityCompat.requestPermissions(this,
+            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+            REQUEST_CODE_LOCATION);
+}
 ```
-...
-<uses-permission android:name="android.permission.BLUETOOTH" />
-<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-feature
-    android:name="android.hardware.bluetooth_le"
-    android:required="true" />
-...
+
+### 4. Register EventBus
+
+Connection status, command results, and Notify data are delivered via EventBus. Register in your Activity/Fragment:
+
+```java
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    EventBus.getDefault().register(this);
+}
+
+@Override
+protected void onDestroy() {
+    EventBus.getDefault().unregister(this);
+    super.onDestroy();
+}
 ```
 
-Start scanning task to find devices around you, then you can get their advertisement content, connect to device and change parameters.
+---
 
-```
-MokoBleScanner mokoBleScanner = new MokoBleScanner(this);
-mokoBleScanner.startScanDevice(new MokoScanDeviceCallback() {
+## 1. Scanning for Devices
+
+### Core classes
+
+| Class | Description |
+|-------|-------------|
+| `MokoBleScanner` | Start/stop scanning |
+| `MokoScanDeviceCallback` | Scan started, per-device callback, scan stopped |
+| `DeviceInfoParseable` | Advertisement parser interface; demo impl: `BeaconXInfoParseableImpl` |
+| `BeaconXParser` | Converts parsed frame data to UID, URL, TLM, iBeacon, T&H, 3-Axis |
+
+The demo scans without hardware filters; filter recognized frames in the parser callback.
+
+### Code example
+
+```java
+MokoBleScanner scanner = new MokoBleScanner(context);
+BeaconXInfoParseableImpl parser = new BeaconXInfoParseableImpl();
+
+scanner.startScanDevice(new MokoScanDeviceCallback() {
     @Override
     public void onStartScan() {
+        // Clear list, refresh UI
     }
 
     @Override
-    public void onScanDevice(DeviceInfo device) {
+    public void onScanDevice(DeviceInfo deviceInfo) {
+        BeaconXInfo info = parser.parseDeviceInfo(deviceInfo);
+        if (info == null) return;
+        // info.mac / info.name / info.rssi
+        // info.battery / info.lockState / info.connectState
+        // info.validDataHashMap — parsed broadcast frames
     }
 
     @Override
     public void onStopScan() {
+        // Stop animation, etc.
     }
 });
+
+// Stop scanning (call before connecting)
+scanner.stopScanDevice();
 ```
 
-at the sometime, you can stop the scanning task in this way:
+### Advertisement frame types (`BeaconXInfoParseableImpl`)
 
-```
-mokoBleScanner.stopScanDevice();
-```
+Recognized Service Data / manufacturer data:
 
-You can use BeaconXInfoParseImpl and BeaconXParser to parsed advertisement data to the frame data, such as iBeacon, URL, UID and etc...
+| Source | UUID / ID | Frame types |
+|--------|-----------|-------------|
+| Eddystone | `0000feaa-...` | UID, URL, TLM |
+| BeaconX Pro | `0000feab-...` | INFO, iBeacon, 3-Axis, T&H |
+| BeaconX Pro (alt) | `0000feac-...` | INFO |
+| Apple iBeacon | Manufacturer `0x004C` (23 bytes) | iBeacon |
+| OTA mode | Service `0000eaff-...` + name `MK_OTA` | DFU entry |
 
-```
-BeaconXInfoParseableImpl beaconXInfoParseable = new BeaconXInfoParseableImpl();
-BeaconXInfo beaconXInfo = beaconXInfoParseable.parseDeviceInfo(deviceInfo);
-ArrayList<BeaconXInfo.ValidData> validDatas = new ArrayList<>(beaconXInfo.validDataHashMap.values());
+INFO frame (`0000feab`, type `0x40`) fields:
+
+- `battery` — battery voltage (mV)
+- `lockState` — `0` = unlocked, `2` = password required (bit mask on newer firmware)
+- `connectState` — connectable flag from scan result
+- `ambientLightState`, `tamperState` — optional sensor flags
+
+Parse frame payload with `BeaconXParser`:
+
+```java
+ArrayList<BeaconXInfo.ValidData> validDatas =
+        new ArrayList<>(info.validDataHashMap.values());
 for (BeaconXInfo.ValidData validData : validDatas) {
-    if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_UID) {
-        BeaconXUID beaconXUID = BeaconXParser.getUID(validData.data);
-    }
-    if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_URL) {
-        BeaconXURL beaconXURL = BeaconXParser.getURL(validData.data);
-    }
-    if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TLM) {
-        BeaconXTLM beaconXTLM = BeaconXParser.getTLM(validData.data);
-    }
-    if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_IBEACON) {
-        BeaconXiBeacon beaconXiBeacon = BeaconXParser.getiBeacon(beaconXInfo.rssi, validData.data);
-    }
-    if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_TH) {
-        BeaconXTH beaconXTH = BeaconXParser.getTH(validData.data);
-    }
-    if (validData.type == BeaconXInfo.VALID_DATA_FRAME_TYPE_AXIS) {
-        BeaconXAxis beaconXAxis = BeaconXParser.getAxis(validData.data);
+    switch (validData.type) {
+        case BeaconXInfo.VALID_DATA_FRAME_TYPE_UID:
+            BeaconXUID uid = BeaconXParser.getUID(validData.data);
+            break;
+        case BeaconXInfo.VALID_DATA_FRAME_TYPE_URL:
+            BeaconXURL url = BeaconXParser.getURL(validData.data);
+            break;
+        case BeaconXInfo.VALID_DATA_FRAME_TYPE_TLM:
+            BeaconXTLM tlm = BeaconXParser.getTLM(validData.data);
+            break;
+        case BeaconXInfo.VALID_DATA_FRAME_TYPE_IBEACON:
+            BeaconXiBeacon ibeacon = BeaconXParser.getiBeacon(info.rssi, validData.data);
+            break;
+        case BeaconXInfo.VALID_DATA_FRAME_TYPE_TH:
+            BeaconXTH th = BeaconXParser.getTH(validData.data);
+            break;
+        case BeaconXInfo.VALID_DATA_FRAME_TYPE_AXIS:
+            BeaconXAxis axis = BeaconXParser.getAxis(validData.data);
+            break;
     }
 }
 ```
 
-**Connect to devices**
+---
 
-Connect to the device in order to do more operations(change parameter, OTA),the only parameter required is the MAC address.
+## 2. Connecting to a Device
 
+### Connect
+
+Only the device **MAC address** is required (from scan result `info.mac`):
+
+```java
+// Stop scanning before connecting
+scanner.stopScanDevice();
+MokoSupport.getInstance().connDevice(mac);
 ```
-MokoSupport.getInstance().connDevice(beaconXInfo.mac);
-```
 
-You can get the connection status through `ConnectStatusEvent`,remember to register `EventBus`
+### Connection status (EventBus)
 
-```
+```java
 @Subscribe(threadMode = ThreadMode.MAIN)
 public void onConnectStatusEvent(ConnectStatusEvent event) {
     String action = event.getAction();
     if (MokoConstants.ACTION_DISCONNECTED.equals(action)) {
-    // connect failed
-    ...
+        // GATT disconnected (failed connect, link lost, manual disconnect, etc.)
     }
     if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
-    // connect success
-    ...
+        // Service discovery done; read lock state or unlock
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getLockState());
     }
 }
 ```
 
-You will find that when connect to device password may need, so ,we need to read the lock state of the device first.
+### Password verification
 
-```
+After `ACTION_DISCOVER_SUCCESS`, read lock state. Response on `OrderCHAR.CHAR_LOCK_STATE`:
+
+| Value | Meaning |
+|-------|---------|
+| `00` | Device locked — prompt for password, reconnect, then unlock |
+| `02` | No password required — proceed to configuration UI |
+| Other | Unlock succeeded — proceed to configuration UI |
+
+Unlock flow (when locked):
+
+```java
+// Step 1: read random challenge
+MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getUnLock());
+
+// Step 2: in ACTION_ORDER_RESULT for CHAR_UNLOCK (READ), encrypt and send password
+MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setUnLock(password, challengeBytes));
+
+// Step 3: after WRITE success, verify lock state again
 MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getLockState());
-
 ```
 
-You can get the response result from device through `OrderTaskResponseEvent`,
+`setUnLock` uses AES encryption (16-byte padded password). See `OrderTaskAssembler.setUnLock` / `setLockState` for password change.
+
+### Manual disconnect
+
+```java
+MokoSupport.getInstance().disConnectBle();
+```
+
+---
+
+## 3. Reading and Writing Parameters
+
+### Task queue
+
+All reads/writes are wrapped as `OrderTask`, created by `OrderTaskAssembler`, and sent via `sendOrder` **in queue order**. Default timeout per task is 3 seconds.
+
+```java
+// Single task
+MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getSlotType());
+
+// Multiple tasks (executed in order)
+List<OrderTask> tasks = new ArrayList<>();
+tasks.add(OrderTaskAssembler.setSlot(SlotEnum.SLOT_1));
+tasks.add(OrderTaskAssembler.getSlotData());
+tasks.add(OrderTaskAssembler.getAdvInterval());
+MokoSupport.getInstance().sendOrder(tasks.toArray(new OrderTask[]{}));
+```
+
+See `OrderTaskAssembler.java` for the full list of `getXxx` / `setXxx` methods (lock, slots, device info, triggers, sensors, alarms, etc.).
+
+### Protocol frame format
+
+Parameter channel (`CHAR_PARAMS`) frame layout:
 
 ```
+EA [cmd] [len_hi] [len_lo] [data...]
+```
+
+| Field | Description |
+|-------|-------------|
+| `0xEA` | Frame header |
+| `cmd` | 1 byte, maps to `ParamsKeyEnum` (read keys `0x2x`, write keys `0x3x` / `0x5x`) |
+| `len` | 2-byte payload length |
+| `data` | Payload; write ACK uses response from device |
+
+GATT characteristics (non-protocol) are accessed via dedicated tasks — e.g. `getBattery()`, `getSlotType()`, `getRssi()` map to `OrderCHAR` directly. Branch on `OrderCHAR` in `ACTION_ORDER_RESULT`.
+
+### Command results (EventBus)
+
+```java
 @Subscribe(threadMode = ThreadMode.MAIN)
 public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
-    final String action = event.getAction();
+    String action = event.getAction();
+    OrderTaskResponse response = event.getResponse();
+
     if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-    // the task timout
+        // Timeout; check response.orderCHAR for which task
     }
     if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
-    // finish all task
+        // All queued tasks finished
     }
     if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
-    // get the task result
-        OrderTaskResponse response = event.getResponse();
         OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-        int responseType = response.responseType;
         byte[] value = response.responseValue;
-        ...
+        // Parse value ...
     }
     if (MokoConstants.ACTION_CURRENT_DATA.equals(action)) {
-    // notify data
+        // Device-initiated Notify (T&H, storage, 3-Axis, light sensor, disconnect, lock)
     }
 }
 ```
 
-> `ACTION_ORDER_RESULT`
->
-> After the task is sent to the device, the data returned by the device can be obtained by using the `OrderTaskResponse`, and you can determine which task is being returned as a resultis according to the `response.orderCHAR`. The `response.responseValue` is the returned data.
+### Example 1: Read slot types
 
-> `ACTION_ORDER_TIMEOUT`
->
-> Every task has a default timeout of 3 seconds to prevent the device from failing to return data due to a fault and the fail will cause other tasks in the queue can not execute normally. You can determine which task is being returned as a resultis according to the `response.orderCHAR` function and then the next task continues.
+```java
+MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getSlotType());
 
-> `ACTION_ORDER_FINISH`
->
-> When the task in the queue is empty, `onOrderFinish` will be called back.
-
-> `ACTION_CURRENT_DATA`
->
-> The data from device notify.
-
-**Communication with the device**
-
-All the read data and write data is encapsulated into `OrderTask` in `OrderTaskAssembler`, and sent to the device in a **QUEUE** way.
-SDK gets task status from task callback `OrderTaskResponse` after sending tasks successfully.
-
-For example, if you want to get the type of each Slot, please refer to the code example below.
-
+// In callback for CHAR_SLOT_TYPE: value[0..5] = SLOT1~SLOT6 frame type
 ```
-// read Slot type
-MokoSupport.getInstance().sendOrder(derTaskAssembler.getSlotType());
-...
-// get result
-@Subscribe(threadMode = ThreadMode.MAIN)
-public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
-    final String action = event.getAction();
-    if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
-        OrderTaskResponse response = event.getResponse();
-        OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
-        int responseType = response.responseType;
-        byte[] value = response.responseValue;
-        switch (orderCHAR) {
-	        case CHAR_SLOT_TYPE:
-	            if (value.length >= 6) {
-	                // value[0]:SLOT1 type;
-	                // value[1]:SLOT2 type;
-	                // value[2]:SLOT3 type;
-	                // value[3]:SLOT4 type;
-	                // value[4]:SLOT5 type;
-	                // value[5]:SLOT6 type;
-	            }
-	            break;
-    	 }
-    }
-}
-// read data of Slot1
-ArrayList<OrderTask> orderTasks = new ArrayList<>();
-// change slot
-orderTasks.add(OrderTaskAssembler.setSlot(SlotEnum.SLOT_1));
-orderTasks.add(OrderTaskAssembler.getSlotData());
-orderTasks.add(OrderTaskAssembler.getTrigger());
-orderTasks.add(OrderTaskAssembler.getAdvTxPower());
-orderTasks.add(OrderTaskAssembler.getRadioTxPower());
-orderTasks.add(OrderTaskAssembler.getAdvInterval());
-MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
 
+### Example 2: Read/write slot 1 configuration
+
+```java
+List<OrderTask> tasks = new ArrayList<>();
+tasks.add(OrderTaskAssembler.setSlot(SlotEnum.SLOT_1));
+tasks.add(OrderTaskAssembler.getSlotData());
+tasks.add(OrderTaskAssembler.getTrigger());
+tasks.add(OrderTaskAssembler.getRssi());           // adv TX power
+tasks.add(OrderTaskAssembler.getRadioTxPower());
+tasks.add(OrderTaskAssembler.getAdvInterval());
+MokoSupport.getInstance().sendOrder(tasks.toArray(new OrderTask[]{}));
 ```
-How to parse the returned results, please refer to the code of the sample project and documentation.
 
-The current data of T&H, 3-Axes,storage and light sensor are sent to APP by notification. you need to turn on and off the notification function of characteristic
+### Example 3: Batch read device info
 
+```java
+List<OrderTask> tasks = new ArrayList<>();
+tasks.add(OrderTaskAssembler.getManufacturer());     // GATT 0x2A29
+tasks.add(OrderTaskAssembler.getDeviceModel());      // GATT 0x2A24
+tasks.add(OrderTaskAssembler.getProductDate());      // GATT 0x2A25
+tasks.add(OrderTaskAssembler.getHardwareVersion());  // GATT 0x2A27
+tasks.add(OrderTaskAssembler.getFirmwareVersion());  // GATT 0x2A26
+tasks.add(OrderTaskAssembler.getSoftwareVersion());  // GATT 0x2A28
+tasks.add(OrderTaskAssembler.getBattery());
+tasks.add(OrderTaskAssembler.getLockState());
+MokoSupport.getInstance().sendOrder(tasks.toArray(new OrderTask[]{}));
 ```
+
+Newer firmware may omit standard GATT characteristics; use protocol keys such as `getNewManufacturer()`, `getNewDeviceModel()`, etc. The demo detects this via presence of `CHAR_MODEL_NUMBER` after connect (`MokoSupport.isNewVersion`).
+
+### Example 4: Sync device time
+
+```java
+MokoSupport.getInstance().sendOrder(
+        OrderTaskAssembler.setDeviceTime(year, month, day, hour, minute, second));
+```
+
+### Example 5: Factory reset / power off
+
+```java
+MokoSupport.getInstance().sendOrder(OrderTaskAssembler.resetDevice());
+MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setClose());
+```
+
+---
+
+## 4. Real-Time Sensor Notify
+
+T&H, 3-Axis, storage, and light-sensor data are pushed via Notify. Enable/disable in `MokoSupport`:
+
+```java
 MokoSupport.getInstance().enableTHNotify();
 MokoSupport.getInstance().disableTHNotify();
-MokoSupport.getInstance().enableStoreNotify();
-MokoSupport.getInstance().disableStoreNotify();
+
 MokoSupport.getInstance().enableThreeAxisNotify();
 MokoSupport.getInstance().disableThreeAxisNotify();
+
+MokoSupport.getInstance().enableStoreNotify();
+MokoSupport.getInstance().disableStoreNotify();
+
 MokoSupport.getInstance().enableLightSensorNotify();
 MokoSupport.getInstance().disableLightSensorNotify();
+
+MokoSupport.getInstance().enableLightSensorCurrentNotify();
+MokoSupport.getInstance().disableLightSensorCurrentNotify();
 ```
 
-**OTA**
+Receive data in `ACTION_CURRENT_DATA` and branch on `OrderCHAR`:
 
-We used the Nordic DFU for the OTA,dependencies have been added to build.gradle.
+| Notify characteristic | Data |
+|----------------------|------|
+| `CHAR_TH_NOTIFY` | Real-time temperature & humidity |
+| `CHAR_THREE_AXIS_NOTIFY` | Real-time 3-Axis samples |
+| `CHAR_STORE_NOTIFY` | Stored T&H / sensor records |
+| `CHAR_LIGHT_SENSOR_NOTIFY` | Stored light-sensor records |
+| `CHAR_LIGHT_SENSOR_CURRENT` | Current light level |
 
-```
-dependencies {
-    api 'no.nordicsemi.android:dfu:0.6.2'
+Demo pages: `THDataActivity`, `AxisDataActivity`, `ExportDataActivity`, `LightSensorDataActivity`.
+
+---
+
+## 5. Disconnect Notifications
+
+Handle two kinds of disconnect events separately.
+
+### 5.1 BLE link disconnect (`ConnectStatusEvent`)
+
+Triggered when the device powers off, goes out of range, connection fails, or you call `disConnectBle()`:
+
+```java
+if (MokoConstants.ACTION_DISCONNECTED.equals(action)) {
+    // Close config UI, return to scan page, restart startScanDevice
 }
 ```
 
-The OTA requires three important parameters:the path of firmware file,the adv name of device and the mac address of device.You can use it like this:
+**During DFU**, suppress disconnect dialogs (demo uses `isUpgrading` / `isUpgradeDisconnected` flags in `DeviceInfoActivity`).
 
+### 5.2 Device-initiated disconnect Notify (`CHAR_DISCONNECT`)
+
+The device may push a byte before disconnecting; receive it in `ACTION_CURRENT_DATA`:
+
+```java
+if (MokoConstants.ACTION_CURRENT_DATA.equals(action)) {
+    OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
+    if (orderCHAR == OrderCHAR.CHAR_DISCONNECT) {
+        int type = value[0] & 0xFF;
+        // 1 = password changed successfully (reconnect required)
+        // 2 = factory reset successful (reconnect required)
+    }
+}
 ```
+
+`ACTION_DISCONNECTED` usually follows. See `DeviceInfoActivity` for dialog handling.
+
+### 5.3 Lock timeout Notify (`CHAR_LOCKED_NOTIFY`)
+
+When the device re-locks due to inactivity, frame `EB 63 00 01 00` is pushed:
+
+```java
+if (orderCHAR == OrderCHAR.CHAR_LOCKED_NOTIFY) {
+    String hex = MokoUtils.bytesToHexString(value);
+    if ("eb63000100".equals(hex.toLowerCase())) {
+        // Device locked — exit config page and reconnect with password
+    }
+}
+```
+
+---
+
+## 6. DFU Firmware Update
+
+The demo uses the **Nordic Android DFU Library** (transitive dependency via `MKBXPUILib`). UI entry: **Settings → DFU**, or connect to an OTA advertisement (`MK_OTA`).
+
+Register the service in `AndroidManifest.xml`:
+
+```xml
+<service android:name="com.moko.bxp.nordic.service.DfuServiceNordic" />
+```
+`DfuService` extends `DfuBaseService` (see `app/.../service/DfuService.java`).
+
+
+### Flow
+
+1. Connected (normal mode) or scan OTA device (`info.isOTA == true`) and connect
+2. User selects a **`.zip`** firmware package
+3. Disconnect normal GATT session if needed, then start DFU with MAC
+4. Show progress via `DfuProgressListener`
+5. Return to scan page and reconnect
+
+### Code example
+
+```java
+DfuServiceListenerHelper.registerProgressListener(context, mDfuProgressListener);
+
 DfuServiceInitiator starter = new DfuServiceInitiator(deviceMac)
-    .setDeviceName(deviceName)
-    .setKeepBond(false)
-    .setDisableNotification(true);
+        .setKeepBond(false)
+        .setDisableNotification(true);
 starter.setZip(null, firmwareFilePath);
-starter.start(this, DfuService.class);
-```
-you can get progress of OTA through `DfuProgressListener`,the examples can be referred to demo project.
+starter.start(context, DfuServiceNordic.class);
 
-At the end of this part, you can refer all code above to develop. If there is something new, we will update this document.
+private final DfuProgressListener mDfuProgressListener = new DfuProgressListenerAdapter() {
+    @Override
+    public void onProgressChanged(String address, int percent, float speed,
+            float avgSpeed, int currentPart, int partsTotal) {
+        // Progress: percent%
+    }
 
-## Notes
+    @Override
+    public void onDfuCompleted(String deviceAddress) {
+        // Success — prompt user to scan and reconnect
+    }
 
-1.In Android-6.0 or later, Bluetooth scanning requires dynamic application for location permissions, as follows:
-
-```
-if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-!= PackageManager.PERMISSION_GRANTED) {
-ActivityCompat.requestPermissions(this,
-                                  new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_FINE_LOCATION);
-} 
-```
-
-2.`EventBus` is used in the SDK and can be modified in `MokoSupport` if you want to use other communication methods.
-
-```
-@Override
-public void orderFinish() {
-    OrderTaskResponseEvent event = new OrderTaskResponseEvent();
-    event.setAction(MokoConstants.ACTION_ORDER_FINISH);
-    EventBus.getDefault().post(event);
-}
+    @Override
+    public void onError(String deviceAddress, int error, int errorType, String message) {
+        // Upgrade failed
+    }
+};
 
 @Override
-public void orderTimeout(OrderTaskResponse response) {
-    OrderTaskResponseEvent event = new OrderTaskResponseEvent();
-    event.setAction(MokoConstants.ACTION_ORDER_TIMEOUT);
-    event.setResponse(response);
-    EventBus.getDefault().post(event);
-}
-
-@Override
-public void orderResult(OrderTaskResponse response) {
-    OrderTaskResponseEvent event = new OrderTaskResponseEvent();
-    event.setAction(MokoConstants.ACTION_ORDER_RESULT);
-    event.setResponse(response);
-    EventBus.getDefault().post(event);
-}
-
-@Override
-public boolean orderNotify(BluetoothGattCharacteristic characteristic, byte[] value) {
-    ...
-    OrderTaskResponseEvent event = new OrderTaskResponseEvent();
-    event.setAction(MokoConstants.ACTION_CURRENT_DATA);
-    event.setResponse(response);
-    EventBus.getDefault().post(event);
-    ...
+protected void onDestroy() {
+    DfuServiceListenerHelper.unregisterProgressListener(context, mDfuProgressListener);
+    super.onDestroy();
 }
 ```
-3.In order to record log files, `XLog` is used in the SDK, and the permission `WRITE_EXTERNAL_STORAGE` is applied. If you do not want to use it, you can modify it in `BaseApplication`, and only keep `XLog.init(config)`.
 
+Notes:
 
-## Change log
+- Firmware must be a valid non-empty **ZIP** file
+- Call `disConnectBle()` before upgrading when already connected in normal mode
+- Abort DFU if connection retries exceed 3 times (see `DfuActivity` / `DeviceInfoActivity`)
 
-* 2021.11.30 mokosupport version:3.0
-	*  Change the SDK package name
-	*  support light sensor data
-* 2021.03.11 mokosupport version:2.0
-	* Change the SDK structure
-    * Support Android API 29
-    * Support androidx
-	* Optimize document content
-* 2020.01.18 mokosupport version:1.0
-	* First commit
+---
+
+## 7. Typical Flow
+
+```
+Scan page (NordicMainActivity)
+  ├─ MokoBleScanner.startScanDevice
+  ├─ BeaconXInfoParseableImpl → device list (UID/URL/TLM/iBeacon/T&H/Axis)
+  ├─ connDevice(mac)
+  ├─ getLockState → [optional] getUnLock / setUnLock
+  └─ DeviceInfoActivity
+       ├─ Slot tab — 6 slots, frame types, triggers (T&H / tap / move / light)
+       ├─ Device tab — model, version, battery, MAC
+       ├─ Setting tab — connectable, password, HW reset, DFU, power off, factory reset
+       ├─ SensorConfigActivity — T&H period, 3-Axis params, storage conditions
+       ├─ QuickSwitchActivity — slot quick switch
+       ├─ THDataActivity / AxisDataActivity / ExportDataActivity / LightSensorDataActivity
+       ├─ RemoteReminderActivity — remote LED / buzzer alarm
+       ├─ SlotDataActivity — per-slot detail editing
+       ├─ ACTION_CURRENT_DATA → sensor Notify / disconnect / lock timeout
+       ├─ ACTION_DISCONNECTED → link lost
+       └─ Settings → DFU → DfuActivity → back to scan and reconnect
+```
+
+---
+
+## 8. Core Classes Quick Reference
+
+| Stage | Class | Role |
+|-------|-------|------|
+| Scan | `MokoBleScanner` | Scan control |
+| Scan | `MokoScanDeviceCallback` | Scan callbacks |
+| Scan | `BeaconXInfoParseableImpl` | Parse advertisements |
+| Scan | `BeaconXParser` | Frame payload parser |
+| Connect | `MokoSupport` | Connect, send commands, Notify control, Bluetooth on/off |
+| Comm | `OrderTaskAssembler` | Build read/write tasks |
+| Comm | `ParamsKeyEnum` | Protocol parameter keys |
+| Comm | `OrderCHAR` | GATT characteristic mapping |
+| Event | `ConnectStatusEvent` | Connected / disconnected |
+| Event | `OrderTaskResponseEvent` | Command results, Notify data |
+
+---
+
+## 9. Notes
+
+1. **Permissions**: Android 6.0+ requires runtime location for scanning; Android 12+ needs `BLUETOOTH_SCAN` / `BLUETOOTH_CONNECT`.
+2. **EventBus**: The SDK posts events internally. To use LiveData/RxJava instead, change `orderFinish` / `orderTimeout` / `orderResult` / `orderNotify` in `MokoSupport`.
+3. **Logging**: The SDK uses `XLog` with file output and storage permission. To disable file logging, keep only `XLog.init(config)` in `BaseApplication`.
+4. **Firmware variants**: Older devices expose standard GATT Device Information characteristics; newer firmware uses `ParamsKeyEnum` `GET_NEW_*` keys. Check `CHAR_MODEL_NUMBER` after connect to choose the read path (see demo `DeviceInfoActivity`).
+5. **Demo references**: Scan/connect — `NordicMainActivity`; device info & tabs — `DeviceInfoActivity`, `DeviceFragment`, `SlotFragment`, `SettingFragment`; slot editing — `SlotDataActivity`; sensors — `SensorConfigActivity`, `THDataActivity`, `AxisDataActivity`, `LightSensorDataActivity`, `ExportDataActivity`; DFU — `DfuActivity`, `DeviceInfoActivity`.
+
+---
+
+## Changelog
+
+| Date | Version | Notes |
+|------|---------|-------|
+| 2020.01.18 | mokosupport 1.0 | Initial release |
+| 2021.03.11 | mokosupport 2.0 | Restructure SDK; support Android API 29; androidx; optimize docs |
+| 2021.11.30 | mokosupport 3.0 | Change SDK package name; support light sensor data |
+| — | mokosupport 4.0 | compileSdk 35, minSdk 28 |
