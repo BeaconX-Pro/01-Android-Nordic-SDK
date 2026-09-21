@@ -4,12 +4,15 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.4'
+        classpath 'com.android.tools.build:gradle:8.6.0'
     }
 }
 
 allprojects {
     repositories {
+        // 添加阿里云 Google 镜像
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
         jcenter()
         google()
         maven { url "https://jitpack.io" }

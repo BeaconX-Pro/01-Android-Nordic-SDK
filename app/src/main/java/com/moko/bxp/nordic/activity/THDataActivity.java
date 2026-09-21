@@ -364,12 +364,8 @@ public class THDataActivity extends BaseActivity implements NumberPickerView.OnV
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            back();
-            return false;
-        }
-        return super.onKeyDown(keyCode, event);
+    public void onBackPressed() {
+        back();
     }
 
     public void setSelectedTemp(int selectedTemp) {
