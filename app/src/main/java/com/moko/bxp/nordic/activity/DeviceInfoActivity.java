@@ -55,6 +55,7 @@ import java.util.Arrays;
 
 import androidx.annotation.IdRes;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import no.nordicsemi.android.dfu.DfuProgressListener;
 import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
 import no.nordicsemi.android.dfu.DfuServiceInitiator;
@@ -152,7 +153,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 if (MokoSupport.getInstance().isBluetoothOpen()) {
                     if (isUpgrading) {
                         mBind.tvTitle.postDelayed(() -> {
-                            dismissDFUProgressDialog();
+                            if (!isUpgradeCompleted)
+                                dismissDFUProgressDialog();
                         }, 2000);
                     } else {
                         AlertMessageDialog dialog = new AlertMessageDialog();
@@ -334,10 +336,11 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                         deviceFragment.setFirmwareVersion(versionBytes);
                                         validParams.firmwareVersion = "1";
                                         if (version.contains("BXP-DH01") || version.contains("BXP-DH_W7") || version.contains("BXP-D04")) {
-                                            isUpgradeDisconnected = true;
                                             slotFragment.setSupportTamperDetect(true);
                                             settingFragment.setRemoteReminderShown();
                                         }
+                                        if (version.contains("BXP-D04"))
+                                            isUpgradeDisconnected = true;
                                         if (version.contains("BXP-C"))
                                             // no single trigger
                                             slotFragment.setNoSingleTrigger(true);
